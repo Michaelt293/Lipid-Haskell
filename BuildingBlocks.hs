@@ -7,11 +7,26 @@ Maintainer  : Michael Thomas <Michaelt293@gmail.com>
 Stability   : experimental
 -}
 
-module BuildingBlocks where
+module BuildingBlocks
+    (
+      NumberOfCarbons
+    , NumberOfDoubleBonds
+    , DeltaPosition
+    , OmegaPosition
+    , MoietyInfo(..)
+    , Moiety(..)
+    , Geometry(..)
+    , CarbonChain(..)
+    , Linkage(..)
+    , Radyl
+    , Shorthand(..)
+    , doubleBondNumber
+    , doubleBondPositions
+    , doubleBondGeometries
+--    , omegaToDelta
+    ) where
 
-import Data.List
-import ElementIsotopes
-
+import qualified Data.List as List
 
 type NumberOfCarbons = Integer
 type NumberOfDoubleBonds = Integer
@@ -28,59 +43,86 @@ data Moiety = OH
             | Me
           deriving (Show, Eq, Ord)
 
-data Geometry = Z | E deriving (Show, Eq, Ord)
+data Geometry = Cis | Trans deriving (Show, Eq, Ord)
 
 data CarbonChain = 
-    SimpleCarbonChain 
-    { carbonNumber   :: NumberOfCarbons 
-    , doubleBondData :: [(MoietyInfo OmegaPosition, MoietyInfo Geometry)] 
-    } 
+    SimpleCarbonChain
+    { carbonNumber   :: NumberOfCarbons
+    , doubleBondData :: [(MoietyInfo OmegaPosition, MoietyInfo Geometry)]
+    }
     |
     ComplexCarbonChain 
-    { carbonNumber   :: NumberOfCarbons 
+    { carbonNumber   :: NumberOfCarbons
     , doubleBondData :: [(MoietyInfo OmegaPosition, MoietyInfo Geometry)]
     , moietyData     :: [(Moiety, MoietyInfo DeltaPosition)]
-    } deriving (Eq, Ord) 
+    } deriving (Show, Eq, Ord)
 
 data Linkage = Acyl
              | Alkyl
              | Alkenyl
-           deriving (Eq, Ord)
+           deriving (Show, Eq, Ord)
 
-data Radyl = Radyl { linkage     :: Linkage 
-                   , carbonChain :: CarbonChain 
-                   } deriving (Eq, Ord)
+data Radyl = Radyl { linkage     :: Linkage
+                   , carbonChain :: CarbonChain
+                   } deriving (Show, Eq, Ord)
+
+
+class Shorthand a where
+    showShorthand :: a -> String
 
 
 instance Functor MoietyInfo where
     fmap f Unknown = Unknown
-    fmap f (Known x) = Known (f x) 
+    fmap f (Known x) = Known (f x)
 
-instance Show CarbonChain where
-    show (SimpleCarbonChain a [(b, c)]) = show a ++ ":" ++ show (length [(b, c)]) ++ info
-        where info = intercalate "," [printMoietyInfo b ++ printMoietyInfo c]
- 
-instance Show Radyl where
-    show (Radyl a b) = printLinkage a ++ show b 
+instance Shorthand Integer where
+    showShorthand = show
 
+instance (Shorthand a) => Shorthand (MoietyInfo a) where
+    showShorthand Unknown = ""
+    showShorthand (Known x) = showShorthand x
 
-showLinkage :: Linkage -> [Char]
-showLinkage Acyl = ""
-showLinkage Alkyl = "O-"
-showLinkage Alkenyl = "P-"
+instance Shorthand Moiety where
+    showShorthand = show
 
-showMoietyInfo :: Show a => MoietyInfo a -> [Char]
-showMoietyInfo Unknown = ""
-showMoietyInfo (Known a) = show a
+instance Shorthand Geometry where
+    showShorthand Cis = "Z"
+    showShorthand Trans = "E"
+
+instance Shorthand Linkage where
+    showShorthand Acyl = ""
+    showShorthand Alkyl = "O-"
+    showShorthand Alkenyl = "P-"
+
+instance Shorthand CarbonChain where
+    showShorthand (SimpleCarbonChain x y) = 
+        showShorthand x ++ ":" ++ show (length y) ++ wrap info
+        where info = List.intercalate "," [showShorthand db ++ showShorthand g | (db, g) <- y]
+              wrap d = if length d == 0 
+                           then ""
+                           else "(" ++ d ++ ")" 
+    showShorthand (ComplexCarbonChain x y z) =  
+        showShorthand x ++ ":" ++ show (length y) ++ wrap dbInfo ++ wrap mInfo
+        where dbInfo = List.intercalate "," [showShorthand db ++ showShorthand g | (db, g) <- y]
+              mInfo = List.intercalate "," [showShorthand m ++ showShorthand p | (m, p) <- z]
+              wrap d = if length d == 0 
+                           then ""
+                           else "(" ++ d ++ ")" 
+
+instance Shorthand Radyl where
+    showShorthand (Radyl x y) = showShorthand x ++ showShorthand y
+
 
 doubleBondNumber :: CarbonChain -> NumberOfDoubleBonds
-doubleBondNumber chain = fromIntegral $ length $ doubleBondData chain
+doubleBondNumber chain = fromIntegral . length . doubleBondData $ chain
 
 doubleBondPositions :: CarbonChain -> [MoietyInfo OmegaPosition]
 doubleBondPositions chain = map fst $ doubleBondData chain
 
 doubleBondGeometries :: CarbonChain -> [MoietyInfo Geometry]
 doubleBondGeometries chain = map snd $ doubleBondData chain
+
+--omegaToDelta chain = fmap (\x -> carbonNumber chain - x) doubleBondPositions chain
 
 
 
