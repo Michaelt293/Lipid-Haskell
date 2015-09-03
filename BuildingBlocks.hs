@@ -23,7 +23,7 @@ module BuildingBlocks
     , doubleBondNumber
     , doubleBondPositions
     , doubleBondGeometries
---    , omegaToDelta
+    , omegaToDelta
     ) where
 
 import qualified Data.List as List
@@ -122,7 +122,8 @@ doubleBondPositions chain = map fst $ doubleBondData chain
 doubleBondGeometries :: CarbonChain -> [MoietyInfo Geometry]
 doubleBondGeometries chain = map snd $ doubleBondData chain
 
---omegaToDelta chain = fmap (\x -> carbonNumber chain - x) doubleBondPositions chain
+omegaToDelta :: CarbonChain -> [MoietyInfo DeltaPosition]
+omegaToDelta chain = fmap (\y -> fmap (\x -> carbonNumber chain - x) y) $ doubleBondPositions chain
 
 
 
