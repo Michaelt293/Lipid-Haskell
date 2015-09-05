@@ -7,8 +7,6 @@ Maintainer  : Michael Thomas <Michaelt293@gmail.com>
 Stability   : experimental
 -}
 
---{-# LANGUAGE ExistentialQuantification #-}
-
 module BuildingBlocks
     (
       NumberOfCarbons
@@ -19,10 +17,13 @@ module BuildingBlocks
     , Linkage(..)
     , Radyl
     , Shorthand(..)
+    , wrap
+    , wrapParen
     , doubleBondNumber
     , doubleBondPositions
     , doubleBondGeometries
-    , omegaToDelta
+    , toDelta
+    , toOmega
     ) where
 
 import qualified Data.List as List
@@ -43,7 +44,7 @@ data Moiety = OH
             | Me
             deriving (Show, Eq, Ord)
 
-data DoubleBond = DoubleBond { dpPosition            :: (Maybe Position) 
+data DoubleBond = DoubleBond { dbPosition            :: (Maybe Position) 
                              , geometry              :: (Maybe Geometry) }
                              deriving (Show, Eq, Ord)
 
@@ -72,6 +73,9 @@ data Radyl = Radyl { linkage     :: Linkage
 class Shorthand a where
     showShorthand :: a -> String
 
+class Nomeclature a where
+    showNnomenclature :: a -> String
+
 
 instance Shorthand Integer where
     showShorthand = show
@@ -81,7 +85,7 @@ instance Shorthand Position where
     showShorthand (Delta x) = show x
 
 instance Shorthand Geometry where
-    showShorthand Cis = "Z"
+    showShorthand Cis   = "Z"
     showShorthand Trans = "E"
 
 instance Shorthand DoubleBond where
@@ -91,56 +95,70 @@ instance Shorthand DoubleBond where
     showShorthand (DoubleBond (Just (Delta x)) (Just y)) = show x ++ showShorthand y
 
 instance Shorthand MoietyData where
-    showShorthand (MoietyData x Nothing) = showShorthand x
-    showShorthand (MoietyData x (Just y)) = showShorthand x ++ showShorthand y
- 
+    showShorthand (MoietyData x Nothing)  = showShorthand x
+    showShorthand (MoietyData x (Just y)) = showShorthand y ++ showShorthand x
 
 instance Shorthand Moiety where
     showShorthand = show
 
 instance Shorthand Linkage where
-    showShorthand Acyl = ""
-    showShorthand Alkyl = "O-"
+    showShorthand Acyl    = ""
+    showShorthand Alkyl   = "O-"
     showShorthand Alkenyl = "P-"
 
 instance Shorthand CarbonChain where
-    showShorthand (SimpleCarbonChain x y) =
+    showShorthand (SimpleCarbonChain x y)    =
         showShorthand x ++ ":" ++ show (length y) ++ wrapParen dbInfo 
-            where dbInfo = List.intercalate "," $ map showShorthand y
+            where dbInfo = List.intercalate "," $ map showShorthand $ List.sort $ toDelta x y
     showShorthand (ComplexCarbonChain x y z) =
         showShorthand x ++ ":" ++ show (length y) ++ wrapParen dbInfo ++ wrapParen mInfo
-            where dbInfo = List.intercalate "," $ map showShorthand y
-                  mInfo = List.intercalate "," $ map showShorthand z
+            where dbInfo = List.intercalate "," $ map showShorthand $ List.sort $ toDelta x y
+                  mInfo = List.intercalate "," $ map showShorthand $ List.sort z
+
+instance Nomeclature CarbonChain where
+    showNnomenclature (SimpleCarbonChain x y)    =
+        showShorthand x ++ ":" ++ show (length y) ++ wrapParen dbInfo 
+            where dbInfo = List.intercalate "," $ map showShorthand $ List.sort $ toOmega x y
+    showNnomenclature (ComplexCarbonChain x y z) =
+        showShorthand x ++ ":" ++ show (length y) ++ wrapParen dbInfo ++ wrapParen mInfo
+            where dbInfo = List.intercalate "," $ map showShorthand $ List.sort $ toOmega x y
+                  mInfo = List.intercalate "," $ map showShorthand $ List.sort z 
 
 instance Shorthand Radyl where
     showShorthand (Radyl x y) = showShorthand x ++ showShorthand y
 
+instance Nomeclature Radyl where
+    showNnomenclature (Radyl x y) = showShorthand x ++ showNnomenclature y
+
+
+wrap :: [Char] -> [Char] -> [Char] -> [Char]
+wrap open close str = if length str == 0 
+                    then ""
+                    else open ++ str ++ close
 
 wrapParen :: [Char] -> [Char]
-wrapParen str = if length str == 0 
-                    then ""
-                    else "(" ++ str ++ ")" 
+wrapParen str = wrap "(" ")" str
+
+toDelta :: NumberOfCarbons -> [DoubleBond] -> [DoubleBond]
+toDelta num positions = map (convert num) positions
+    where convert num (DoubleBond Nothing y) = DoubleBond Nothing y
+          convert num (DoubleBond (Just (Delta x)) y) = DoubleBond (Just (Delta x)) y
+          convert num (DoubleBond (Just (Omega x)) y) = DoubleBond (Just (Delta (num - x))) y
+
+toOmega :: NumberOfCarbons -> [DoubleBond] -> [DoubleBond]
+toOmega num positions = map (convert num) positions
+    where convert num (DoubleBond Nothing y) = DoubleBond Nothing y
+          convert num (DoubleBond (Just (Delta x)) y) = DoubleBond (Just (Omega (num - x))) y
+          convert num (DoubleBond (Just (Omega x)) y) = DoubleBond (Just (Omega x)) y
 
 doubleBondNumber :: CarbonChain -> NumberOfDoubleBonds
 doubleBondNumber chain = fromIntegral . length . doubleBonds $ chain
 
 doubleBondPositions :: CarbonChain -> [Maybe Position]
-doubleBondPositions chain = map dpPosition $ doubleBonds chain
+doubleBondPositions chain = map dbPosition $ doubleBonds chain
 
 doubleBondGeometries :: CarbonChain -> [Maybe Geometry]
 doubleBondGeometries chain = map geometry $ doubleBonds chain
-
---class DBNotation a where
- --   changeNotation :: CarbonChain -> MoietyInfo a
-
-
---instance (DBNotation a) => DBNotation (MoietyInfo a) where
-  --  omegaToDelta :: CarbonChain -> [MoietyInfo DeltaPosition]
-   -- omegaToDelta chain = fmap (\y -> fmap (\x -> carbonNumber chain - x) y) $ --doubleBondPositions chain
-
-
-
-
 
 
 
