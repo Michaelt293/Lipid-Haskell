@@ -17,6 +17,7 @@ module BuildingBlocks
     , Linkage(..)
     , Radyl
     , Shorthand(..)
+    , Nomeclature(..)
     , wrap
     , wrapParen
     , doubleBondNumber
@@ -31,7 +32,6 @@ import qualified Data.List as List
 
 type NumberOfCarbons = Integer
 type NumberOfDoubleBonds = Integer
-
 
 data Position = Omega Integer
               | Delta Integer
@@ -57,8 +57,12 @@ data CarbonChain = SimpleCarbonChain { carbonNumber  :: NumberOfCarbons
                  |
                    ComplexCarbonChain { carbonNumber :: NumberOfCarbons
                                       , doubleBonds  :: [DoubleBond]
-                                      , moietyData   :: [MoietyData] } 
+                                      , moietyData   :: [MoietyData] }
                                       deriving (Show, Eq, Ord)
+
+data CombinedChains = CombinedChains { combinedCNumber     :: NumberOfCarbons
+                                     , combinedDoubleBonds :: [DoubleBond] }
+                                     -- This should be a list of lists
 
 data Linkage = Acyl
              | Alkyl
@@ -66,8 +70,12 @@ data Linkage = Acyl
              deriving (Show, Eq, Ord)
 
 data Radyl = Radyl { linkage     :: Linkage
-                   , carbonChain :: CarbonChain } 
+                   , carbonChain :: CarbonChain }
                    deriving (Show, Eq, Ord)
+
+data SnPosition = Sn1 | Sn2 | Sn3 deriving (Show, Eq, Ord)
+
+data RadylData = RadylData Radyl (Maybe SnPosition)
 
 
 class Shorthand a where
@@ -108,7 +116,7 @@ instance Shorthand Linkage where
 
 instance Shorthand CarbonChain where
     showShorthand (SimpleCarbonChain x y)    =
-        showShorthand x ++ ":" ++ show (length y) ++ wrapParen dbInfo 
+        showShorthand x ++ ":" ++ show (length y) ++ wrapParen dbInfo
             where dbInfo = List.intercalate "," $ map showShorthand $ List.sort $ toDelta x y
     showShorthand (ComplexCarbonChain x y z) =
         showShorthand x ++ ":" ++ show (length y) ++ wrapParen dbInfo ++ wrapParen mInfo
@@ -117,18 +125,30 @@ instance Shorthand CarbonChain where
 
 instance Nomeclature CarbonChain where
     showNnomenclature (SimpleCarbonChain x y)    =
-        showShorthand x ++ ":" ++ show (length y) ++ wrapParen dbInfo 
+        showShorthand x ++ ":" ++ show (length y) ++ wrapParen dbInfo
             where dbInfo = List.intercalate "," $ map showShorthand $ List.sort $ toOmega x y
     showNnomenclature (ComplexCarbonChain x y z) =
         showShorthand x ++ ":" ++ show (length y) ++ wrapParen dbInfo ++ wrapParen mInfo
             where dbInfo = List.intercalate "," $ map showShorthand $ List.sort $ toOmega x y
-                  mInfo = List.intercalate "," $ map showShorthand $ List.sort z 
+                  mInfo = List.intercalate "," $ map showShorthand $ List.sort z
+
+instance Shorthand CombinedChains where
+    showShorthand (CombinedChains x y) =
+        showShorthand x ++ ":" ++ show (length y) ++ wrapParen dbInfo
+            where dbInfo = List.intercalate "," $ map showShorthand $ List.sort y 
+            -- This needs to be changed y is a list of lists
 
 instance Shorthand Radyl where
     showShorthand (Radyl x y) = showShorthand x ++ showShorthand y
 
 instance Nomeclature Radyl where
     showNnomenclature (Radyl x y) = showShorthand x ++ showNnomenclature y
+
+instance Shorthand RadylData where
+    showShorthand (RadylData x y) = showShorthand x
+
+instance Nomeclature RadylData where
+    showNnomenclature (RadylData x y) = showNnomenclature x
 
 
 wrap :: [Char] -> [Char] -> [Char] -> [Char]
