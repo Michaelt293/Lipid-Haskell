@@ -14,10 +14,13 @@ module BuildingBlocks
     , Moiety(..)
     , Geometry(..)
     , CarbonChain(..)
+    , CombinedChains
     , Linkage(..)
     , Radyl
+    , CombinedRadyls
+    , SnPosition
     , Shorthand(..)
-    , Nomeclature(..)
+    , Nomenclature(..)
     , wrap
     , wrapParen
     , doubleBondNumber
@@ -62,6 +65,8 @@ data CarbonChain = SimpleCarbonChain { carbonNumber  :: NumberOfCarbons
 
 data CombinedChains = CombinedChains { combinedCNumber     :: NumberOfCarbons
                                      , combinedDoubleBonds :: [DoubleBond] }
+                                     deriving (Show, Eq, Ord)
+
                                      -- This should be a list of lists
 
 data Linkage = Acyl
@@ -73,15 +78,18 @@ data Radyl = Radyl { linkage     :: Linkage
                    , carbonChain :: CarbonChain }
                    deriving (Show, Eq, Ord)
 
-data SnPosition = Sn1 | Sn2 | Sn3 deriving (Show, Eq, Ord)
+data CombinedRadyls = CombinedRadyls { linkages       :: [Linkage]
+                                     , combinedChains :: CombinedChains }
+                                     deriving (Show, Eq, Ord)
 
-data RadylData = RadylData Radyl (Maybe SnPosition)
+                                     
+data SnPosition = Sn1 | Sn2 | Sn3 deriving (Show, Eq, Ord)
 
 
 class Shorthand a where
     showShorthand :: a -> String
 
-class Nomeclature a where
+class Nomenclature a where
     showNnomenclature :: a -> String
 
 
@@ -123,7 +131,7 @@ instance Shorthand CarbonChain where
             where dbInfo = List.intercalate "," $ map showShorthand $ List.sort $ toDelta x y
                   mInfo = List.intercalate "," $ map showShorthand $ List.sort z
 
-instance Nomeclature CarbonChain where
+instance Nomenclature CarbonChain where
     showNnomenclature (SimpleCarbonChain x y)    =
         showShorthand x ++ ":" ++ show (length y) ++ wrapParen dbInfo
             where dbInfo = List.intercalate "," $ map showShorthand $ List.sort $ toOmega x y
@@ -141,14 +149,8 @@ instance Shorthand CombinedChains where
 instance Shorthand Radyl where
     showShorthand (Radyl x y) = showShorthand x ++ showShorthand y
 
-instance Nomeclature Radyl where
+instance Nomenclature Radyl where
     showNnomenclature (Radyl x y) = showShorthand x ++ showNnomenclature y
-
-instance Shorthand RadylData where
-    showShorthand (RadylData x y) = showShorthand x
-
-instance Nomeclature RadylData where
-    showNnomenclature (RadylData x y) = showNnomenclature x
 
 
 wrap :: [Char] -> [Char] -> [Char] -> [Char]
