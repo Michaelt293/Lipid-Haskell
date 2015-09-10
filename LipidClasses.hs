@@ -153,8 +153,8 @@ data CL   = ClassLevelCL       IntegerMass
           | UnknownSnCL        (Radyl, Radyl, Radyl, Radyl)
           | KnownSnCL          { clSn1 :: Radyl
                                , clSn2 :: Radyl
-                               , clSn3 :: Radyl
-                               , clSn4 :: Radyl }
+                               , clSn1' :: Radyl
+                               , clSn2' :: Radyl }
           | UnknownSnLCL        [Radyl]
           deriving (Show, Eq, Ord)
 
@@ -167,6 +167,44 @@ instance Nomenclature FA where
     showNnomenclature (ClassLevelFA x) = "FA (" ++ show x ++ ")"
     showNnomenclature (FA x) = "FA " ++ showNnomenclature x
 
+instance Shorthand MG where
+    showShorthand (ClassLevelMG x) = "MG (" ++ show x ++ ")"
+    showShorthand (UnknownSn x) = "MG " ++ showShorthand x  
+    showShorthand (Sn1MG x) = "MG " ++ showShorthand x ++ "/0:0/0:0"
+    showShorthand (Sn2MG x) = "MG 0:0/" ++ showShorthand x ++ "/0:0"
+    showShorthand (Sn3MG x) = "MG 0:0/0:0/" ++ showShorthand x
+    
+instance Nomenclature MG where
+    showNnomenclature (ClassLevelMG x) = "MG (" ++ show x ++ ")"
+    showNnomenclature (UnknownSn x) = "MG " ++ showNnomenclature x
+    showNnomenclature (Sn1MG x) = "MG " ++ showNnomenclature x ++ "/0:0/0:0"
+    showNnomenclature (Sn2MG x) = "MG 0:0/" ++ showNnomenclature x ++ "/0:0"
+    showNnomenclature (Sn3MG x) = "MG 0:0/0:0/" ++ showNnomenclature x
+
 instance Shorthand DG where
     showShorthand (ClassLevelDG x) = "DG (" ++ show x ++ ")"
-    
+    showShorthand (CombinedRadylsDG x) = "DG " ++ showShorthand x
+    showShorthand (UnknownDG (x,y)) = "DG " ++ showShorthand x ++ "_" ++ showShorthand y
+    showShorthand (Sn12DG x y) = "DG " ++ showShorthand x ++ "/" ++ showShorthand y ++ "/0:0"
+    showShorthand (Sn13DG x y) = "DG " ++ showShorthand x ++ "/0:0/" ++ showShorthand y
+    showShorthand (Sn23DG x y) = "DG " ++ "0:0/" ++ showShorthand x ++ "/" ++ showShorthand y 
+ 
+instance Nomenclature DG where
+    showNnomenclature (ClassLevelDG x) = "DG (" ++ show x ++ ")"
+    showNnomenclature (CombinedRadylsDG x) = "DG " ++ showNnomenclature x
+    showNnomenclature (UnknownDG (x,y)) = "DG " ++ showNnomenclature x ++ "_" ++ showNnomenclature y
+    showNnomenclature (Sn12DG x y) = "DG " ++ showNnomenclature x ++ "/" ++ showNnomenclature y ++ "/0:0"
+    showNnomenclature (Sn13DG x y) = "DG " ++ showNnomenclature x ++ "/0:0/" ++ showNnomenclature y
+    showNnomenclature (Sn23DG x y) = "DG " ++ "0:0/" ++ showNnomenclature x ++ "/" ++ showNnomenclature y 
+
+instance Shorthand TG where
+    showShorthand (ClassLevelTG x) = "TG (" ++ show x ++ ")"
+    showShorthand (CombinedRadylsTG x) = "TG " ++ showShorthand x
+    showShorthand (UnknownSnTG (x, y, z)) = "TG " ++ showShorthand x ++ "_" ++ showShorthand y ++ "_" ++ showShorthand z 
+    showShorthand (KnownSnTG x y z) = "TG " ++ showShorthand x ++ "/" ++ showShorthand y ++ "/" ++ showShorthand z   
+ 
+instance Nomenclature TG where
+    showNnomenclature (ClassLevelTG x) = "TG (" ++ show x ++ ")"
+    showNnomenclature (CombinedRadylsTG x) = "TG " ++ showNnomenclature x
+    showNnomenclature (UnknownSnTG (x, y, z)) = "TG " ++ showNnomenclature x ++ "_" ++ showNnomenclature y ++ "_" ++ showNnomenclature z 
+    showNnomenclature (KnownSnTG x y z) = "TG " ++ showNnomenclature x ++ "/" ++ showNnomenclature y ++ "/" ++ showNnomenclature z   
