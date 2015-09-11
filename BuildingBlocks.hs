@@ -11,18 +11,22 @@ module BuildingBlocks
     (
       NumberOfCarbons
     , NumberOfDoubleBonds
+    , Position(..)
     , Moiety(..)
+    , DoubleBond(..)
     , Geometry(..)
     , CarbonChain(..)
-    , CombinedChains
+    , CombinedChains(..)
     , Linkage(..)
-    , Radyl
-    , CombinedRadyls
-    , SnPosition
+    , Radyl(..)
+    , CombinedRadyls(..)
+    , SnPosition(..)
+    , PhosphatePosition(..)
     , Shorthand(..)
     , Nomenclature(..)
     , wrap
     , wrapParen
+    , wrapBrackets
     , doubleBondNumber
     , doubleBondPositions
     , doubleBondGeometries
@@ -85,6 +89,8 @@ data CombinedRadyls = CombinedRadyls { linkages       :: [Linkage]
                                      
 data SnPosition = Sn1 | Sn2 | Sn3 deriving (Show, Eq, Ord)
 
+data PhosphatePosition = P3' | P4' | P5' deriving (Show, Eq, Ord)
+
 
 class Shorthand a where
     showShorthand :: a -> String
@@ -146,11 +152,42 @@ instance Shorthand CombinedChains where
             where dbInfo = List.intercalate "," $ map showShorthand $ List.sort y 
             -- This needs to be changed y is a list of lists
 
+instance Nomenclature CombinedChains where
+    showNnomenclature (CombinedChains x y) =
+        showShorthand x ++ ":" ++ show (length y) ++ wrapParen dbInfo
+            where dbInfo = List.intercalate "," $ map showShorthand $ List.sort y 
+
 instance Shorthand Radyl where
     showShorthand (Radyl x y) = showShorthand x ++ showShorthand y
 
 instance Nomenclature Radyl where
     showNnomenclature (Radyl x y) = showShorthand x ++ showNnomenclature y
+
+instance Shorthand CombinedRadyls where
+    showShorthand (CombinedRadyls x y) = links ++ showShorthand y
+        where links =  List.intercalate "," $ map freq2shorthand $ linkageStrList x
+
+instance Nomenclature CombinedRadyls where
+    showNnomenclature (CombinedRadyls x y) = links ++ showNnomenclature y
+        where links =  List.intercalate "," $ map freq2shorthand $ linkageStrList x
+
+--From Stackoverflow
+frequency :: Ord t => [t] -> [(Int, t)]
+frequency list = map (\l -> (length l, head l)) (List.group (List.sort list))
+
+linkageStrList :: Shorthand a => [a] -> [(Int, [Char])]
+linkageStrList list = frequency $ filter (\x -> x /= "") $ map showShorthand list
+
+freq2shorthand :: (Eq a, Num a) => (a, [Char]) -> [Char]
+freq2shorthand (x, y)
+    | x == 1 = y
+    | x == 2 = 'd' : y
+    | x == 3 = 't' : y
+
+instance Shorthand PhosphatePosition where
+    showShorthand P3' = "3'"
+    showShorthand P4' = "4'"
+    showShorthand P5' = "5'"
 
 
 wrap :: [Char] -> [Char] -> [Char] -> [Char]
@@ -160,6 +197,9 @@ wrap open close str = if length str == 0
 
 wrapParen :: [Char] -> [Char]
 wrapParen str = wrap "(" ")" str
+
+wrapBrackets :: [Char] -> [Char]
+wrapBrackets str = wrap "[" "]" str
 
 toDelta :: NumberOfCarbons -> [DoubleBond] -> [DoubleBond]
 toDelta num positions = map (convert num) positions
