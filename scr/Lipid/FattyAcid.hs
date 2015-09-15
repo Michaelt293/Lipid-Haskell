@@ -7,13 +7,13 @@ Maintainer  : Michael Thomas <Michaelt293@gmail.com>
 Stability   : experimental
 -}
 
-module FattyAcid
+module Lipid.FattyAcid
     (
       FA
     ) where
 
 import ElementIsotopes
-import BuildingBlocks
+import Lipid.Blocks
 
 
 data FA   = ClassLevelFA       IntegerMass
