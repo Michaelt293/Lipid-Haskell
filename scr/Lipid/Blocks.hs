@@ -1,13 +1,14 @@
 {-|
-Module      : BuildingBlocks
-Description :
+Module      : Blocks
+Description : Module contains data types used to construct lipid data types.
+              In addition, the classes Shorthand and Nomenclature are defined.
 Copyright   : Copyright 2015 IMBCR pty ltd. All rights reserved.
 License     : GPL-3
 Maintainer  : Michael Thomas <Michaelt293@gmail.com>
 Stability   : experimental
 -}
 
-module BuildingBlocks
+module Lipid.Blocks
     (
       NumberOfCarbons(..)
     , NumberOfDoubleBonds(..)
