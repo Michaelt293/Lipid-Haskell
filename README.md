@@ -35,34 +35,34 @@ When working with the interpreter, it is adventagous to be able to make lipid da
 
 Functions can be defined to represent enzymatic reactions. As a proof of principle, the biosynthesis of n-3 polyunsaturated fatty acids is modeled below by using functions representing desaturase, elongation and beta oxidation reactions-
 
-In this example, ala is a variable (value) representing α-linolenic acid (ALA). When working with in GHCI, entering ala reveals the internal representation of ALA.
+- In this example, ala is a variable (value) representing α-linolenic acid (ALA). When working with in GHCI, entering ala reveals the internal representation of ALA-
 *Pathways> ala
 FA (SimpleCarbonChain {carbonNumber = 18, doubleBonds = [DoubleBond {dbPosition = Just (Delta 9), geometry = Just Cis},DoubleBond {dbPosition = Just (Delta 12), geometry = Just Cis},DoubleBond {dbPosition = Just (Delta 15), geometry = Just Cis}]})
 
-Using the showShorthand function, we can get the shorthand representation of ALA-
+- Using the showShorthand function, we can get the shorthand representation of ALA-
 *Pathways> showShorthand $ ala
 "FA 18:3(9Z,12Z,15Z)"
 
-Using the elongation function, we can perform a chain elongation reaction-
+- Using the elongation function, we can perform a chain elongation reaction-
 *Pathways> showShorthand $ elongation ala
 "FA 20:3(11Z,14Z,17Z)"
 
-Using function composition, we can chain together functions to model sequential biochemical modifications-
+- Using function composition, we can chain together functions to model sequential biochemical modifications-
 *Pathways> showShorthand $ elongation . delta6Desaturase $ ala
 "FA 20:4(8Z,11Z,14Z,17Z)"
 
-This can be done to represent an entire pathway-
+- This can be done to represent an entire pathway-
 *Pathways> let product = betaOxidation . delta6Desaturase . elongation . elongation . delta5Desaturase . elongation . delta6Desaturase $ ala
 
-Here, the product is DHA-
+- Here, the product is DHA-
 *Pathways> showShorthand product
 "FA 22:6(4Z,7Z,10Z,13Z,16Z,19Z)"
 
-Now having synthesised a new lipid, we can get its molecular formula-
+- Now having synthesised a new lipid, we can get its molecular formula-
 *Pathways> getFormula product
 MolecularFormula [(C,22),(O,2),(H,32)]
 
-And from its formula we can calculate its monoisotopic mass-
+- And from its formula we can calculate its monoisotopic mass-
 *Pathways> monoisotopicMass . getFormula $ product
 328.24023027050004
 
