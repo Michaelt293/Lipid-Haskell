@@ -11,7 +11,8 @@ Stability   : experimental
 module Lipid.Glycerolipid
 
 import ElementIsotopes
-import BuildingBlocks
+import Lipid.Blocks
+import Lipid.Format
 
 
 data MG = ClassLevelMG       IntegerMass
