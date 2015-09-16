@@ -11,7 +11,8 @@ Stability   : experimental
 module Lipid.Glycerophospholipid
 
 import ElementIsotopes
-import BuildingBlocks
+import Lipid.Blocks
+import Lipid.Format
 
 
 data PA   = ClassLevelPA       IntegerMass
@@ -99,6 +100,12 @@ data CL   = ClassLevelCL       IntegerMass
                                , clSn1' :: Radyl
                                , clSn2' :: Radyl }
           deriving (Show, Eq, Ord)
+
+data BMP   = ClassLevelBMP     IntegerMass
+          | CombinedRadylsBMP  CombinedRadyls
+          | BMP       (Radyl, Radyl)
+          deriving (Show, Eq, Ord)
+
 
 instance Shorthand PA where
     showShorthand (ClassLevelPA x)          = "PA (" ++ show x ++ ")" 
@@ -240,7 +247,6 @@ instance Shorthand PIP where
                         (Just p') -> wrapBrackets $ showShorthand p'
 
 instance Nomenclature PIP where
-
     showNnomenclature (ClassLevelPIP x)        = "PIP (" ++ show x ++ ")"
     showNnomenclature (CombinedRadylsPIP x p)  = "PIP" ++ po4 ++ " " ++ showNnomenclature x
         where po4 = case p of
@@ -295,7 +301,7 @@ instance Nomenclature PIP2 where
                         (Nothing, _)  -> ""
                         (_, Nothing)  -> ""
                         (Just p1, Just p2) -> wrapBrackets $ showShorthand p1 ++ "," ++ showShorthand p2
-    showNnomenclature (KnownSnPIP2 x y p) = "PIP" ++ po4 ++ " " ++ sn1 ++ "/" ++ sn2
+    showNnomenclature (KnownSnPIP2 x y p)       = "PIP" ++ po4 ++ " " ++ sn1 ++ "/" ++ sn2
         where sn1 = showNnomenclature x
               sn2 = showNnomenclature y
               po4 = case p of
@@ -370,3 +376,18 @@ instance Nomenclature CL where
               sn2 = showNnomenclature y
               sn1' = showNnomenclature z
               sn2' = showNnomenclature w
+
+instance Shorthand BMP where
+    showShorthand (ClassLevelBMP x)           = "BMP (" ++ show x ++ ")" 
+    showShorthand (CombinedRadylsBMP x)       = "BMP " ++ showShorthand x 
+    showShorthand (BMP (x, y))       = "BMP " ++ fa1 ++ "/" ++ fa2
+        where fa1 = showShorthand x
+              fa2 = showShorthand y
+ 
+instance Nomenclature BMP where
+    showNnomenclature (ClassLevelBMP x)       = "BMP (" ++ show x ++ ")" 
+    showNnomenclature (CombinedRadylsBMP x)   = "BMP " ++ showNnomenclature x 
+    showNnomenclature (BMP (x, y))   = "BMP " ++ fa1 ++ "/" ++ fa2
+        where fa1 = showNnomenclature x
+              fa2 = showNnomenclature y
+
