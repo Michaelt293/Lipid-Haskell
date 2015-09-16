@@ -25,9 +25,6 @@ module Lipid.Blocks
     , PhosphatePosition(..)
     , Shorthand(..)
     , Nomenclature(..)
-    , wrap
-    , wrapParen
-    , wrapBrackets
     , doubleBondNumber
     , doubleBondPositions
     , doubleBondGeometries
@@ -36,6 +33,7 @@ module Lipid.Blocks
     ) where
 
 import qualified Data.List as List
+import Lipid.Format
 
 data NumberOfCarbons     = Carbons Integer
                          deriving (Show, Eq, Ord)
@@ -138,8 +136,6 @@ instance Shorthand Linkage where
     showShorthand Alkyl   = "O-"
     showShorthand Alkenyl = "P-"
 
-
-
 instance Shorthand CarbonChain where
     showShorthand (SimpleCarbonChain x y)    =
         showShorthand x ++ ":" ++ show (length y) ++ wrapParen dbInfo
@@ -201,17 +197,6 @@ instance Shorthand PhosphatePosition where
     showShorthand P4' = "4'"
     showShorthand P5' = "5'"
 
-
-wrap :: [Char] -> [Char] -> [Char] -> [Char]
-wrap open close str = if length str == 0 
-                    then ""
-                    else open ++ str ++ close
-
-wrapParen :: [Char] -> [Char]
-wrapParen str = wrap "(" ")" str
-
-wrapBrackets :: [Char] -> [Char]
-wrapBrackets str = wrap "[" "]" str
 
 toDelta :: NumberOfCarbons -> [DoubleBond] -> [DoubleBond]
 toDelta (Carbons n) positions = map (convert (Carbons n)) positions
