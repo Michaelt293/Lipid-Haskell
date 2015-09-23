@@ -8,7 +8,7 @@ Maintainer  : Michael Thomas <Michaelt293@gmail.com>
 Stability   : experimental
 -}
 
-module Lipid.Glycerophospholipid
+module Lipid.Glycerophospholipid where
 
 import ElementIsotopes
 import Lipid.Blocks
