@@ -9,6 +9,11 @@ Stability   : experimental
 -}
 
 module Lipid.Glycerolipid
+    (
+      MG(..)
+    , DG(..)
+    , TG(..)
+    ) where
 
 import ElementIsotopes
 import Lipid.Blocks
