@@ -15,6 +15,7 @@ module Lipid.Blocks
     , Position(..)
     , Moiety(..)
     , DoubleBond(..)
+    , MoietyData(..)
     , Geometry(..)
     , CarbonChain(..)
     , CombinedChains(..)
@@ -218,6 +219,7 @@ doubleBondPositions chain = map dbPosition $ doubleBonds chain
 
 doubleBondGeometries :: CarbonChain -> [Maybe Geometry]
 doubleBondGeometries chain = map geometry $ doubleBonds chain
+
 
 
 
