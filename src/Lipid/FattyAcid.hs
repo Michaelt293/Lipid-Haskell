@@ -9,16 +9,16 @@ Stability   : experimental
 
 module Lipid.FattyAcid
     (
-      FA
+      FA(..)
     ) where
 
 import ElementIsotopes
 import Lipid.Blocks
 
 
-data FA   = ClassLevelFA       IntegerMass
-          | FA                 CarbonChain
-          deriving (Show, Eq, Ord)
+data FA = ClassLevelFA       IntegerMass
+        | FA                 CarbonChain
+        deriving (Show, Eq, Ord)
 
 
 instance Shorthand FA where
