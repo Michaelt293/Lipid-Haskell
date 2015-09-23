@@ -11,7 +11,7 @@ Stability   : Experimental
 module Formula.Lysoglycerophospholipid where
 
 
-import Lipid.Lysoglycerophospholipids
+import Lipid.Lysoglycerophospholipid
 import Formula.Blocks
  
 instance MolecularFormulae LPA where

@@ -5,10 +5,10 @@ Description : Lysoglycerophospholipid data type and instances of Shorthand and
 Copyright   : Michael Thomas 
 License     : GPL-3
 Maintainer  : Michael Thomas <Michaelt293@gmail.com>
-Stability   : experimental
+Stability   : Experimental
 -}
 
-module Lipid.Lysoglycerophospholipids where
+module Lipid.Lysoglycerophospholipid where
 
 import ElementIsotopes
 import Lipid.Blocks
