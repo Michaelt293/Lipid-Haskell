@@ -1,13 +1,15 @@
 {-|
-Module      : Formula
-Description :
+Module      : Formula.Blocks
+Description : MolecularFormula data type and operators for working with molecular 
+              formulae are defined. Building blocks for constructing whole lipids 
+              provided.
 Copyright   : Michael Thomas
 License     : GPL-3
 Maintainer  : Michael Thomas <Michaelt293@gmail.com>
-Stability   : experimental
+Stability   : Experimental
 -}
 
-module Experimentation.Formula where
+module Formula.Blocks where
 
 import qualified Data.Map.Strict as Map
 import qualified Data.Maybe as Maybe
