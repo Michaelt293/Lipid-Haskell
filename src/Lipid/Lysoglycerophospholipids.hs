@@ -8,7 +8,7 @@ Maintainer  : Michael Thomas <Michaelt293@gmail.com>
 Stability   : experimental
 -}
 
-module Lipid.Lysoglycerophospholipid
+module Lipid.Lysoglycerophospholipids where
 
 import ElementIsotopes
 import Lipid.Blocks
@@ -52,8 +52,7 @@ data LPIP  = UnknownSnLPIP      Radyl (Maybe PhosphatePosition)
 data LPIP2 = UnknownSnLPIP2     Radyl (Maybe PhosphatePosition, Maybe PhosphatePosition)
            | Sn1LPIP2           Radyl (Maybe PhosphatePosition, Maybe PhosphatePosition)
            | Sn2LPIP2           Radyl (Maybe PhosphatePosition, Maybe PhosphatePosition)
-                               , pip2PO4 :: ( Maybe PhosphatePosition
-                                            , Maybe PhosphatePosition )}
+
            deriving (Show, Eq, Ord)
 
 data LPIP3 = UnknownSnLPIP3     Radyl
@@ -137,15 +136,15 @@ instance Nomenclature LPI where
     showNnomenclature (Sn2LPI x)         = "LPI 0:0/" ++ showNnomenclature x 
 
 instance Shorthand LPIP where
-    show (UnknownSnLPIP x p)   = "LPI" ++ po4 ++ " " ++ showShorthand x ++ "_0:0"
+    showShorthand (UnknownSnLPIP x p)   = "LPI" ++ po4 ++ " " ++ showShorthand x ++ "_0:0"
         where po4 = case p of
                         Nothing  -> ""
                         (Just p') -> wrapBrackets $ showShorthand p'
-    show (Sn1LPIP x p)         = "LPI" ++ po4 ++ " " ++ showShorthand x ++ "/0:0"
+    showShorthand (Sn1LPIP x p)         = "LPI" ++ po4 ++ " " ++ showShorthand x ++ "/0:0"
         where po4 = case p of
                         Nothing  -> ""
                         (Just p') -> wrapBrackets $ showShorthand p'
-    show (Sn2LPIP x p)         = "LPI"  ++ po4 ++ " 0:0/" ++ showShorthand x 
+    showShorthand (Sn2LPIP x p)         = "LPI"  ++ po4 ++ " 0:0/" ++ showShorthand x 
         where po4 = case p of
                         Nothing  -> ""
                         (Just p') -> wrapBrackets $ showShorthand p'
@@ -171,29 +170,29 @@ instance Shorthand LPIP2 where
                         (_, Nothing)  -> ""
                         (Just p1, Just p2) -> wrapBrackets $ showShorthand p1 ++ "," ++ showShorthand p2
     showShorthand (Sn1LPIP2 x p)  = "LPIP2" ++ po4 ++ " " ++ showShorthand x ++ "/0:0"
-              po4 = case p of
+        where po4 = case p of
                         (Nothing, _)  -> ""
                         (_, Nothing)  -> ""
                         (Just p1, Just p2) -> wrapBrackets $ showShorthand p1 ++ "," ++ showShorthand p2
     showShorthand (Sn2LPIP2 x p) = "LPIP2" ++ po4 ++ " 0:0/" ++ showShorthand x
-              po4 = case p of
+        where po4 = case p of
                         (Nothing, _)  -> ""
                         (_, Nothing)  -> ""
                         (Just p1, Just p2) -> wrapBrackets $ showShorthand p1 ++ "," ++ showShorthand p2
 
 instance Nomenclature LPIP2 where
-    showNnomenclature (UnknownSnLPIP2 x p)  = "LPIP2" ++ po4 ++ showNnomenclature x x ++ "_0:0"
+    showNnomenclature (UnknownSnLPIP2 x p)  = "LPIP2" ++ po4 ++ showNnomenclature x ++ "_0:0"
         where po4 = case p of
                         (Nothing, _)  -> ""
                         (_, Nothing)  -> ""
                         (Just p1, Just p2) -> wrapBrackets $ showShorthand p1 ++ "," ++ showShorthand p2
     showNnomenclature (Sn1LPIP2 x p)  = "LPIP2" ++ po4 ++ " " ++ showNnomenclature x ++ "/0:0"
-              po4 = case p of
+        where po4 = case p of
                         (Nothing, _)  -> ""
                         (_, Nothing)  -> ""
                         (Just p1, Just p2) -> wrapBrackets $ showShorthand p1 ++ "," ++ showShorthand p2
     showNnomenclature (Sn2LPIP2 x p) = "LPIP2" ++ po4 ++ " 0:0/" ++ showNnomenclature x
-              po4 = case p of
+        where po4 = case p of
                         (Nothing, _)  -> ""
                         (_, Nothing)  -> ""
                         (Just p1, Just p2) -> wrapBrackets $ showShorthand p1 ++ "," ++ showShorthand p2
@@ -220,7 +219,7 @@ instance Nomenclature LPS where
     showNnomenclature (Sn2LPS x)         = "LPS 0:0/" ++ showNnomenclature x 
 
 instance Shorthand LCL where
-    showShorthand (UnknownSnLCL x y z)   = "LCL " ++ fa1 ++ "_0:0_" ++ fa2 ++ "_" ++ fa3 
+    showShorthand (UnknownSnLCL (x, y, z))   = "LCL " ++ fa1 ++ "_0:0_" ++ fa2 ++ "_" ++ fa3 
         where fa1 = showShorthand x
               fa2 = showShorthand y
               fa3 = showShorthand z
@@ -234,7 +233,7 @@ instance Shorthand LCL where
               sn2' = showShorthand z 
 
 instance Nomenclature LCL where
-    showNnomenclature (UnknownSnLCL x y z)   = "LCL " ++ fa1 ++ "_0:0_" ++ fa2 ++ "_" ++ fa3 
+    showNnomenclature (UnknownSnLCL (x, y, z))   = "LCL " ++ fa1 ++ "_0:0_" ++ fa2 ++ "_" ++ fa3 
         where fa1 = showNnomenclature x
               fa2 = showNnomenclature y
               fa3 = showNnomenclature z
