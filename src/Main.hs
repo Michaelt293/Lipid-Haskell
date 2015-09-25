@@ -1,11 +1,18 @@
-import Experimentation.Formula
-import Tests.Chains
-import Lipid.Blocks
-import Lipid.Glycerophospholipid
 import ElementIsotopes hiding (monoisotopicMass, nominalMass)
 import qualified ElementIsotopes as Elem (monoisotopicMass, nominalMass)
-import Experimentation.FAFormula
-import Experimentation.GLFormula
-import Experimentation.GPLFormula
-import Experimentation.LPLFormula
-import Experimentation.Mass
+import Tests.Chains
+import Lipid.Blocks
+import Lipid.FattyAcid
+import Lipid.Glycerolipid
+import Lipid.Glycerophospholipid
+import Lipid.Lysoglycerophospholipid
+import Formula.Blocks
+import Formula.FattyAcid
+import Formula.Glycerolipid
+import Formula.Glycerophospholipid
+import Formula.Lysoglycerophospholipid
+import Formula.LipidIon
+import Mass.Mass
+import Ion.LipidIon
+
+
