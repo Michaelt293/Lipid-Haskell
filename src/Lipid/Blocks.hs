@@ -2,10 +2,10 @@
 Module      : Blocks
 Description : Module contains data types used to construct lipid data types.
               In addition, the classes Shorthand and Nomenclature are defined.
-Copyright   : Copyright 2015 IMBCR pty ltd. All rights reserved.
+Copyright   : Michael Thomas
 License     : GPL-3
 Maintainer  : Michael Thomas <Michaelt293@gmail.com>
-Stability   : experimental
+Stability   : Experimental
 -}
 
 module Lipid.Blocks
@@ -30,11 +30,13 @@ module Lipid.Blocks
     , doubleBondPositions
     , doubleBondGeometries
     , toDelta
+    , dbToDelta
     , toOmega
+    , numberOfCarbonsAdd
     ) where
 
 import qualified Data.List as List
-import Lipid.Format
+import           Lipid.Format
 
 data NumberOfCarbons     = Carbons Integer
                          deriving (Show, Eq, Ord)
@@ -42,15 +44,17 @@ data NumberOfCarbons     = Carbons Integer
 data NumberOfDoubleBonds = DoubleBonds Integer
                          deriving (Show, Eq, Ord)
 
-data Position = Omega Integer
-              | Delta Integer
-              deriving (Show, Eq, Ord)
+data Position = Omega {getOmegaPosition :: Integer}
+              | Delta {getDeltaPosition :: Integer}
+              deriving (Show, Eq)
 
 data Geometry = Cis | Trans deriving (Show, Eq, Ord)
 
 data Moiety   = Hydroxyl
               | Keto
               | Methyl
+              | Criegee
+              | Ozonide
               deriving (Show, Eq, Ord)
 
 data DoubleBond = DoubleBond          { dbPosition          :: (Maybe Position) 
@@ -99,6 +103,9 @@ class Shorthand a where
 class Nomenclature a where
     showNnomenclature :: a -> String
 
+instance Ord Position where
+    compare (Delta x) (Delta y) = compare x y
+    compare (Omega x) (Omega y) = compare y x
 
 instance Shorthand Integer where
     showShorthand = show
@@ -129,8 +136,9 @@ instance Shorthand MoietyData where
 
 instance Shorthand Moiety where
     showShorthand Hydroxyl = "OH"
-    showShorthand Keto = "O"
-    showShorthand Methyl = "Me"
+    showShorthand Keto     = "O"
+    showShorthand Methyl   = "Me"
+    showShorthand Criegee  = "Criegee"
 
 instance Shorthand Linkage where
     showShorthand Acyl    = ""
@@ -149,7 +157,7 @@ instance Shorthand CarbonChain where
 instance Nomenclature CarbonChain where
     showNnomenclature (SimpleCarbonChain x y)    =
         showShorthand x ++ ":" ++ show (length y) ++ wrapParen dbInfo
-            where dbInfo = List.intercalate "," $ map showShorthand $ List.sort $ toOmega x y
+            where dbInfo = showShorthand $ maximum $ toOmega x y
     showNnomenclature (ComplexCarbonChain x y z) =
         showShorthand x ++ ":" ++ show (length y) ++ wrapParen dbInfo ++ wrapParen mInfo
             where dbInfo = List.intercalate "," $ map showShorthand $ List.sort $ toOmega x y
@@ -200,10 +208,12 @@ instance Shorthand PhosphatePosition where
 
 
 toDelta :: NumberOfCarbons -> [DoubleBond] -> [DoubleBond]
-toDelta (Carbons n) positions = map (convert (Carbons n)) positions
-    where convert (Carbons n) (DoubleBond Nothing y) = DoubleBond Nothing y
-          convert (Carbons n) (DoubleBond (Just (Delta x)) y) = DoubleBond (Just (Delta x)) y
-          convert (Carbons n) (DoubleBond (Just (Omega x)) y) = DoubleBond (Just (Delta (n - x))) y
+toDelta (Carbons n) positions = map (dbToDelta (Carbons n)) positions
+
+dbToDelta :: NumberOfCarbons -> DoubleBond -> DoubleBond
+dbToDelta (Carbons n) (DoubleBond Nothing y) = DoubleBond Nothing y
+dbToDelta (Carbons n) (DoubleBond (Just (Delta x)) y) = DoubleBond (Just (Delta x)) y
+dbToDelta (Carbons n) (DoubleBond (Just (Omega x)) y) = DoubleBond (Just (Delta (n - x))) y
 
 toOmega :: NumberOfCarbons -> [DoubleBond] -> [DoubleBond]
 toOmega (Carbons n) positions = map (convert (Carbons n)) positions
@@ -219,6 +229,8 @@ doubleBondPositions chain = map dbPosition $ doubleBonds chain
 
 doubleBondGeometries :: CarbonChain -> [Maybe Geometry]
 doubleBondGeometries chain = map geometry $ doubleBonds chain
+
+numberOfCarbonsAdd f (Carbons x) = Carbons (f x)
 
 
 
