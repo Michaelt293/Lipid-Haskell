@@ -16,8 +16,8 @@ import ElementIsotopes
 import Lipid.Blocks
 
 
-data FA = ClassLevelFA       IntegerMass
-        | FA                 CarbonChain
+data FA = ClassLevelFA IntegerMass
+        | FA           CarbonChain
         deriving (Show, Eq, Ord)
 
 

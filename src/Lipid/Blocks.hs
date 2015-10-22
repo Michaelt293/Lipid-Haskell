@@ -1,5 +1,5 @@
 {-|
-Module      : Blocks
+Module      : Lipid.Blocks
 Description : Module contains data types used to construct lipid data types.
               In addition, the classes Shorthand and Nomenclature are defined.
 Copyright   : Michael Thomas
@@ -10,8 +10,8 @@ Stability   : Experimental
 
 module Lipid.Blocks
     (
-      NumberOfCarbons(..)
-    , NumberOfDoubleBonds(..)
+      Carbons(..)
+    , NumDoubleBonds(..)
     , Position(..)
     , Moiety(..)
     , DoubleBond(..)
@@ -38,19 +38,19 @@ module Lipid.Blocks
     , numberOfCarbonsAdd
     ) where
 
-import Control.Applicative
+import           Control.Applicative
 import qualified Data.List as List
 import qualified Data.Maybe as Maybe
 import           Lipid.Format
 
-data NumberOfCarbons     = Carbons Integer
-                         deriving (Show, Eq, Ord)
+data Carbons = Carbons Integer
+             deriving (Show, Eq, Ord)
 
-data NumberOfDoubleBonds = DoubleBonds Integer
-                         deriving (Show, Eq, Ord)
+newtype NumDoubleBonds = NumDoubleBonds {numDoubleBonds :: Integer}
+                       deriving (Show, Eq, Ord)
 
-data Position = Omega {getOmegaPosition :: Integer}
-              | Delta {getDeltaPosition :: Integer}
+data Position = Omega Integer
+              | Delta Integer
               deriving (Show, Eq)
 
 data Geometry = Cis | Trans deriving (Show, Eq, Ord)
@@ -70,18 +70,13 @@ data MoietyData = MoietyData          { moiety              :: Moiety
                                       , moietyPosition      :: (Maybe Position) }
                                       deriving (Show, Eq, Ord)
 
-data CarbonChain = SimpleCarbonChain  { carbonNumber        :: NumberOfCarbons
-                                      , doubleBonds         :: [DoubleBond] }
-                 |
-                   ComplexCarbonChain  { carbonNumber       :: NumberOfCarbons
-                                       , doubleBonds        :: [DoubleBond]
-                                       , moietyData         :: [MoietyData] }
-                                       deriving (Show, Eq, Ord)
+data CarbonChain = SimpleCarbonChain  Carbons [DoubleBond]
+                 | ComplexCarbonChain Carbons [DoubleBond] [MoietyData]
+                 deriving (Show, Eq, Ord)
 
-data CombinedChains = CombinedChains  { combinedCNumber     :: NumberOfCarbons
-                                      , combinedDoubleBonds :: [DoubleBond] }
+data CombinedChains = CombinedChains  { combinedCarbons     :: Carbons
+                                      , combinedDoubleBonds :: [[DoubleBond]] }
                                       deriving (Show, Eq, Ord)
-                                     -- This should be a list of lists
 
 data Linkage = Acyl
              | Alkyl
@@ -107,13 +102,13 @@ class Shorthand a where
 class Nomenclature a where
     showNnomenclature :: a -> String
 
-instance Enum NumberOfCarbons where
+instance Enum Carbons where
     toEnum x = Carbons (fromIntegral x)
     fromEnum (Carbons x) = fromIntegral x
 
-instance Enum NumberOfDoubleBonds where
-    toEnum x = DoubleBonds (fromIntegral x)
-    fromEnum (DoubleBonds x) = fromIntegral x
+instance Enum NumDoubleBonds where
+    toEnum x = NumDoubleBonds (fromIntegral x)
+    fromEnum (NumDoubleBonds x) = fromIntegral x
 
 instance Enum Position where
     toEnum x = Delta (fromIntegral x)
@@ -136,11 +131,11 @@ instance Num Position where
     signum (Delta x) = Delta (signum x)
     fromInteger x = Delta x
 
-instance Shorthand NumberOfCarbons where
+instance Shorthand Carbons where
     showShorthand (Carbons x) = show x
 
-instance Shorthand NumberOfDoubleBonds where
-    showShorthand (DoubleBonds x) = show x
+instance Shorthand NumDoubleBonds where
+    showShorthand (NumDoubleBonds x) = show x
 
 instance Shorthand Position where
     showShorthand (Omega x) = "n-" ++ show x
@@ -202,7 +197,7 @@ renderComplexChain c dbs ms f
                  mInfo  = formatIntercalate ms
 
 
-isBisAllylic :: NumberOfCarbons -> [DoubleBond] -> Bool
+isBisAllylic :: Carbons -> [DoubleBond] -> Bool
 isBisAllylic c dbs = doubleBondList == (take (length dbs) $ Just <$> [Delta 0, Delta 3 ..])
     where sortedDoubleBondList = List.sort $ dbPosition <$> List.sort (toDelta c dbs)
           minDoubleBond = minimum sortedDoubleBondList
@@ -216,13 +211,12 @@ renderOmegaPositions c dbs
 instance Shorthand CombinedChains where
     showShorthand (CombinedChains x y) =
         showShorthand x ++ ":" ++ show (length y) ++ wrapParen dbInfo
-            where dbInfo = List.intercalate "," $ map showShorthand $ List.sort y
-            -- This needs to be changed y is a list of lists
+            where dbInfo = List.intercalate "," $ map showShorthand $ concat $ List.sort y
 
 instance Nomenclature CombinedChains where
     showNnomenclature (CombinedChains x y) =
         showShorthand x ++ ":" ++ show (length y) ++ wrapParen dbInfo
-            where dbInfo = List.intercalate "," $ map showShorthand $ List.sort y
+            where dbInfo = List.intercalate "," $ map showShorthand $ concat $ List.sort y
 
 instance Shorthand Radyl where
     showShorthand (Radyl x y)              = showShorthand x ++ showShorthand y
@@ -258,26 +252,29 @@ instance Shorthand PhosphatePosition where
                           P5' -> "5'"
 
 
-toDelta :: NumberOfCarbons -> [DoubleBond] -> [DoubleBond]
+toDelta :: Carbons -> [DoubleBond] -> [DoubleBond]
 toDelta cs positions = map (dbToDelta cs) positions
 
-dbToDelta :: NumberOfCarbons -> DoubleBond -> DoubleBond
+dbToDelta :: Carbons -> DoubleBond -> DoubleBond
 dbToDelta _ db@(DoubleBond Nothing _)  = db
 dbToDelta (Carbons n) (DoubleBond (Just (Omega x)) y)
                                        = DoubleBond (Just (Delta (n - x))) y
 dbToDelta _ db = db
 
-toOmega :: NumberOfCarbons -> [DoubleBond] -> [DoubleBond]
+toOmega :: Carbons -> [DoubleBond] -> [DoubleBond]
 toOmega (Carbons n) positions = map (dbToOmega (Carbons n)) positions
 
-dbToOmega :: NumberOfCarbons -> DoubleBond -> DoubleBond
+dbToOmega :: Carbons -> DoubleBond -> DoubleBond
 dbToOmega _ db@(DoubleBond Nothing _)  = db
 dbToOmega (Carbons n) (DoubleBond (Just (Delta x)) y)
                                        = DoubleBond (Just (Omega (n - x))) y
 dbToOmega _ db = db
 
-doubleBondNumber :: CarbonChain -> NumberOfDoubleBonds
-doubleBondNumber chain = DoubleBonds $ fromIntegral . length . doubleBonds $ chain
+doubleBondNumber :: CarbonChain -> NumDoubleBonds
+doubleBondNumber chain = NumDoubleBonds $ fromIntegral . length . doubleBonds $ chain
+
+doublebonds (SimpleCarbonChain _ dbs) = dbs
+doubleBonds (ComplexCarbonChain _ dbs _) = dbs
 
 doubleBondPositions :: CarbonChain -> [Maybe Position]
 doubleBondPositions chain = map dbPosition $ doubleBonds chain
