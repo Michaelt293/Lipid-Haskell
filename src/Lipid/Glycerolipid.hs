@@ -1,11 +1,11 @@
 {-|
 Module      : Glycerolipid
-Description : Glycerolipid data type and instances of Shorthand and 
+Description : Glycerolipid data type and instances of Shorthand and
               Nomenclature defined.
-Copyright   : Michael Thomas 
+Copyright   : Michael Thomas
 License     : GPL-3
 Maintainer  : Michael Thomas <Michaelt293@gmail.com>
-Stability   : experimental
+Stability   : Experimental
 -}
 
 module Lipid.Glycerolipid
@@ -29,21 +29,16 @@ data MG = ClassLevelMG       IntegerMass
 
 data DG = ClassLevelDG       IntegerMass
         | CombinedRadylsDG   CombinedRadyls
-        | UnknownDG          (Radyl, Radyl)
-        | Sn12DG             { dgSn1 :: Radyl
-                             , dgSn2 :: Radyl } 
-        | Sn13DG             { dgSn1 :: Radyl
-                             , dgSn3 :: Radyl }
-        | Sn23DG             { dgSn2 :: Radyl
-                             , dgSn3 :: Radyl }
+        | UnknownDG          Radyl Radyl
+        | Sn12DG             Radyl Radyl
+        | Sn13DG             Radyl Radyl
+        | Sn23DG             Radyl Radyl
         deriving (Show, Eq, Ord)
 
 data TG = ClassLevelTG       IntegerMass
         | CombinedRadylsTG   CombinedRadyls
-        | UnknownSnTG        (Radyl, Radyl, Radyl)
-        | KnownSnTG          { tgSn1 :: Radyl
-                             , tgSn2 :: Radyl
-                             , tgSn3 :: Radyl }
+        | UnknownSnTG        Radyl Radyl Radyl
+        | KnownSnTG          Radyl Radyl Radyl
         deriving (Show, Eq, Ord)
 
 
@@ -53,7 +48,7 @@ instance Shorthand MG where
     showShorthand (Sn1MG x)            = "MG " ++ showShorthand x ++ "/0:0/0:0"
     showShorthand (Sn2MG x)            = "MG 0:0/" ++ showShorthand x ++ "/0:0"
     showShorthand (Sn3MG x)            = "MG 0:0/0:0/" ++ showShorthand x
-    
+
 instance Nomenclature MG where
     showNnomenclature (ClassLevelMG x) = "MG (" ++ show x ++ ")"
     showNnomenclature (UnknownSn x)    = "MG " ++ showNnomenclature x
@@ -64,7 +59,7 @@ instance Nomenclature MG where
 instance Shorthand DG where
     showShorthand (ClassLevelDG x)     = "DG (" ++ show x ++ ")"
     showShorthand (CombinedRadylsDG x) = "DG " ++ showShorthand x
-    showShorthand (UnknownDG (x,y))    = "DG " ++ fa1 ++ "_" ++ fa2
+    showShorthand (UnknownDG x y)    = "DG " ++ fa1 ++ "_" ++ fa2
         where fa1 = showShorthand x
               fa2 = showShorthand y
     showShorthand (Sn12DG x y)         = "DG " ++ sn1 ++ "/" ++ sn2 ++ "/0:0"
@@ -80,7 +75,7 @@ instance Shorthand DG where
 instance Nomenclature DG where
     showNnomenclature (ClassLevelDG x)     = "DG (" ++ show x ++ ")"
     showNnomenclature (CombinedRadylsDG x) = "DG " ++ showNnomenclature x
-    showNnomenclature (UnknownDG (x,y))    = "DG " ++ fa1 ++ "_" ++ fa2
+    showNnomenclature (UnknownDG x y)    = "DG " ++ fa1 ++ "_" ++ fa2
         where fa1 = showNnomenclature x
               fa2 = showNnomenclature y
     showNnomenclature (Sn12DG x y)         = "DG " ++ sn1 ++ "/" ++ sn2 ++ "/0:0"
@@ -96,7 +91,7 @@ instance Nomenclature DG where
 instance Shorthand TG where
     showShorthand (ClassLevelTG x)         = "TG (" ++ show x ++ ")"
     showShorthand (CombinedRadylsTG x)     = "TG " ++ showShorthand x
-    showShorthand (UnknownSnTG (x, y, z))  = "TG " ++ fa1 ++ "_" ++ fa2 ++ "_" ++ fa3 
+    showShorthand (UnknownSnTG x y z)  = "TG " ++ fa1 ++ "_" ++ fa2 ++ "_" ++ fa3 
         where fa1 = showShorthand x
               fa2 = showShorthand y
               fa3 = showShorthand z
@@ -108,7 +103,7 @@ instance Shorthand TG where
 instance Nomenclature TG where
     showNnomenclature (ClassLevelTG x)        = "TG (" ++ show x ++ ")"
     showNnomenclature (CombinedRadylsTG x)    = "TG " ++ showNnomenclature x
-    showNnomenclature (UnknownSnTG (x, y, z)) = "TG " ++ fa1 ++ "_" ++ fa2 ++ "_" ++ fa3
+    showNnomenclature (UnknownSnTG x y z) = "TG " ++ fa1 ++ "_" ++ fa2 ++ "_" ++ fa3
         where fa1 = showNnomenclature x
               fa2 = showNnomenclature y
               fa3 = showNnomenclature z

@@ -1,8 +1,8 @@
 {-|
-Module      : Lysoglycerophospholipid
-Description : Lysoglycerophospholipid data type and instances of Shorthand and 
+Module      : Lipid.Lysoglycerophospholipid
+Description : Lysoglycerophospholipid data type and instances of Shorthand and
               Nomenclature defined.
-Copyright   : Michael Thomas 
+Copyright   : Michael Thomas
 License     : GPL-3
 Maintainer  : Michael Thomas <Michaelt293@gmail.com>
 Stability   : Experimental
@@ -65,13 +65,9 @@ data LPS   = UnknownSnLPS       Radyl
            | Sn2LPS             Radyl
            deriving (Show, Eq, Ord)
 
-data LCL   = UnknownSnLCL      (Radyl, Radyl, Radyl)
-           | Sn1LCL            { clSn1  :: Radyl
-                               , clSn1' :: Radyl
-                               , clSn2' :: Radyl }
-           | Sn2LCL            { clSn2  :: Radyl
-                               , clSn1' :: Radyl
-                               , clSn2' :: Radyl }
+data LCL   = UnknownSnLCL      Radyl Radyl Radyl
+           | Sn1LCL            Radyl Radyl Radyl
+           | Sn2LCL            Radyl Radyl Radyl
            deriving (Show, Eq, Ord)
 
 
@@ -202,7 +198,7 @@ instance Shorthand LPIP3 where
     showShorthand (Sn1LPIP3 x)         = "LPIP3 " ++ showShorthand x ++ "/0:0"
     showShorthand (Sn2LPIP3 x)         = "LPIP3 0:0/" ++ showShorthand x 
 
- 
+
 instance Nomenclature LPIP3 where
     showNnomenclature (UnknownSnLPIP3 x)   = "LPIP3 " ++ showNnomenclature x ++ "_0:0"
     showNnomenclature (Sn1LPIP3 x)         = "LPIP3 " ++ showNnomenclature x ++ "/0:0"
@@ -219,7 +215,7 @@ instance Nomenclature LPS where
     showNnomenclature (Sn2LPS x)         = "LPS 0:0/" ++ showNnomenclature x 
 
 instance Shorthand LCL where
-    showShorthand (UnknownSnLCL (x, y, z))   = "LCL " ++ fa1 ++ "_0:0_" ++ fa2 ++ "_" ++ fa3 
+    showShorthand (UnknownSnLCL x y z)   = "LCL " ++ fa1 ++ "_0:0_" ++ fa2 ++ "_" ++ fa3 
         where fa1 = showShorthand x
               fa2 = showShorthand y
               fa3 = showShorthand z
@@ -230,10 +226,10 @@ instance Shorthand LCL where
     showShorthand (Sn2LCL x y z)       = "CL 0:0/" ++ sn2 ++ "/" ++ sn1' ++ "/" ++ sn2'
         where sn2  = showShorthand x
               sn1' = showShorthand y
-              sn2' = showShorthand z 
+              sn2' = showShorthand z
 
 instance Nomenclature LCL where
-    showNnomenclature (UnknownSnLCL (x, y, z))   = "LCL " ++ fa1 ++ "_0:0_" ++ fa2 ++ "_" ++ fa3 
+    showNnomenclature (UnknownSnLCL x y z)   = "LCL " ++ fa1 ++ "_0:0_" ++ fa2 ++ "_" ++ fa3 
         where fa1 = showNnomenclature x
               fa2 = showNnomenclature y
               fa3 = showNnomenclature z
