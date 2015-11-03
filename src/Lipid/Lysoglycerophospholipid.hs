@@ -13,6 +13,7 @@ module Lipid.Lysoglycerophospholipid where
 import ElementIsotopes
 import Lipid.Blocks
 import Lipid.Format
+import Lipid.Glycerophospholipid
 
 data LPA   = UnknownSnLPA       Radyl
            | Sn1LPA             Radyl
@@ -33,7 +34,7 @@ data LPG   = UnknownSnLPG       Radyl
            | Sn1LPG             Radyl
            | Sn2LPG             Radyl
            deriving (Show, Eq, Ord)
- 
+
 data LPGP  = UnknownSnLPGP      Radyl
            | Sn1LPGP            Radyl
            | Sn2LPGP            Radyl
@@ -43,15 +44,18 @@ data LPI   = UnknownSnLPI       Radyl
            | Sn1LPI             Radyl
            | Sn2LPI             Radyl
            deriving (Show, Eq, Ord)
- 
+
 data LPIP  = UnknownSnLPIP      Radyl (Maybe PhosphatePosition)
            | Sn1LPIP            Radyl (Maybe PhosphatePosition)
            | Sn2LPIP            Radyl (Maybe PhosphatePosition)
            deriving (Show, Eq, Ord)
 
-data LPIP2 = UnknownSnLPIP2     Radyl (Maybe PhosphatePosition, Maybe PhosphatePosition)
-           | Sn1LPIP2           Radyl (Maybe PhosphatePosition, Maybe PhosphatePosition)
-           | Sn2LPIP2           Radyl (Maybe PhosphatePosition, Maybe PhosphatePosition)
+data LPIP2 = UnknownSnLPIP2     Radyl ( Maybe PhosphatePosition
+                                      , Maybe PhosphatePosition )
+           | Sn1LPIP2           Radyl ( Maybe PhosphatePosition
+                                      , Maybe PhosphatePosition )
+           | Sn2LPIP2           Radyl (Maybe PhosphatePosition
+                                      , Maybe PhosphatePosition )
 
            deriving (Show, Eq, Ord)
 
@@ -72,173 +76,118 @@ data LCL   = UnknownSnLCL      Radyl Radyl Radyl
 
 
 instance Shorthand LPA where
-    showShorthand (UnknownSnLPA x)   = "LPA " ++ showShorthand x ++ "_0:0"
-    showShorthand (Sn1LPA x)         = "LPA " ++ showShorthand x ++ "/0:0"
-    showShorthand (Sn2LPA x)         = "LPA 0:0/" ++ showShorthand x 
+    showShorthand (UnknownSnLPA r) = "LPA " ++ showShorthand r ++ "_0:0"
+    showShorthand (Sn1LPA r)       = "LPA " ++ showShorthand r ++ "/0:0"
+    showShorthand (Sn2LPA r)       = "LPA 0:0/" ++ showShorthand r 
 
 instance Nomenclature LPA where
-    showNnomenclature (UnknownSnLPA x)   = "LPA " ++ showNnomenclature x ++ "_0:0"
-    showNnomenclature (Sn1LPA x)         = "LPA " ++ showNnomenclature x ++ "/0:0"
-    showNnomenclature (Sn2LPA x)         = "LPA 0:0/" ++ showNnomenclature x 
+    showNnomenclature (UnknownSnLPA r) = "LPA " ++ showNnomenclature r ++ "_0:0"
+    showNnomenclature (Sn1LPA r)       = "LPA " ++ showNnomenclature r ++ "/0:0"
+    showNnomenclature (Sn2LPA r)       = "LPA 0:0/" ++ showNnomenclature r 
 
 instance Shorthand LPC where
-    showShorthand (UnknownSnLPC x)   = "LPC " ++ showShorthand x ++ "_0:0"
-    showShorthand (Sn1LPC x)         = "LPC " ++ showShorthand x ++ "/0:0"
-    showShorthand (Sn2LPC x)         = "LPC 0:0/" ++ showShorthand x 
+    showShorthand (UnknownSnLPC r) = "LPC " ++ showShorthand r ++ "_0:0"
+    showShorthand (Sn1LPC r)       = "LPC " ++ showShorthand r ++ "/0:0"
+    showShorthand (Sn2LPC r)       = "LPC 0:0/" ++ showShorthand r 
 
 instance Nomenclature LPC where
-    showNnomenclature (UnknownSnLPC x)   = "LPC " ++ showNnomenclature x ++ "_0:0"
-    showNnomenclature (Sn1LPC x)         = "LPC " ++ showNnomenclature x ++ "/0:0"
-    showNnomenclature (Sn2LPC x)         = "LPC 0:0/" ++ showNnomenclature x 
+    showNnomenclature (UnknownSnLPC r) = "LPC " ++ showNnomenclature r ++ "_0:0"
+    showNnomenclature (Sn1LPC r)       = "LPC " ++ showNnomenclature r ++ "/0:0"
+    showNnomenclature (Sn2LPC r)       = "LPC 0:0/" ++ showNnomenclature r 
 
 instance Shorthand LPE where
-    showShorthand (UnknownSnLPE x)   = "LPE " ++ showShorthand x ++ "_0:0"
-    showShorthand (Sn1LPE x)         = "LPE " ++ showShorthand x ++ "/0:0"
-    showShorthand (Sn2LPE x)         = "LPE 0:0/" ++ showShorthand x 
+    showShorthand (UnknownSnLPE r) = "LPE " ++ showShorthand r ++ "_0:0"
+    showShorthand (Sn1LPE r)       = "LPE " ++ showShorthand r ++ "/0:0"
+    showShorthand (Sn2LPE r)       = "LPE 0:0/" ++ showShorthand r 
 
 instance Nomenclature LPE where
-    showNnomenclature (UnknownSnLPE x)   = "LPE " ++ showNnomenclature x ++ "_0:0"
-    showNnomenclature (Sn1LPE x)         = "LPE " ++ showNnomenclature x ++ "/0:0"
-    showNnomenclature (Sn2LPE x)         = "LPE 0:0/" ++ showNnomenclature x 
+    showNnomenclature (UnknownSnLPE r) = "LPE " ++ showNnomenclature r ++ "_0:0"
+    showNnomenclature (Sn1LPE r)       = "LPE " ++ showNnomenclature r ++ "/0:0"
+    showNnomenclature (Sn2LPE r)       = "LPE 0:0/" ++ showNnomenclature r 
 
 instance Shorthand LPG where
-    showShorthand (UnknownSnLPG x)   = "LPG " ++ showShorthand x ++ "_0:0"
-    showShorthand (Sn1LPG x)         = "LPG " ++ showShorthand x ++ "/0:0"
-    showShorthand (Sn2LPG x)         = "LPG 0:0/" ++ showShorthand x 
+    showShorthand (UnknownSnLPG r) = "LPG " ++ showShorthand r ++ "_0:0"
+    showShorthand (Sn1LPG r)       = "LPG " ++ showShorthand r ++ "/0:0"
+    showShorthand (Sn2LPG r)       = "LPG 0:0/" ++ showShorthand r 
 
 instance Nomenclature LPG where
-    showNnomenclature (UnknownSnLPG x)   = "LPG " ++ showNnomenclature x ++ "_0:0"
-    showNnomenclature (Sn1LPG x)         = "LPG " ++ showNnomenclature x ++ "/0:0"
-    showNnomenclature (Sn2LPG x)         = "LPG 0:0/" ++ showNnomenclature x 
+    showNnomenclature (UnknownSnLPG r) = "LPG " ++ showNnomenclature r ++ "_0:0"
+    showNnomenclature (Sn1LPG r)       = "LPG " ++ showNnomenclature r ++ "/0:0"
+    showNnomenclature (Sn2LPG r)       = "LPG 0:0/" ++ showNnomenclature r 
 
 instance Shorthand LPGP where
-    showShorthand (UnknownSnLPGP x)   = "LPGP " ++ showShorthand x ++ "_0:0"
-    showShorthand (Sn1LPGP x)         = "LPGP " ++ showShorthand x ++ "/0:0"
-    showShorthand (Sn2LPGP x)         = "LPGP 0:0/" ++ showShorthand x 
+    showShorthand (UnknownSnLPGP r) = "LPGP " ++ showShorthand r ++ "_0:0"
+    showShorthand (Sn1LPGP r)       = "LPGP " ++ showShorthand r ++ "/0:0"
+    showShorthand (Sn2LPGP r)       = "LPGP 0:0/" ++ showShorthand r 
 
 instance Nomenclature LPGP where
-    showNnomenclature (UnknownSnLPGP x)   = "LPGP " ++ showNnomenclature x ++ "_0:0"
-    showNnomenclature (Sn1LPGP x)         = "LPGP " ++ showNnomenclature x ++ "/0:0"
-    showNnomenclature (Sn2LPGP x)         = "LPGP 0:0/" ++ showNnomenclature x 
+    showNnomenclature (UnknownSnLPGP r) = "LPGP " ++ showNnomenclature r ++ "_0:0"
+    showNnomenclature (Sn1LPGP r)       = "LPGP " ++ showNnomenclature r ++ "/0:0"
+    showNnomenclature (Sn2LPGP r)       = "LPGP 0:0/" ++ showNnomenclature r 
 
 instance Shorthand LPI where
-    showShorthand (UnknownSnLPI x)   = "LPI " ++ showShorthand x ++ "_0:0"
-    showShorthand (Sn1LPI x)         = "LPI " ++ showShorthand x ++ "/0:0"
-    showShorthand (Sn2LPI x)         = "LPI 0:0/" ++ showShorthand x 
+    showShorthand (UnknownSnLPI r) = "LPI " ++ showShorthand r ++ "_0:0"
+    showShorthand (Sn1LPI r)       = "LPI " ++ showShorthand r ++ "/0:0"
+    showShorthand (Sn2LPI r)       = "LPI 0:0/" ++ showShorthand r 
  
 instance Nomenclature LPI where
-    showNnomenclature (UnknownSnLPI x)   = "LPI " ++ showNnomenclature x ++ "_0:0"
-    showNnomenclature (Sn1LPI x)         = "LPI " ++ showNnomenclature x ++ "/0:0"
-    showNnomenclature (Sn2LPI x)         = "LPI 0:0/" ++ showNnomenclature x 
+    showNnomenclature (UnknownSnLPI r) = "LPI " ++ showNnomenclature r ++ "_0:0"
+    showNnomenclature (Sn1LPI r)       = "LPI " ++ showNnomenclature r ++ "/0:0"
+    showNnomenclature (Sn2LPI r)       = "LPI 0:0/" ++ showNnomenclature r 
 
 instance Shorthand LPIP where
-    showShorthand (UnknownSnLPIP x p)   = "LPI" ++ po4 ++ " " ++ showShorthand x ++ "_0:0"
-        where po4 = case p of
-                        Nothing  -> ""
-                        (Just p') -> wrapBrackets $ showShorthand p'
-    showShorthand (Sn1LPIP x p)         = "LPI" ++ po4 ++ " " ++ showShorthand x ++ "/0:0"
-        where po4 = case p of
-                        Nothing  -> ""
-                        (Just p') -> wrapBrackets $ showShorthand p'
-    showShorthand (Sn2LPIP x p)         = "LPI"  ++ po4 ++ " 0:0/" ++ showShorthand x 
-        where po4 = case p of
-                        Nothing  -> ""
-                        (Just p') -> wrapBrackets $ showShorthand p'
+    showShorthand (UnknownSnLPIP r p) = "LPI" ++ renderPO4 p ++ " " ++ showShorthand r ++ "_0:0"
+    showShorthand (Sn1LPIP r p)       = "LPI" ++ renderPO4 p ++ " " ++ showShorthand r ++ "/0:0"
+    showShorthand (Sn2LPIP r p)       = "LPI"  ++ renderPO4 p ++ " 0:0/" ++ showShorthand r 
 
 instance Nomenclature LPIP where
-    showNnomenclature (UnknownSnLPIP x p)   = "LPI" ++ po4 ++ " " ++ showNnomenclature x ++ "_0:0"
-        where po4 = case p of
-                        Nothing  -> ""
-                        (Just p') -> wrapBrackets $ showShorthand p'
-    showNnomenclature (Sn1LPIP x p)         = "LPI" ++ po4 ++ " " ++ showNnomenclature x ++ "/0:0"
-        where po4 = case p of
-                        Nothing  -> ""
-                        (Just p') -> wrapBrackets $ showShorthand p'
-    showNnomenclature (Sn2LPIP x p)         = "LPI"  ++ po4 ++ " 0:0/" ++ showNnomenclature x 
-        where po4 = case p of
-                        Nothing  -> ""
-                        (Just p') -> wrapBrackets $ showShorthand p'
+    showNnomenclature (UnknownSnLPIP r p) = "LPI" ++ renderPO4 p ++ " " ++ showNnomenclature r ++ "_0:0"
+    showNnomenclature (Sn1LPIP r p)       = "LPI" ++ renderPO4 p ++ " " ++ showNnomenclature r ++ "/0:0"
+    showNnomenclature (Sn2LPIP r p)       = "LPI"  ++ renderPO4 p ++ " 0:0/" ++ showNnomenclature r 
 
 instance Shorthand LPIP2 where
-    showShorthand (UnknownSnLPIP2 x p)  = "LPIP2" ++ po4 ++ showShorthand x ++ "_0:0"
-        where po4 = case p of
-                        (Nothing, _)  -> ""
-                        (_, Nothing)  -> ""
-                        (Just p1, Just p2) -> wrapBrackets $ showShorthand p1 ++ "," ++ showShorthand p2
-    showShorthand (Sn1LPIP2 x p)  = "LPIP2" ++ po4 ++ " " ++ showShorthand x ++ "/0:0"
-        where po4 = case p of
-                        (Nothing, _)  -> ""
-                        (_, Nothing)  -> ""
-                        (Just p1, Just p2) -> wrapBrackets $ showShorthand p1 ++ "," ++ showShorthand p2
-    showShorthand (Sn2LPIP2 x p) = "LPIP2" ++ po4 ++ " 0:0/" ++ showShorthand x
-        where po4 = case p of
-                        (Nothing, _)  -> ""
-                        (_, Nothing)  -> ""
-                        (Just p1, Just p2) -> wrapBrackets $ showShorthand p1 ++ "," ++ showShorthand p2
+    showShorthand (UnknownSnLPIP2 r p) = "LPIP2" ++ renderPO4s p ++ showShorthand r ++ "_0:0"
+    showShorthand (Sn1LPIP2 r p)       = "LPIP2" ++ renderPO4s p ++ " " ++ showShorthand r ++ "/0:0"
+    showShorthand (Sn2LPIP2 r p)       = "LPIP2" ++ renderPO4s p ++ " 0:0/" ++ showShorthand r
 
 instance Nomenclature LPIP2 where
-    showNnomenclature (UnknownSnLPIP2 x p)  = "LPIP2" ++ po4 ++ showNnomenclature x ++ "_0:0"
-        where po4 = case p of
-                        (Nothing, _)  -> ""
-                        (_, Nothing)  -> ""
-                        (Just p1, Just p2) -> wrapBrackets $ showShorthand p1 ++ "," ++ showShorthand p2
-    showNnomenclature (Sn1LPIP2 x p)  = "LPIP2" ++ po4 ++ " " ++ showNnomenclature x ++ "/0:0"
-        where po4 = case p of
-                        (Nothing, _)  -> ""
-                        (_, Nothing)  -> ""
-                        (Just p1, Just p2) -> wrapBrackets $ showShorthand p1 ++ "," ++ showShorthand p2
-    showNnomenclature (Sn2LPIP2 x p) = "LPIP2" ++ po4 ++ " 0:0/" ++ showNnomenclature x
-        where po4 = case p of
-                        (Nothing, _)  -> ""
-                        (_, Nothing)  -> ""
-                        (Just p1, Just p2) -> wrapBrackets $ showShorthand p1 ++ "," ++ showShorthand p2
+    showNnomenclature (UnknownSnLPIP2 r p) = "LPIP2" ++ renderPO4s p ++ showNnomenclature r ++ "_0:0"
+    showNnomenclature (Sn1LPIP2 r p)       = "LPIP2" ++ renderPO4s p ++ " " ++ showNnomenclature r ++ "/0:0"
+    showNnomenclature (Sn2LPIP2 r p)       = "LPIP2" ++ renderPO4s p ++ " 0:0/" ++ showNnomenclature r
 
 instance Shorthand LPIP3 where
-    showShorthand (UnknownSnLPIP3 x)   = "LPIP3 " ++ showShorthand x ++ "_0:0"
-    showShorthand (Sn1LPIP3 x)         = "LPIP3 " ++ showShorthand x ++ "/0:0"
-    showShorthand (Sn2LPIP3 x)         = "LPIP3 0:0/" ++ showShorthand x 
-
+    showShorthand (UnknownSnLPIP3 r) = "LPIP3 " ++ showShorthand r ++ "_0:0"
+    showShorthand (Sn1LPIP3 r)       = "LPIP3 " ++ showShorthand r ++ "/0:0"
+    showShorthand (Sn2LPIP3 r)       = "LPIP3 0:0/" ++ showShorthand r 
 
 instance Nomenclature LPIP3 where
-    showNnomenclature (UnknownSnLPIP3 x)   = "LPIP3 " ++ showNnomenclature x ++ "_0:0"
-    showNnomenclature (Sn1LPIP3 x)         = "LPIP3 " ++ showNnomenclature x ++ "/0:0"
-    showNnomenclature (Sn2LPIP3 x)         = "LPIP3 0:0/" ++ showNnomenclature x 
+    showNnomenclature (UnknownSnLPIP3 r) = "LPIP3 " ++ showNnomenclature r ++ "_0:0"
+    showNnomenclature (Sn1LPIP3 r)       = "LPIP3 " ++ showNnomenclature r ++ "/0:0"
+    showNnomenclature (Sn2LPIP3 r)       = "LPIP3 0:0/" ++ showNnomenclature r 
 
 instance Shorthand LPS where
-    showShorthand (UnknownSnLPS x)   = "LPS " ++ showShorthand x ++ "_0:0"
-    showShorthand (Sn1LPS x)         = "LPS " ++ showShorthand x ++ "/0:0"
-    showShorthand (Sn2LPS x)         = "LPS 0:0/" ++ showShorthand x 
+    showShorthand (UnknownSnLPS r) = "LPS " ++ showShorthand r ++ "_0:0"
+    showShorthand (Sn1LPS r)       = "LPS " ++ showShorthand r ++ "/0:0"
+    showShorthand (Sn2LPS r)       = "LPS 0:0/" ++ showShorthand r 
 
 instance Nomenclature LPS where
-    showNnomenclature (UnknownSnLPS x)   = "LPS " ++ showNnomenclature x ++ "_0:0"
-    showNnomenclature (Sn1LPS x)         = "LPS " ++ showNnomenclature x ++ "/0:0"
-    showNnomenclature (Sn2LPS x)         = "LPS 0:0/" ++ showNnomenclature x 
+    showNnomenclature (UnknownSnLPS r) = "LPS " ++ showNnomenclature r ++ "_0:0"
+    showNnomenclature (Sn1LPS r)       = "LPS " ++ showNnomenclature r ++ "/0:0"
+    showNnomenclature (Sn2LPS r)       = "LPS 0:0/" ++ showNnomenclature r 
 
 instance Shorthand LCL where
-    showShorthand (UnknownSnLCL x y z)   = "LCL " ++ fa1 ++ "_0:0_" ++ fa2 ++ "_" ++ fa3 
-        where fa1 = showShorthand x
-              fa2 = showShorthand y
-              fa3 = showShorthand z
-    showShorthand (Sn1LCL x y z)       = "CL " ++ sn1 ++ "/0:0/" ++ sn1' ++ "/" ++ sn2'
-        where sn1  = showShorthand x
-              sn1' = showShorthand y
-              sn2' = showShorthand z
-    showShorthand (Sn2LCL x y z)       = "CL 0:0/" ++ sn2 ++ "/" ++ sn1' ++ "/" ++ sn2'
-        where sn2  = showShorthand x
-              sn1' = showShorthand y
-              sn2' = showShorthand z
+    showShorthand (UnknownSnLCL r1 r2 r3) = renderUnknownSnLCL showShorthand r1 r2 r3
+    showShorthand (Sn1LCL r1 r2 r3)       = renderKnownSnLCL showShorthand "sn1" r1 r2 r3
+    showShorthand (Sn2LCL r1 r2 r3)       = renderKnownSnLCL showShorthand "sn2" r1 r2 r3
 
 instance Nomenclature LCL where
-    showNnomenclature (UnknownSnLCL x y z)   = "LCL " ++ fa1 ++ "_0:0_" ++ fa2 ++ "_" ++ fa3 
-        where fa1 = showNnomenclature x
-              fa2 = showNnomenclature y
-              fa3 = showNnomenclature z
-    showNnomenclature (Sn1LCL x y z)       = "CL " ++ sn1 ++ "/0:0/" ++ sn1' ++ "/" ++ sn2'
-        where sn1  = showNnomenclature x
-              sn1' = showNnomenclature y
-              sn2' = showNnomenclature z
-    showNnomenclature (Sn2LCL x y z)       = "CL 0:0/" ++ sn2 ++ "/" ++ sn1' ++ "/" ++ sn2'
-        where sn2  = showNnomenclature x
-              sn1' = showNnomenclature y
-              sn2' = showNnomenclature z 
+    showNnomenclature (UnknownSnLCL r1 r2 r3) = renderUnknownSnLCL showNnomenclature r1 r2 r3
+    showNnomenclature (Sn1LCL r1 r2 r3)       = renderKnownSnLCL showNnomenclature "sn1" r1 r2 r3
+    showNnomenclature (Sn2LCL r1 r2 r3)       = renderKnownSnLCL showNnomenclature "sn2" r1 r2 r3
 
+renderUnknownSnLCL f r1 r2 r3 = "LCL " ++ f r1 ++ "_" ++ f r2 ++ "_" ++ f r3
+  
+renderKnownSnLCL f sn r1 r2 r3 =
+  case sn of
+    "sn1" -> "LCL " ++ f r1 ++ "/0:0/" ++ f r2 ++ "/" ++ f r3
+    "sn2" -> "LCL 0:0/" ++ f r1 ++ "/" ++ f r2 ++ "/" ++ f r3
