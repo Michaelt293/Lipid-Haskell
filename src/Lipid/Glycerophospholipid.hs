@@ -1,6 +1,6 @@
 {-|
 Module      : Lipid.Glycerophospholipid
-Description : Glycerophospholipid data type and instances of Shorthand and
+Description : Glycerophospholipid data types and instances of Shorthand and
               Nomenclature defined.
 Copyright   : Michael Thomas
 License     : GPL-3
@@ -16,50 +16,49 @@ import Lipid.Format
 
 
 data PA   = ClassLevelPA       IntegerMass
-          | CombinedRadylsPA   CombinedRadyls
+          | CombinedRadylsPA   TwoCombinedRadyls
           | UnknownSnPA        Radyl Radyl
           | KnownSnPA          Radyl Radyl
           deriving (Show, Eq, Ord)
 
-
 data PC   = ClassLevelPC       IntegerMass
-          | CombinedRadylsPC   CombinedRadyls
+          | CombinedRadylsPC   TwoCombinedRadyls
           | UnknownSnPC        Radyl Radyl
           | KnownSnPC          Radyl Radyl
           deriving (Show, Eq, Ord)
 
 data PE   = ClassLevelPE       IntegerMass
-          | CombinedRadylsPE   CombinedRadyls
+          | CombinedRadylsPE   TwoCombinedRadyls
           | UnknownSnPE        Radyl Radyl
           | KnownSnPE          Radyl Radyl
           deriving (Show, Eq, Ord)
 
 data PG   = ClassLevelPG       IntegerMass
-          | CombinedRadylsPG   CombinedRadyls
+          | CombinedRadylsPG   TwoCombinedRadyls
           | UnknownSnPG        Radyl Radyl
           | KnownSnPG          Radyl Radyl
           deriving (Show, Eq, Ord)
 
 data PGP  = ClassLevelPGP      IntegerMass
-          | CombinedRadylsPGP  CombinedRadyls
+          | CombinedRadylsPGP  TwoCombinedRadyls
           | UnknownSnPGP       Radyl Radyl
           | KnownSnPGP         Radyl Radyl
           deriving (Show, Eq, Ord)
 
 data PI   = ClassLevelPI       IntegerMass
-          | CombinedRadylsPI   CombinedRadyls
+          | CombinedRadylsPI   TwoCombinedRadyls
           | UnknownSnPI        Radyl Radyl
           | KnownSnPI          Radyl Radyl
           deriving (Show, Eq, Ord)
 
 data PIP  = ClassLevelPIP      IntegerMass
-          | CombinedRadylsPIP  CombinedRadyls (Maybe PhosphatePosition)
+          | CombinedRadylsPIP  TwoCombinedRadyls (Maybe PhosphatePosition)
           | UnknownSnPIP       Radyl Radyl (Maybe PhosphatePosition)
           | KnownSnPIP         Radyl Radyl (Maybe PhosphatePosition)
           deriving (Show, Eq, Ord)
 
 data PIP2 = ClassLevelPIP2     IntegerMass
-          | CombinedRadylsPIP2 CombinedRadyls ( Maybe PhosphatePosition
+          | CombinedRadylsPIP2 TwoCombinedRadyls ( Maybe PhosphatePosition
                                               , Maybe PhosphatePosition )
           | UnknownSnPIP2      Radyl Radyl ( Maybe PhosphatePosition
                                            , Maybe PhosphatePosition )
@@ -68,310 +67,239 @@ data PIP2 = ClassLevelPIP2     IntegerMass
           deriving (Show, Eq, Ord)
 
 data PIP3 = ClassLevelPIP3     IntegerMass
-          | CombinedRadylsPIP3 CombinedRadyls
+          | CombinedRadylsPIP3 TwoCombinedRadyls
           | UnknownSnPIP3      Radyl Radyl
           | KnownSnPIP3        Radyl Radyl
           deriving (Show, Eq, Ord)
 
 data PS   = ClassLevelPS       IntegerMass
-          | CombinedRadylsPS   CombinedRadyls
+          | CombinedRadylsPS   TwoCombinedRadyls
           | UnknownSnPS        Radyl Radyl
           | KnownSnPS          Radyl Radyl
           deriving (Show, Eq, Ord)
 
 data CL   = ClassLevelCL       IntegerMass
-          | CombinedRadylsCL   CombinedRadyls
+          | CombinedRadylsCL   FourCombinedRadyls
           | UnknownSnCL        Radyl Radyl Radyl Radyl
           | KnownSnCL          Radyl Radyl Radyl Radyl
           deriving (Show, Eq, Ord)
 
 data BMP  = ClassLevelBMP     IntegerMass
-          | CombinedRadylsBMP CombinedRadyls
+          | CombinedRadylsBMP TwoCombinedRadyls
           | BMP               Radyl Radyl
           deriving (Show, Eq, Ord)
 
 
 instance Shorthand PA where
-    showShorthand (ClassLevelPA x)          = "PA (" ++ show x ++ ")" 
-    showShorthand (CombinedRadylsPA x)      = "PA " ++ showShorthand x 
-    showShorthand (UnknownSnPA x y)      = "PA " ++ fa1 ++ "_" ++ fa2
-        where fa1 = showShorthand x
-              fa2 = showShorthand y
-    showShorthand (KnownSnPA x y)           = "PA " ++ sn1 ++ "/" ++ sn2
-        where sn1 = showShorthand x
-              sn2 = showShorthand y
+    showShorthand l =
+      case l of
+        (ClassLevelPA n)      -> "PA (" ++ show n ++ ")"
+        (CombinedRadylsPA rs) -> "PA " ++ showShorthand rs
+        (UnknownSnPA r1 r2)   -> renderDiradylPL showShorthand "PA" "_" r1 r2
+        (KnownSnPA r1 r2)     -> renderDiradylPL showShorthand "PA" "/" r1 r2
  
 instance Nomenclature PA where
-    showNnomenclature (ClassLevelPA x)      = "PA (" ++ show x ++ ")" 
-    showNnomenclature (CombinedRadylsPA x)  = "PA " ++ showNnomenclature x 
-    showNnomenclature (UnknownSnPA x y)  = "PA " ++ fa1 ++ "_" ++ fa2
-        where fa1 = showNnomenclature x
-              fa2 = showNnomenclature y
-    showNnomenclature (KnownSnPA x y)       = "PA " ++ sn1 ++ "/" ++ sn2
-        where sn1 = showNnomenclature x
-              sn2 = showNnomenclature y
+    showNnomenclature l =
+      case l of
+        (ClassLevelPA n)      -> "PA (" ++ show n ++ ")"
+        (CombinedRadylsPA rs) -> "PA " ++ showNnomenclature rs
+        (UnknownSnPA r1 r2)   -> renderDiradylPL showNnomenclature "PA" "_" r1 r2
+        (KnownSnPA r1 r2)     -> renderDiradylPL showNnomenclature "PA" "/" r1 r2
 
 instance Shorthand PC where
-    showShorthand (ClassLevelPC x)          = "PC (" ++ show x ++ ")" 
-    showShorthand (CombinedRadylsPC x)      = "PC " ++ showShorthand x 
-    showShorthand (UnknownSnPC x y)      = "PC " ++ fa1 ++ "_" ++ fa2
-        where fa1 = showShorthand x
-              fa2 = showShorthand y
-    showShorthand (KnownSnPC x y)           = "PC " ++ sn1 ++ "/" ++ sn2
-        where sn1 = showShorthand x
-              sn2 = showShorthand y
+    showShorthand l =
+      case l of
+        (ClassLevelPC n)      -> "PC (" ++ show n ++ ")"
+        (CombinedRadylsPC rs) -> "PC " ++ showShorthand rs
+        (UnknownSnPC r1 r2)   -> renderDiradylPL showShorthand "PC" "_" r1 r2
+        (KnownSnPC r1 r2)     -> renderDiradylPL showShorthand "PC" "/" r1 r2
  
 instance Nomenclature PC where
-    showNnomenclature (ClassLevelPC x)      = "PC (" ++ show x ++ ")" 
-    showNnomenclature (CombinedRadylsPC x)  = "PC " ++ showNnomenclature x 
-    showNnomenclature (UnknownSnPC x y)  = "PC " ++ fa1 ++ "_" ++ fa2
-        where fa1 = showNnomenclature x
-              fa2 = showNnomenclature y
-    showNnomenclature (KnownSnPC x y)       = "PC " ++ sn1 ++ "/" ++ sn2
-        where sn1 = showNnomenclature x
-              sn2 = showNnomenclature y
+    showNnomenclature l =
+      case l of
+        (ClassLevelPC n)      -> "PC (" ++ show n ++ ")"
+        (CombinedRadylsPC rs) -> "PC " ++ showNnomenclature rs
+        (UnknownSnPC r1 r2)   -> renderDiradylPL showNnomenclature "PC" "_" r1 r2
+        (KnownSnPC r1 r2)     -> renderDiradylPL showNnomenclature "PC" "/" r1 r2
 
 instance Shorthand PE where
-    showShorthand (ClassLevelPE x)          = "PE (" ++ show x ++ ")" 
-    showShorthand (CombinedRadylsPE x)      = "PE " ++ showShorthand x 
-    showShorthand (UnknownSnPE x y)      = "PE " ++ fa1 ++ "_" ++ fa2
-        where fa1 = showShorthand x
-              fa2 = showShorthand y
-    showShorthand (KnownSnPE x y)           = "PE " ++ sn1 ++ "/" ++ sn2
-        where sn1 = showShorthand x
-              sn2 = showShorthand y
+    showShorthand l =
+      case l of
+        (ClassLevelPE n)      -> "PE (" ++ show n ++ ")"
+        (CombinedRadylsPE rs) -> "PE " ++ showShorthand rs
+        (UnknownSnPE r1 r2)   -> renderDiradylPL showShorthand "PE" "_" r1 r2
+        (KnownSnPE r1 r2)     -> renderDiradylPL showShorthand "PE" "/" r1 r2
  
 instance Nomenclature PE where
-    showNnomenclature (ClassLevelPE x)      = "PE (" ++ show x ++ ")" 
-    showNnomenclature (CombinedRadylsPE x)  = "PE " ++ showNnomenclature x 
-    showNnomenclature (UnknownSnPE x y)  = "PE " ++ fa1 ++ "_" ++ fa2
-        where fa1 = showNnomenclature x
-              fa2 = showNnomenclature y
-    showNnomenclature (KnownSnPE x y)       = "PE " ++ sn1 ++ "/" ++ sn2
-        where sn1 = showNnomenclature x
-              sn2 = showNnomenclature y
+    showNnomenclature l =
+      case l of
+        (ClassLevelPE n)      -> "PE (" ++ show n ++ ")"
+        (CombinedRadylsPE rs) -> "PE " ++ showNnomenclature rs
+        (UnknownSnPE r1 r2)   -> renderDiradylPL showNnomenclature "PE" "_" r1 r2
+        (KnownSnPE r1 r2)     -> renderDiradylPL showNnomenclature "PE" "/" r1 r2
 
 instance Shorthand PG where
-    showShorthand (ClassLevelPG x)          = "PG (" ++ show x ++ ")" 
-    showShorthand (CombinedRadylsPG x)      = "PG " ++ showShorthand x 
-    showShorthand (UnknownSnPG x y)      = "PG " ++ fa1 ++ "_" ++ fa2
-        where fa1 = showShorthand x
-              fa2 = showShorthand y
-    showShorthand (KnownSnPG x y)           = "PG " ++ sn1 ++ "/" ++ sn2
-        where sn1 = showShorthand x
-              sn2 = showShorthand y
+    showShorthand l =
+      case l of
+        (ClassLevelPG n)      -> "PG (" ++ show n ++ ")"
+        (CombinedRadylsPG rs) -> "PG " ++ showShorthand rs
+        (UnknownSnPG r1 r2)   -> renderDiradylPL showShorthand "PG" "_" r1 r2
+        (KnownSnPG r1 r2)     -> renderDiradylPL showShorthand "PG" "/" r1 r2
  
 instance Nomenclature PG where
-    showNnomenclature (ClassLevelPG x)      = "PG (" ++ show x ++ ")" 
-    showNnomenclature (CombinedRadylsPG x)  = "PG " ++ showNnomenclature x 
-    showNnomenclature (UnknownSnPG x y)  = "PG " ++ fa1 ++ "_" ++ fa2
-        where fa1 = showNnomenclature x
-              fa2 = showNnomenclature y
-    showNnomenclature (KnownSnPG x y)       = "PG " ++ sn1 ++ "/" ++ sn2
-        where sn1 = showNnomenclature x
-              sn2 = showNnomenclature y
+    showNnomenclature l =
+      case l of
+        (ClassLevelPG n)      -> "PG (" ++ show n ++ ")"
+        (CombinedRadylsPG rs) -> "PG " ++ showNnomenclature rs
+        (UnknownSnPG r1 r2)   -> renderDiradylPL showNnomenclature "PG" "_" r1 r2
+        (KnownSnPG r1 r2)     -> renderDiradylPL showNnomenclature "PG" "/" r1 r2
 
 instance Shorthand PGP where
-    showShorthand (ClassLevelPGP x)         = "PGP (" ++ show x ++ ")" 
-    showShorthand (CombinedRadylsPGP x)     = "PGP " ++ showShorthand x 
-    showShorthand (UnknownSnPGP x y)     = "PGP " ++ fa1 ++ "_" ++ fa2
-        where fa1 = showShorthand x
-              fa2 = showShorthand y
-    showShorthand (KnownSnPGP x y)          = "PGP " ++ sn1 ++ "/" ++ sn2
-        where sn1 = showShorthand x
-              sn2 = showShorthand y
- 
+    showShorthand l =
+      case l of
+        (ClassLevelPGP n)      -> "PGP (" ++ show n ++ ")"
+        (CombinedRadylsPGP rs) -> "PGP " ++ showShorthand rs
+        (UnknownSnPGP r1 r2)   -> renderDiradylPL showShorthand "PGP" "_" r1 r2
+        (KnownSnPGP r1 r2)     -> renderDiradylPL showShorthand "PGP" "/" r1 r2
+
 instance Nomenclature PGP where
-    showNnomenclature (ClassLevelPGP x)     = "PGP (" ++ show x ++ ")" 
-    showNnomenclature (CombinedRadylsPGP x) = "PGP " ++ showNnomenclature x 
-    showNnomenclature (UnknownSnPGP x y) = "PGP " ++ fa1 ++ "_" ++ fa2
-        where fa1 = showNnomenclature x
-              fa2 = showNnomenclature y
-    showNnomenclature (KnownSnPGP x y)      = "PGP " ++ sn1 ++ "/" ++ sn2
-        where sn1 = showNnomenclature x
-              sn2 = showNnomenclature y
+    showNnomenclature l =
+      case l of
+        (ClassLevelPGP n)      -> "PGP (" ++ show n ++ ")"
+        (CombinedRadylsPGP rs) -> "PGP " ++ showNnomenclature rs
+        (UnknownSnPGP r1 r2)   -> renderDiradylPL showNnomenclature "PGP" "_" r1 r2
+        (KnownSnPGP r1 r2)     -> renderDiradylPL showNnomenclature "PGP" "/" r1 r2
 
 instance Shorthand PI where
-    showShorthand (ClassLevelPI x)         = "PI (" ++ show x ++ ")" 
-    showShorthand (CombinedRadylsPI x)     = "PI " ++ showShorthand x 
-    showShorthand (UnknownSnPI x y)     = "PI " ++ fa1 ++ "_" ++ fa2
-        where fa1 = showShorthand x
-              fa2 = showShorthand y
-    showShorthand (KnownSnPI x y)          = "PI " ++ sn1 ++ "/" ++ sn2
-        where sn1 = showShorthand x
-              sn2 = showShorthand y
- 
+    showShorthand l =
+      case l of
+        (ClassLevelPI n)      -> "PI (" ++ show n ++ ")"
+        (CombinedRadylsPI rs) -> "PI " ++ showShorthand rs
+        (UnknownSnPI r1 r2)   -> renderDiradylPL showShorthand "PI" "_" r1 r2
+        (KnownSnPI r1 r2)     -> renderDiradylPL showShorthand "PI" "/" r1 r2
+
 instance Nomenclature PI where
-    showNnomenclature (ClassLevelPI x)     = "PI (" ++ show x ++ ")" 
-    showNnomenclature (CombinedRadylsPI x) = "PI " ++ showNnomenclature x 
-    showNnomenclature (UnknownSnPI x y) = "PI " ++ fa1 ++ "_" ++ fa2
-        where fa1 = showNnomenclature x
-              fa2 = showNnomenclature y
-    showNnomenclature (KnownSnPI x y)      = "PI " ++ sn1 ++ "/" ++ sn2
-        where sn1 = showNnomenclature x
-              sn2 = showNnomenclature y
+    showNnomenclature l =
+      case l of
+        (ClassLevelPI n)      -> "PI (" ++ show n ++ ")"
+        (CombinedRadylsPI rs) -> "PI " ++ showNnomenclature rs
+        (UnknownSnPI r1 r2)   -> renderDiradylPL showNnomenclature "PI" "_" r1 r2
+        (KnownSnPI r1 r2)     -> renderDiradylPL showNnomenclature "PI" "/" r1 r2
 
 instance Shorthand PIP where
-    showShorthand (ClassLevelPIP x)        = "PIP (" ++ show x ++ ")"
-    showShorthand (CombinedRadylsPIP x p)  = "PIP" ++ po4 ++ " " ++ showShorthand x
-        where po4 = case p of
-                        Nothing  -> ""
-                        (Just p') -> wrapBrackets $ showShorthand p'
-    showShorthand (UnknownSnPIP x y p)  = "PIP" ++ po4 ++ " " ++ fa1 ++ "_" ++ fa2
-        where fa1 = showShorthand x
-              fa2 = showShorthand y
-              po4 = case p of
-                        Nothing  -> ""
-                        (Just p') -> wrapBrackets $ showShorthand p'
-    showShorthand (KnownSnPIP x y p) = "PIP" ++ po4 ++ " " ++ sn1 ++ "/" ++ sn2
-        where sn1 = showShorthand x
-              sn2 = showShorthand y
-              po4 = case p of
-                        Nothing  -> ""
-                        (Just p') -> wrapBrackets $ showShorthand p'
+    showShorthand l =
+      case l of
+        (ClassLevelPIP n)       ->   "PIP (" ++ show n ++ ")"
+        (CombinedRadylsPIP rs p) ->   "PIP" ++ renderPO4 p ++ " " ++ showShorthand rs
+        (UnknownSnPIP r1 r2 p)   -> renderPIPs showShorthand renderPO4 "_" r1 r2 p
+        (KnownSnPIP r1 r2 p)     -> renderPIPs showShorthand renderPO4 "/" r1 r2 p
 
 instance Nomenclature PIP where
-    showNnomenclature (ClassLevelPIP x)        = "PIP (" ++ show x ++ ")"
-    showNnomenclature (CombinedRadylsPIP x p)  = "PIP" ++ po4 ++ " " ++ showNnomenclature x
-        where po4 = case p of
-                        Nothing  -> ""
-                        (Just p') -> wrapBrackets $ showShorthand p'
-    showNnomenclature (UnknownSnPIP x y p)  = "PIP" ++ po4 ++ " " ++ fa1 ++ "_" ++ fa2
-        where fa1 = showNnomenclature x
-              fa2 = showNnomenclature y
-              po4 = case p of
-                        Nothing  -> ""
-                        (Just p') -> wrapBrackets $ showShorthand p'
-    showNnomenclature (KnownSnPIP x y p)       = "PIP" ++ po4 ++ " " ++ sn1 ++ "/" ++ sn2
-        where sn1 = showNnomenclature x
-              sn2 = showNnomenclature y
-              po4 = case p of
-                        Nothing  -> ""
-                        (Just p') -> wrapBrackets $ showShorthand p'
+    showNnomenclature l =
+      case l of
+        (ClassLevelPIP n)       ->   "PIP (" ++ show n ++ ")"
+        (CombinedRadylsPIP rs p) ->   "PIP" ++ renderPO4 p ++ " " ++ showNnomenclature rs
+        (UnknownSnPIP r1 r2 p)   -> renderPIPs showNnomenclature renderPO4 "_" r1 r2 p
+        (KnownSnPIP r1 r2 p)     -> renderPIPs showNnomenclature renderPO4 "/" r1 r2 p
 
 instance Shorthand PIP2 where
-    showShorthand (ClassLevelPIP2 x)          = "PIP2 (" ++ show x ++ ")"
-    showShorthand (CombinedRadylsPIP2 x p)    = "PIP2" ++ po4 ++ " " ++ showShorthand x
-        where po4 = case p of
-                        (Nothing, _)  -> ""
-                        (_, Nothing)  -> ""
-                        (Just p1, Just p2) -> wrapBrackets $ showShorthand p1 ++ "," ++ showShorthand p2
-    showShorthand (UnknownSnPIP2 x y p)    = "PIP2" ++ po4 ++ " " ++ fa1 ++ "_" ++ fa2
-        where fa1 = showShorthand x
-              fa2 = showShorthand y
-              po4 = case p of
-                        (Nothing, _)  -> ""
-                        (_, Nothing)  -> ""
-                        (Just p1, Just p2) -> wrapBrackets $ showShorthand p1 ++ "," ++ showShorthand p2
-    showShorthand (KnownSnPIP2 x y p) = "PIP2" ++ po4 ++ " " ++ sn1 ++ "/" ++ sn2
-        where sn1 = showShorthand x
-              sn2 = showShorthand y
-              po4 = case p of
-                        (Nothing, _)  -> ""
-                        (_, Nothing)  -> ""
-                        (Just p1, Just p2) -> wrapBrackets $ showShorthand p1 ++ "," ++ showShorthand p2
+    showShorthand l =
+      case l of
+        (ClassLevelPIP2 n)         -> "PIP2 (" ++ show n ++ ")"
+        (CombinedRadylsPIP2 rs ps) -> "PIP2" ++ renderPO4s ps ++ " " ++ showShorthand rs
+        (UnknownSnPIP2 r1 r2 ps)   -> renderPIPs showShorthand renderPO4s "_" r1 r2 ps
+        (KnownSnPIP2 r1 r2 ps)     -> renderPIPs showShorthand renderPO4s "/" r1 r2 ps
 
 instance Nomenclature PIP2 where
-    showNnomenclature (ClassLevelPIP2 x)        = "PIP (" ++ show x ++ ")"
-    showNnomenclature (CombinedRadylsPIP2 x p)  = "PIP" ++ po4 ++ " " ++ showNnomenclature x
-        where po4 = case p of
-                        (Nothing, _)  -> ""
-                        (_, Nothing)  -> ""
-                        (Just p1, Just p2) -> wrapBrackets $ showShorthand p1 ++ "," ++ showShorthand p2
-    showNnomenclature (UnknownSnPIP2 x y p)  = "PIP" ++ po4 ++ " " ++ fa1 ++ "_" ++ fa2
-        where fa1 = showNnomenclature x
-              fa2 = showNnomenclature y
-              po4 = case p of
-                        (Nothing, _)  -> ""
-                        (_, Nothing)  -> ""
-                        (Just p1, Just p2) -> wrapBrackets $ showShorthand p1 ++ "," ++ showShorthand p2
-    showNnomenclature (KnownSnPIP2 x y p)       = "PIP" ++ po4 ++ " " ++ sn1 ++ "/" ++ sn2
-        where sn1 = showNnomenclature x
-              sn2 = showNnomenclature y
-              po4 = case p of
-                        (Nothing, _)  -> ""
-                        (_, Nothing)  -> ""
-                        (Just p1, Just p2) -> wrapBrackets $ showShorthand p1 ++ "," ++ showShorthand p2
+    showNnomenclature l =
+      case l of
+        (ClassLevelPIP2 n)         -> "PIP (" ++ show n ++ ")"
+        (CombinedRadylsPIP2 rs ps) -> "PIP" ++ renderPO4s ps ++ " " ++ showNnomenclature rs
+        (UnknownSnPIP2 r1 r2 ps)   -> renderPIPs showNnomenclature renderPO4s "_" r1 r2 ps
+        (KnownSnPIP2 r1 r2 ps)     -> renderPIPs showNnomenclature renderPO4s "/" r1 r2 ps
+
+renderPIPs f1 f2 sep r1 r2 p  = "PIP" ++ f2 p ++ " " ++ r1' ++ "_" ++ r2'
+    where r1' = f1 r1
+          r2' = f1 r2
+
+renderPO4 p =
+  case p of
+    Nothing  -> ""
+    (Just p') -> wrapBrackets $ showShorthand p'
+
+renderPO4s ps =
+  case ps of
+    (Just p1, Just p2) -> wrapBrackets $ showShorthand p1 ++ "," ++ showShorthand p2
+    (_, _)  -> ""
 
 instance Shorthand PIP3 where
-    showShorthand (ClassLevelPIP3 x)         = "PIP3 (" ++ show x ++ ")" 
-    showShorthand (CombinedRadylsPIP3 x)     = "PIP3 " ++ showShorthand x 
-    showShorthand (UnknownSnPIP3 x y)     = "PIP3 " ++ fa1 ++ "_" ++ fa2
-        where fa1 = showShorthand x
-              fa2 = showShorthand y
-    showShorthand (KnownSnPIP3 x y)          = "PIP3 " ++ sn1 ++ "/" ++ sn2
-        where sn1 = showShorthand x
-              sn2 = showShorthand y
- 
+    showShorthand l =
+      case l of
+        (ClassLevelPIP3 n)      -> "PIP3 (" ++ show n ++ ")"
+        (CombinedRadylsPIP3 rs) -> "PIP3 " ++ showShorthand rs
+        (UnknownSnPIP3 r1 r2)   -> renderDiradylPL showShorthand "PS" "_" r1 r2
+        (KnownSnPIP3 r1 r2)     -> renderDiradylPL showShorthand "PS" "_" r1 r2
+
 instance Nomenclature PIP3 where
-    showNnomenclature (ClassLevelPIP3 x)     = "PIP3 (" ++ show x ++ ")" 
-    showNnomenclature (CombinedRadylsPIP3 x) = "PIP3 " ++ showNnomenclature x 
-    showNnomenclature (UnknownSnPIP3 x y) = "PIP3 " ++ fa1 ++ "_" ++ fa2
-        where fa1 = showNnomenclature x
-              fa2 = showNnomenclature y
-    showNnomenclature (KnownSnPIP3 x y)      = "PIP3 " ++ sn1 ++ "/" ++ sn2
-        where sn1 = showNnomenclature x
-              sn2 = showNnomenclature y
+    showNnomenclature l =
+      case l of
+        (ClassLevelPIP3 n)      -> "PIP3 (" ++ show n ++ ")"
+        (CombinedRadylsPIP3 rs) -> "PIP3 " ++ showNnomenclature rs
+        (UnknownSnPIP3 r1 r2)   -> renderDiradylPL showNnomenclature "PS" "_" r1 r2
+        (KnownSnPIP3 r1 r2)     -> renderDiradylPL showNnomenclature "PS" "_" r1 r2
 
 instance Shorthand PS where
-    showShorthand (ClassLevelPS x)           = "PS (" ++ show x ++ ")" 
-    showShorthand (CombinedRadylsPS x)       = "PS " ++ showShorthand x 
-    showShorthand (UnknownSnPS x y)       = "PS " ++ fa1 ++ "_" ++ fa2
-        where fa1 = showShorthand x
-              fa2 = showShorthand y
-    showShorthand (KnownSnPS x y)            = "PS " ++ sn1 ++ "/" ++ sn2
-        where sn1 = showShorthand x
-              sn2 = showShorthand y
+    showShorthand l =
+      case l of
+        (ClassLevelPS n)      -> "PS (" ++ show n ++ ")"
+        (CombinedRadylsPS rs) -> "PS " ++ showShorthand rs
+        (UnknownSnPS r1 r2)   -> renderDiradylPL showShorthand "PS" "_" r1 r2
+        (KnownSnPS r1 r2)     -> renderDiradylPL showShorthand "PS" "/" r1 r2
  
 instance Nomenclature PS where
-    showNnomenclature (ClassLevelPS x)       = "PS (" ++ show x ++ ")" 
-    showNnomenclature (CombinedRadylsPS x)   = "PS " ++ showNnomenclature x 
-    showNnomenclature (UnknownSnPS x y)   = "PS " ++ fa1 ++ "_" ++ fa2
-        where fa1 = showNnomenclature x
-              fa2 = showNnomenclature y
-    showNnomenclature (KnownSnPS x y)        = "PS " ++ sn1 ++ "/" ++ sn2
-        where sn1 = showNnomenclature x
-              sn2 = showNnomenclature y
+    showNnomenclature l =
+      case l of
+        (ClassLevelPS n)      -> "PS (" ++ show n ++ ")"
+        (CombinedRadylsPS rs) -> "PS " ++ showNnomenclature rs
+        (UnknownSnPS r1 r2)   -> renderDiradylPL showNnomenclature "PS" "_" r1 r2
+        (KnownSnPS r1 r2)     -> renderDiradylPL showNnomenclature "PS" "/" r1 r2
 
 instance Shorthand CL where
-    showShorthand (ClassLevelCL x)           = "CL (" ++ show x ++ ")" 
-    showShorthand (CombinedRadylsCL x)       = "CL " ++ showShorthand x 
-    showShorthand (UnknownSnCL x y z w) = "CL " ++ fa1 ++ "_" ++ fa2 ++ "_" ++ fa3 ++ "_" ++ fa4
-        where fa1 = showShorthand x
-              fa2 = showShorthand y
-              fa3 = showShorthand z
-              fa4 = showShorthand w
-    showShorthand (KnownSnCL x y z w)        = "CL " ++ sn1 ++ "/" ++ sn2 ++ "/" ++ sn1' ++ "/" ++ sn2'
-        where sn1 = showShorthand x
-              sn2 = showShorthand y
-              sn1' = showShorthand z
-              sn2' = showShorthand w
- 
+    showShorthand l =
+      case l of
+        (ClassLevelCL n)          -> "CL (" ++ show n ++ ")"
+        (CombinedRadylsCL rs)     -> "CL " ++ showShorthand rs
+        (UnknownSnCL r1 r2 r3 r4) -> renderCL showShorthand "_" r1 r2 r3 r4
+        (KnownSnCL r1 r2 r3 r4)   -> renderCL showShorthand "/" r1 r2 r3 r4
+
 instance Nomenclature CL where
-    showNnomenclature (ClassLevelCL x)           = "CL (" ++ show x ++ ")" 
-    showNnomenclature (CombinedRadylsCL x)       = "CL " ++ showNnomenclature x 
-    showNnomenclature (UnknownSnCL x y z w) = "CL " ++ fa1 ++ "_" ++ fa2 ++ "_" ++ fa3 ++ "_" ++ fa4
-        where fa1 = showNnomenclature x
-              fa2 = showNnomenclature y
-              fa3 = showNnomenclature z
-              fa4 = showNnomenclature w
-    showNnomenclature (KnownSnCL x y z w)        = "CL " ++ sn1 ++ "/" ++ sn2 ++ "/" ++ sn1' ++ "/" ++ sn2'
-        where sn1 = showNnomenclature x
-              sn2 = showNnomenclature y
-              sn1' = showNnomenclature z
-              sn2' = showNnomenclature w
+    showNnomenclature l =
+      case l of
+        (ClassLevelCL n)          -> "CL (" ++ show n ++ ")"
+        (CombinedRadylsCL rs)     -> "CL " ++ showNnomenclature rs
+        (UnknownSnCL r1 r2 r3 r4) -> renderCL showNnomenclature "_" r1 r2 r3 r4
+        (KnownSnCL r1 r2 r3 r4)   -> renderCL showNnomenclature "/" r1 r2 r3 r4
+
+renderCL f sep r1 r2 r3 r4 = "CL " ++ r1' ++ sep ++ r2' ++ sep ++ r3'++ sep ++ r4'
+    where r1' = f r1
+          r2' = f r2
+          r3' = f r3
+          r4' = f r4
 
 instance Shorthand BMP where
-    showShorthand (ClassLevelBMP x)           = "BMP (" ++ show x ++ ")" 
-    showShorthand (CombinedRadylsBMP x)       = "BMP " ++ showShorthand x 
-    showShorthand (BMP x y)       = "BMP " ++ fa1 ++ "/" ++ fa2
-        where fa1 = showShorthand x
-              fa2 = showShorthand y
- 
-instance Nomenclature BMP where
-    showNnomenclature (ClassLevelBMP x)       = "BMP (" ++ show x ++ ")" 
-    showNnomenclature (CombinedRadylsBMP x)   = "BMP " ++ showNnomenclature x 
-    showNnomenclature (BMP x y)   = "BMP " ++ fa1 ++ "/" ++ fa2
-        where fa1 = showNnomenclature x
-              fa2 = showNnomenclature y
+    showShorthand l =
+      case l of
+        (ClassLevelBMP n)      -> "BMP (" ++ show n ++ ")"
+        (CombinedRadylsBMP rs) -> "BMP " ++ showShorthand rs
+        (BMP r1 r2)            -> renderDiradylPL showShorthand "BMP" "/" r1 r2
 
+instance Nomenclature BMP where
+    showNnomenclature l =
+      case l of
+        (ClassLevelBMP n)      -> "BMP (" ++ show n ++ ")"
+        (CombinedRadylsBMP rs) -> "BMP " ++ showNnomenclature rs
+        (BMP r1 r2)            -> renderDiradylPL showNnomenclature "BMP" "/" r1 r2
+
+renderDiradylPL f h sep r1 r2 = h ++ " " ++ r1' ++ sep ++ r2'
+    where r1' = f r1
+          r2' = f r2

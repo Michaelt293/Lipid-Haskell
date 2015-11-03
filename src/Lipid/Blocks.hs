@@ -1,12 +1,13 @@
 {-|
 Module      : Lipid.Blocks
-Description : Module contains data types used to construct lipid data types.
-              In addition, the classes Shorthand and Nomenclature are defined.
+Description : Module contains lipid data types. In addition,
+              the classes Shorthand and Nomenclature are defined.
 Copyright   : Michael Thomas
 License     : GPL-3
 Maintainer  : Michael Thomas <Michaelt293@gmail.com>
 Stability   : Experimental
 -}
+
 
 module Lipid.Blocks
     (
@@ -18,10 +19,14 @@ module Lipid.Blocks
     , MoietyData(..)
     , Geometry(..)
     , CarbonChain(..)
-    , CombinedChains(..)
+    , TwoCombinedChains(..)
+    , ThreeCombinedChains(..)
+    , FourCombinedChains(..)
     , Linkage(..)
     , Radyl(..)
-    , CombinedRadyls(..)
+    , TwoCombinedRadyls(..)
+    , ThreeCombinedRadyls(..)
+    , FourCombinedRadyls(..)
     , SnPosition(..)
     , PhosphatePosition(..)
     , Shorthand(..)
@@ -43,18 +48,30 @@ import qualified Data.List as List
 import qualified Data.Maybe as Maybe
 import           Lipid.Format
 
-data Carbons = Carbons Integer
-             deriving (Show, Eq, Ord)
+-- |Carbons represents the number of carbons in a single carbon chain or
+-- two or more combined chains.
+newtype Carbons = Carbons Integer
+                deriving (Show, Eq, Ord)
 
+-- |NumDoubleBonds represents the number of carbon-carbon double bonds
+-- on a carbon chain.
 newtype NumDoubleBonds = NumDoubleBonds {numDoubleBonds :: Integer}
                        deriving (Show, Eq, Ord)
 
+-- |Position represents the position of carbon-carbon double bonds or
+-- moieties on a carbon chain. Positions can be provided from the
+-- methyl end (Omega) or from the linkage (Delta).
 data Position = Omega Integer
               | Delta Integer
               deriving (Show, Eq)
 
-data Geometry = Cis | Trans deriving (Show, Eq, Ord)
+-- |Geometry represent the geometry of carbon-carbon double bonds.
+data Geometry = Cis | Trans
+              deriving (Show, Eq, Ord)
 
+-- |Moiety represents moieties commonly found on carbon chains
+-- (Hydroxyl, Keto and Methyl) as well as ozonolysis products
+-- (Criegee and Ozonide) observed in OzID experiments.
 data Moiety   = Hydroxyl
               | Keto
               | Methyl
@@ -62,38 +79,80 @@ data Moiety   = Hydroxyl
               | Ozonide
               deriving (Show, Eq, Ord)
 
-data DoubleBond = DoubleBond          { dbPosition          :: (Maybe Position)
-                                      , geometry            :: (Maybe Geometry) }
-                                      deriving (Show, Eq, Ord)
+-- |DoubleBond represents a carbon-carbon double bond as found on
+-- carbon chains. A DoubleBond data type has two fields, Maybe Position
+-- and Maybe Geometry. These fields use the Maybe type to
+-- account for uncertainity (i.e., Nothing represents an unknown
+-- position or geometry).
+data DoubleBond = DoubleBond
+    { dbPosition :: (Maybe Position)
+    , geometry   :: (Maybe Geometry) }
+    deriving (Show, Eq, Ord)
 
-data MoietyData = MoietyData          { moiety              :: Moiety
-                                      , moietyPosition      :: (Maybe Position) }
-                                      deriving (Show, Eq, Ord)
+-- |MoietyData represents a moiety on a carbon chain. A MoietyData
+-- data type has two fields, Moiety and Maybe Position. The use of
+-- the Maybe type accounts for uncertainity (i.e., Nothing
+-- represents and unknown moiety position).
+data MoietyData = MoietyData
+    { moiety         :: Moiety
+    , moietyPosition :: (Maybe Position) }
+    deriving (Show, Eq, Ord)
 
+-- |CarbonChain represents a carbon chain. A carbon chain can be
+-- a SimpleCarbonChain (no additional moieties) or a ComplexCarbonChain
+-- (addition moieties). SimpleCarbonChain has two fields, Carbons and
+-- [Dou]
 data CarbonChain = SimpleCarbonChain  Carbons [DoubleBond]
                  | ComplexCarbonChain Carbons [DoubleBond] [MoietyData]
                  deriving (Show, Eq, Ord)
 
-data CombinedChains = CombinedChains  { combinedCarbons     :: Carbons
-                                      , combinedDoubleBonds :: [[DoubleBond]] }
-                                      deriving (Show, Eq, Ord)
+-- |TwoCombinedChains represents two combined carbon chains. For example,
+-- a diradyl phosphatidylcholine can be written as PC 32:1
+data TwoCombinedChains = TwoCombinedChains
+    { twoCombinedCarbons     :: Carbons
+    , twoCombinedDoubleBonds :: [[DoubleBond]] }
+    deriving (Show, Eq, Ord)
+
+data ThreeCombinedChains = ThreeCombinedChains
+    { threeCombinedCarbons     :: Carbons
+    , threeCombinedDoubleBonds :: [[DoubleBond]] }
+    deriving (Show, Eq, Ord)
+
+data FourCombinedChains = FourCombinedChains
+    { fourCombinedCarbons     :: Carbons
+    , fourCombinedDoubleBonds :: [[DoubleBond]] }
+    deriving (Show, Eq, Ord)
 
 data Linkage = Acyl
              | Alkyl
              | Alkenyl
              deriving (Show, Eq, Ord)
 
-data Radyl         = Radyl           { linkage     :: Linkage
-                                     , carbonChain :: CarbonChain }
-                                     deriving (Show, Eq, Ord)
+data Radyl = Radyl
+    { linkage     :: Linkage
+    , carbonChain :: CarbonChain }
+    deriving (Show, Eq, Ord)
 
-data CombinedRadyls = CombinedRadyls { linkages       :: [Linkage]
-                                     , combinedChains :: CombinedChains }
-                                     deriving (Show, Eq, Ord)
+data TwoCombinedRadyls = TwoCombinedRadyls
+    { twoLinkages       :: [Linkage]
+    , twoCombinedChains :: TwoCombinedChains }
+    deriving (Show, Eq, Ord)
 
-data SnPosition = Sn1 | Sn2 | Sn3 deriving (Show, Eq, Ord)
+data ThreeCombinedRadyls = ThreeCombinedRadyls
+    { threeLinkages     :: [Linkage]
+    , threeCombinedChains :: ThreeCombinedChains }
+    deriving (Show, Eq, Ord)
 
-data PhosphatePosition = P3' | P4' | P5' deriving (Show, Eq, Ord)
+data FourCombinedRadyls = FourCombinedRadyls
+    { fourLinkages       :: [Linkage]
+    , fourCombinedChains :: FourCombinedChains }
+    deriving (Show, Eq, Ord)
+
+data SnPosition = Sn1 | Sn2 | Sn3
+                deriving (Show, Eq, Ord)
+
+data PhosphatePosition = P3' | P4' | P5'
+                       deriving (Show, Eq, Ord)
 
 
 class Shorthand a where
@@ -160,25 +219,31 @@ instance Shorthand MoietyData where
               (MoietyData x (Just y)) -> showShorthand y ++ showShorthand x
 
 instance Shorthand Moiety where
-    showShorthand x = case x of
-                          Hydroxyl -> "OH"
-                          Keto     -> "O"
-                          Methyl   -> "Me"
-                          Criegee  -> "Criegee"
+    showShorthand x =
+      case x of
+        Hydroxyl -> "OH"
+        Keto     -> "O"
+        Methyl   -> "Me"
+        Criegee  -> "Criegee"
 
 instance Shorthand Linkage where
-    showShorthand x = case x of
-                          Acyl    -> ""
-                          Alkyl   -> "O-"
-                          Alkenyl -> "P-"
+    showShorthand x =
+      case x of
+        Acyl    -> ""
+        Alkyl   -> "O-"
+        Alkenyl -> "P-"
 
 instance Shorthand CarbonChain where
-    showShorthand (SimpleCarbonChain c dbs)         = renderSimpleChain c dbs toDelta
-    showShorthand (ComplexCarbonChain c dbs ms)     = renderComplexChain c dbs ms toDelta
+    showShorthand c =
+      case c of
+        (SimpleCarbonChain c dbs)     -> renderSimpleChain c dbs toDelta
+        (ComplexCarbonChain c dbs ms) -> renderComplexChain c dbs ms toDelta
 
 instance Nomenclature CarbonChain where
-    showNnomenclature (SimpleCarbonChain c dbs)     = renderSimpleChain c dbs renderOmegaPositions
-    showNnomenclature (ComplexCarbonChain c dbs ms) = renderComplexChain c dbs ms renderOmegaPositions
+    showNnomenclature c =
+      case c of
+        (SimpleCarbonChain c dbs)     -> renderSimpleChain c dbs renderOmegaPositions
+        (ComplexCarbonChain c dbs ms) -> renderComplexChain c dbs ms renderOmegaPositions
 
 formatIntercalate l = List.intercalate "," $ map showShorthand $ List.sort l
 
@@ -208,14 +273,25 @@ renderOmegaPositions c dbs
           True -> toOmega c [maximum dbs]
           False -> toOmega c dbs
 
-instance Shorthand CombinedChains where
-    showShorthand (CombinedChains x y) =
-        showShorthand x ++ ":" ++ show (length y) ++ wrapParen dbInfo
-            where dbInfo = List.intercalate "," $ map showShorthand $ concat $ List.sort y
+instance Shorthand TwoCombinedChains where
+    showShorthand (TwoCombinedChains x y) = renderCombinedChains x y
 
-instance Nomenclature CombinedChains where
-    showNnomenclature (CombinedChains x y) =
-        showShorthand x ++ ":" ++ show (length y) ++ wrapParen dbInfo
+instance Nomenclature TwoCombinedChains where
+    showNnomenclature (TwoCombinedChains x y) = renderCombinedChains x y
+
+instance Shorthand ThreeCombinedChains where
+    showShorthand (ThreeCombinedChains x y) = renderCombinedChains x y
+
+instance Shorthand FourCombinedChains where
+    showShorthand (FourCombinedChains x y) = renderCombinedChains x y
+
+instance Nomenclature ThreeCombinedChains where
+    showNnomenclature (ThreeCombinedChains x y) = renderCombinedChains x y
+
+instance Nomenclature FourCombinedChains where
+    showNnomenclature (FourCombinedChains x y) = renderCombinedChains x y
+
+renderCombinedChains x y = showShorthand x ++ ":" ++ show (length y) ++ wrapParen dbInfo
             where dbInfo = List.intercalate "," $ map showShorthand $ concat $ List.sort y
 
 instance Shorthand Radyl where
@@ -224,11 +300,23 @@ instance Shorthand Radyl where
 instance Nomenclature Radyl where
     showNnomenclature (Radyl x y)          = showShorthand x ++ showNnomenclature y
 
-instance Shorthand CombinedRadyls where
-    showShorthand (CombinedRadyls x y)     = links x ++ showShorthand y
+instance Shorthand TwoCombinedRadyls where
+    showShorthand (TwoCombinedRadyls x y)     = links x ++ showShorthand y
 
-instance Nomenclature CombinedRadyls where
-    showNnomenclature (CombinedRadyls x y) = links x ++ showNnomenclature y
+instance Nomenclature TwoCombinedRadyls where
+    showNnomenclature (TwoCombinedRadyls x y) = links x ++ showNnomenclature y
+
+instance Shorthand ThreeCombinedRadyls where
+    showShorthand (ThreeCombinedRadyls x y)     = links x ++ showShorthand y
+
+instance Nomenclature ThreeCombinedRadyls where
+    showNnomenclature (ThreeCombinedRadyls x y) = links x ++ showNnomenclature y
+
+instance Shorthand FourCombinedRadyls where
+    showShorthand (FourCombinedRadyls x y)     = links x ++ showShorthand y
+
+instance Nomenclature FourCombinedRadyls where
+    showNnomenclature (FourCombinedRadyls x y) = links x ++ showNnomenclature y
 
 -- Helper functions are defined below. frequency function from a Stackoverflow reply.
 frequency :: Ord t => [t] -> [(Int, t)]

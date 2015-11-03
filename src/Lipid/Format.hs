@@ -4,7 +4,7 @@ Description : Functions for formatting lipid shorthand.
 Copyright   : Michael Thomas
 License     : GPL-3
 Maintainer  : Michael Thomas <Michaelt293@gmail.com>
-Stability   : experimental
+Stability   : Experimental
 -}
 
 module Lipid.Format
