@@ -15,7 +15,7 @@ import Chains
 import Formulae
 
 class Desaturase a where
-    delta5Desaturase :: a -> a 
+    delta5Desaturase :: a -> a
     delta6Desaturase :: a -> a
     delta8Desaturase :: a -> a
 
@@ -41,16 +41,14 @@ instance BetaOxidation FA where
 addDoubleBond :: Integer -> Geometry -> CarbonChain -> CarbonChain
 addDoubleBond position geometry (SimpleCarbonChain x y)
     | Just (Delta position) `elem` doubleBondPositions (SimpleCarbonChain x y) = SimpleCarbonChain x y
-    | otherwise = SimpleCarbonChain x ((DoubleBond (Just (Delta position)) (Just geometry)) : y)
+    | otherwise = SimpleCarbonChain x (DoubleBond (Just (Delta position) (Just geometry)) : y)
 
 shiftPosition n (Delta p) = Delta (p + n)
 
 shiftDoubleBond n (DoubleBond x y) = DoubleBond (fmap (shiftPosition n) x) y
 
 chainElongate (SimpleCarbonChain x y) =
-    SimpleCarbonChain (x + 2) (map (shiftDoubleBond 2) y)
+    SimpleCarbonChain (x + 2) (fmap (shiftDoubleBond 2) y)
 
 chainBetaOxidation (SimpleCarbonChain x y) =
-    SimpleCarbonChain (x - 2) (map (shiftDoubleBond (- 2)) y)
-
-
+    SimpleCarbonChain (x - 2) (fmap (shiftDoubleBond (- 2)) y)

@@ -1,5 +1,3 @@
-import ElementIsotopes hiding (monoisotopicMass, nominalMass)
-import qualified ElementIsotopes as Elem (monoisotopicMass, nominalMass)
 import Tests.Chains
 import Lipid.Blocks
 import Lipid.FattyAcid
@@ -14,5 +12,3 @@ import Formula.Lysoglycerophospholipid
 import Formula.LipidIon
 import Mass.Mass
 import Ion.LipidIon
-
-

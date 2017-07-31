@@ -77,10 +77,10 @@ snPosition = char '/' <|> char '_'
 
 linkageParser :: Parser Linkage
 linkageParser = do
-  oOrP <- optional $ (string "O-") <|> (string "P-")
+  oOrP <- optional $ string "O-" <|> string "P-"
   case oOrP of
-    (Just "O-") -> return Alkyl
-    (Just "P-") -> return Alkenyl
+    Just "O-" -> return Alkyl
+    Just "P-" -> return Alkenyl
     _ -> return Acyl
 
 simpleChain = do
@@ -89,7 +89,7 @@ simpleChain = do
   noOfdbs <- numDb
   dbs <- optional doubleBondList
   case dbs of
-    Nothing -> return $ SimpleCarbonChain carbons $
+    Nothing -> return . SimpleCarbonChain carbons $
                         replicateBonds noOfdbs unknownDb
       where unknownDb = DoubleBond Nothing Nothing
             replicateBonds n = replicate (fromIntegral $ numDoubleBonds n)
@@ -110,10 +110,10 @@ faParser = do
   string "FA "
   intMass <- optional integerMass
   case intMass of
-    (Just intMass') -> return $ ParsedFA $ ClassLevelFA intMass'
+    (Just intMass') -> return . ParsedFA $ ClassLevelFA intMass'
     _ -> do
       chain' <- simpleChain
-      return $ ParsedFA $ FA chain'
+      return . ParsedFA $ FA chain'
 
 paParser = do
   string "PA "
@@ -121,8 +121,8 @@ paParser = do
   identifier <- snPosition
   r2 <- radylParser
   case identifier of
-    '/' -> return $ ParsedPA $ KnownSnPA r1 r2
-    '_' -> return $ ParsedPA $ UnknownSnPA r1 r2
+    '/' -> return . ParsedPA $ KnownSnPA r1 r2
+    '_' -> return . ParsedPA $ UnknownSnPA r1 r2
 
 
 data ParsedLipid a where
@@ -150,6 +150,3 @@ parser :: Parser AParsedLipid
 parser = ((AParsedLipid . ParsedFA) <$> faParser) <|> ((AParsedLipid . ParsedPA) <$> paParser)
 
 use str = evaluate $ parseOnly paParser str
-
-
-

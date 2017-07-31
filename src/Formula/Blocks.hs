@@ -11,38 +11,8 @@ Stability   : Experimental
 
 module Formula.Blocks where
 
-import qualified Data.Map.Strict as Map
-import qualified Data.Maybe as Maybe
-import Control.Applicative
-import ElementIsotopes hiding (monoisotopicMass, nominalMass)
-import qualified ElementIsotopes as Elem (monoisotopicMass, nominalMass)
+import Data.Maybe
 import Lipid.Blocks
-
-
-data MolecularFormula = MolecularFormula (Map.Map ElementSymbol Integer)
-                      deriving (Show, Eq, Ord)
-
-class MolecularFormulae a where
-    getFormula :: a -> Maybe MolecularFormula
-
-
-(|+|) :: MolecularFormula -> MolecularFormula -> MolecularFormula
-(|+|) (MolecularFormula m1) (MolecularFormula m2) =
-           MolecularFormula $ Map.unionsWith (+) [m1, m2]
-
-(|*|) :: Integer -> MolecularFormula -> MolecularFormula
-(|*|) x (MolecularFormula m) = MolecularFormula $
-           Map.fromList [(e, (find e m) * x) | e <- Map.keys m ]
-
-(|-|) :: MolecularFormula -> MolecularFormula -> MolecularFormula
-(|-|) (MolecularFormula m1) (MolecularFormula m2) =
-           MolecularFormula $ Map.unionsWith (-) [m1, m2]
-
-infixl 6 |+|
-
-infixl 7 |*|
-
-infixl 6 |-|
 
 data BlockComp = BlockProton
                | BlockHydroxyl
@@ -155,14 +125,10 @@ instance MolecularFormulae CombinedRadyls where
 
 find k v = Maybe.fromJust $ Map.lookup k v
 
-lookupBlockComp :: BlockComp -> Maybe MolecularFormula 
+lookupBlockComp :: BlockComp -> Maybe MolecularFormula
 lookupBlockComp n = do
      lst <- Map.lookup n blockComposition
      return $ MolecularFormula $ Map.fromList lst
 
 sumFormula :: [Maybe MolecularFormula] -> Maybe MolecularFormula
 sumFormula = foldl1 (\acc x -> liftA2 (|+|) acc x)
-
-
-
-

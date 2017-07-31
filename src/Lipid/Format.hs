@@ -15,13 +15,13 @@ module Lipid.Format
     ) where
 
 wrap :: [Char] -> [Char] -> [Char] -> [Char]
-wrap open close str = if length str == 0
-                         then ""
-                         else open ++ str ++ close
+wrap open close str =
+  if null str
+    then ""
+    else open ++ str ++ close
 
 wrapParen :: [Char] -> [Char]
 wrapParen str = wrap "(" ")" str
 
 wrapBrackets :: [Char] -> [Char]
 wrapBrackets str = wrap "[" "]" str
-

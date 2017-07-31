@@ -1,31 +1,36 @@
 {-|
 Module      : FattyAcid
-Description : FA data type and instances of Shorthand and Nomenclature defined.
-Copyright   : Michael Thomas 
+Description : FA data type and instances of Shorthand and NNomenclature defined.
+Copyright   : Michael Thomas
 License     : GPL-3
 Maintainer  : Michael Thomas <Michaelt293@gmail.com>
 Stability   : experimental
 -}
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE DeriveFoldable #-}
+{-# LANGUAGE DeriveTraversable #-}
 
 module Lipid.FattyAcid
     (
       FA(..)
     ) where
 
-import ElementIsotopes
 import Lipid.Blocks
+import Lipid.Format
+import Data.Monoid ((<>))
 
+data FA a b
+  = ClassLevelFA Integer
+  | FA           (CarbonChain a b)
+  deriving (Show, Eq, Ord,Functor, Foldable, Traversable)
 
-data FA = ClassLevelFA IntegerMass
-        | FA           CarbonChain
-        deriving (Show, Eq, Ord)
+-- makePrisms ''FA
 
+instance Shorthand b => Shorthand (FA a b) where
+    shorthand (ClassLevelFA x) = "FA " <> wrapParen (show x)
+    shorthand (FA x)           = "FA " <> shorthand x
 
-instance Shorthand FA where
-    showShorthand (ClassLevelFA x) = "FA (" ++ show x ++ ")"
-    showShorthand (FA x) = "FA " ++ showShorthand x
-
-instance Nomenclature FA where
-    showNnomenclature (ClassLevelFA x) = "FA (" ++ show x ++ ")"
-    showNnomenclature (FA x)           = "FA " ++ showNnomenclature x
-
+instance NNomenclature b => NNomenclature (FA a b) where
+    nNomenclature (ClassLevelFA x) = "FA " <> wrapParen (show x)
+    nNomenclature (FA x)           = "FA " <> nNomenclature x
