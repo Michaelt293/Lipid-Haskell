@@ -316,19 +316,18 @@ data SnPosition
 makePrisms ''SnPosition
 
 data Radyl a b = Radyl
-   { radylSnPosition   :: Maybe SnPosition
-   , _radylLinkage     :: Linkage
+   { _radylLinkage     :: Linkage
    , _radylCarbonChain :: CarbonChain a b }
    deriving (Show, Eq, Ord, Functor, Foldable, Traversable)
 
 makeClassy ''Radyl
 
 instance (Shorthand a, Shorthand b) => Shorthand (Radyl a b) where
-  shorthand (Radyl _ x y) =
+  shorthand (Radyl x y) =
     shorthand x <> shorthand y
 
 instance (NNomenclature a, NNomenclature b) => NNomenclature (Radyl a b) where
-  nNomenclature (Radyl _ x y) =
+  nNomenclature (Radyl x y) =
     shorthand x <> nNomenclature y
 
 instance IsBisAllylic [DoubleBond b] => IsBisAllylic (Radyl a b) where
@@ -336,11 +335,18 @@ instance IsBisAllylic [DoubleBond b] => IsBisAllylic (Radyl a b) where
     r^.radylCarbonChain.doubleBonds.to isBisAllylic
 
 data TwoCombinedRadyls a = TwoCombinedRadyls
-   { _radylLinkages                :: [Linkage]
+   { _radylLinkages           :: [Linkage]
    , _twoCombinedCarbonChains :: TwoCombinedChains a
    } deriving (Show, Eq, Ord, Functor, Foldable, Traversable)
 
 makeClassy ''TwoCombinedRadyls
+
+data ThreeCombinedRadyls a = ThreeCombinedRadyls
+   { _threeRadylLinkages        :: [Linkage]
+   , _threeCombinedCarbonChains :: ThreeCombinedChains a
+   } deriving (Show, Eq, Ord, Functor, Foldable, Traversable)
+
+makeClassy ''ThreeCombinedRadyls
 
 data PhosphatePosition
   = P3'

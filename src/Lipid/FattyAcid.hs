@@ -19,13 +19,14 @@ module Lipid.FattyAcid
 import Lipid.Blocks
 import Lipid.Format
 import Data.Monoid ((<>))
+import Control.Lens
 
 data FA a b
   = ClassLevelFA Integer
   | FA           (CarbonChain a b)
-  deriving (Show, Eq, Ord,Functor, Foldable, Traversable)
+  deriving (Show, Eq, Ord, Functor, Foldable, Traversable)
 
--- makePrisms ''FA
+makePrisms ''FA
 
 instance Shorthand b => Shorthand (FA a b) where
     shorthand (ClassLevelFA x) = "FA " <> wrapParen (show x)

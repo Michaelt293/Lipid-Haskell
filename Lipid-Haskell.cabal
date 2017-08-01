@@ -17,16 +17,14 @@ extra-source-files:  README.md
 cabal-version:       >=1.10
 
 library
-  exposed-modules:   Experimentation.Checker
-                   , Experimentation.Parser
-                    --  , LipidClasses
-                    --  , Smiles
-                    --  , Chains
-                    --  , Pathways
-                    --  , Formulae
-                    --  , BuildingBlocks
-  -- other-modules:
-  -- other-extensions:
+  exposed-modules:   LipidHaskell
+                   , Lipid.Format
+                   , Lipid.Blocks
+                   , Lipid.FattyAcid
+                   , Lipid.Glycerolipid
+
+  other-modules:
+  other-extensions:
   build-depends:       base
                      , containers
                      , attoparsec
