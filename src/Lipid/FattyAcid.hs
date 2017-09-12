@@ -12,8 +12,7 @@ Stability   : experimental
 {-# LANGUAGE DeriveTraversable #-}
 
 module Lipid.FattyAcid
-    (
-      FA(..)
+    ( FA(..)
     ) where
 
 import Lipid.Blocks
@@ -21,17 +20,33 @@ import Lipid.Format
 import Data.Monoid ((<>))
 import Control.Lens
 
-data FA a b
+data FA a
   = ClassLevelFA Integer
-  | FA           (CarbonChain a b)
+  | FA           (CarbonChain a)
   deriving (Show, Eq, Ord, Functor, Foldable, Traversable)
 
 makePrisms ''FA
 
-instance Shorthand b => Shorthand (FA a b) where
+instance Shorthand a => Shorthand (FA a) where
     shorthand (ClassLevelFA x) = "FA " <> wrapParen (show x)
     shorthand (FA x)           = "FA " <> shorthand x
 
-instance NNomenclature b => NNomenclature (FA a b) where
+instance NNomenclature a => NNomenclature (FA a) where
     nNomenclature (ClassLevelFA x) = "FA " <> wrapParen (show x)
     nNomenclature (FA x)           = "FA " <> nNomenclature x
+
+instance IsSaturated (FA a) where
+  isSaturated (ClassLevelFA _) = Nothing
+  isSaturated (FA cc) = isSaturated cc
+
+instance IsMonounsaturated (FA a) where
+  isMonounsaturated (ClassLevelFA cc) = Nothing
+  isMonounsaturated (FA cc) = isMonounsaturated cc
+
+instance IsPolyunsaturated (FA a) where
+  isPolyunsaturated (ClassLevelFA cc) = Nothing
+  isPolyunsaturated (FA cc) = isPolyunsaturated cc
+
+instance Position a => IsBisAllylic (FA a) where
+  isBisAllylic (ClassLevelFA cc) = Nothing
+  isBisAllylic (FA cc) = isBisAllylic cc

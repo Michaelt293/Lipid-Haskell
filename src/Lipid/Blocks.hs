@@ -52,10 +52,10 @@ module Lipid.Blocks where
 --    , numberOfCarbonsAdd
  --) where
 
-import Data.Maybe
 import Data.Monoid ((<>))
-import Data.List (sort, sortBy, group, maximumBy, intersperse, intercalate)
+import Data.List (sort, group, intercalate)
 import Data.Ord (comparing, Down(..))
+import Data.Maybe (fromMaybe)
 import Control.Arrow ((&&&))
 import Control.Lens
 import Lipid.Format
@@ -76,21 +76,21 @@ instance NNomenclature a => NNomenclature (Maybe a) where
   nNomenclature (Just x) = nNomenclature x
 
 class IsSaturated a where
-  isSaturated :: a -> Bool
+  isSaturated :: a -> Maybe Bool
 
 class IsMonounsaturated a where
-  isMonounsaturated :: a -> Bool
+  isMonounsaturated :: a -> Maybe Bool
 
 class IsPolyunsaturated a where
-  isPolyunsaturated :: a -> Bool
+  isPolyunsaturated :: a -> Maybe Bool
 
 class IsBisAllylic a where
-  isBisAllylic :: a -> Bool
+  isBisAllylic :: a -> Maybe Bool
 
 -- |Carbons represents the number of carbons in a single carbon chain or
 -- two or more combined chains.
 newtype NumCarbons = NumCarbons { _getNumCarbons :: Integer }
-                   deriving (Eq, Ord, Enum)
+                   deriving (Eq, Ord, Enum, Num)
 
 makeClassy ''NumCarbons
 
@@ -116,6 +116,11 @@ instance Monoid NumDoubleBonds where
   mempty = NumDoubleBonds 0
   NumDoubleBonds x `mappend` NumDoubleBonds y = NumDoubleBonds (x + y)
 
+class Position a where
+  getPosition :: a -> Maybe Integer
+  getPositions :: [a] -> Maybe [Integer]
+  getPositions x = sort <$> traverse getPosition x
+
 -- |Position represents the position of carbon-carbon double bonds or
 -- moieties on a carbon chain. Positions can be provided from the
 -- methyl end (Omega) or from the linkage (Delta).
@@ -128,6 +133,12 @@ makeClassy ''OmegaPosition
 instance NNomenclature OmegaPosition where
   nNomenclature (OmegaPosition x) = "n-" <> show x
 
+instance Position OmegaPosition where
+  getPosition = Just . _getOmegaPosition
+
+instance Position a => Position (Maybe a) where
+  getPosition p = getPosition =<< p
+
 newtype DeltaPosition = DeltaPosition
   { _getDeltaPosition :: Integer
   } deriving (Show, Read, Eq, Ord, Enum, Num)
@@ -137,6 +148,8 @@ makeClassy ''DeltaPosition
 instance Shorthand DeltaPosition where
   shorthand (DeltaPosition x) = show x
 
+instance Position DeltaPosition where
+  getPosition = Just . _getDeltaPosition
 -- |Geometry represent the geometry of carbon-carbon double bonds.
 data Geometry
   = Cis
@@ -153,20 +166,20 @@ instance Shorthand Geometry where
   shorthand Trans = "E"
 
 -- |Moiety represents moieties commonly found on carbon chains
-data Moiety
-  = Hydroxyl
-  | Keto
-  | Methyl
-  deriving (Show, Read, Eq, Ord, Enum)
-
-makePrisms ''Moiety
-
-instance Shorthand Moiety where
-   shorthand x =
-     case x of
-       Hydroxyl -> "OH"
-       Keto     -> "O"
-       Methyl   -> "Me"
+-- data Moiety
+--   = Hydroxyl
+--   | Keto
+--   | Methyl
+--   deriving (Show, Read, Eq, Ord, Enum)
+--
+-- makePrisms ''Moiety
+--
+-- instance Shorthand Moiety where
+--    shorthand x =
+--      case x of
+--        Hydroxyl -> "OH"
+--        Keto     -> "O"
+--        Methyl   -> "Me"
 
 -- |DoubleBond represents a carbon-carbon double bond as found on
 -- carbon chains. A DoubleBond data type has two fields, Position
@@ -186,73 +199,93 @@ instance NNomenclature a => NNomenclature (DoubleBond a) where
   nNomenclature (DoubleBond p g) =
     nNomenclature p <> nNomenclature g
 
-instance IsBisAllylic [DoubleBond DeltaPosition] where
-  isBisAllylic dbs =
-    case sort dbs of
-      [x,y] ->
-         x^.dbPosition.getDeltaPosition.to (+3) == y^.dbPosition.getDeltaPosition
-      x:y:zs ->
-        x^.dbPosition.getDeltaPosition.to (+3) /= y^.dbPosition.getDeltaPosition &&
-        isBisAllylic (y:zs)
-      _ -> False
+instance Position a => Position (DoubleBond a) where
+  getPosition (DoubleBond p _) = getPosition p
 
-instance IsBisAllylic [DoubleBond OmegaPosition] where
-  isBisAllylic dbs =
-    case sortBy (comparing Down) dbs of
-      [x,y] ->
-         x^.dbPosition.getOmegaPosition.to (\x -> x - 3) == y^.dbPosition.getOmegaPosition
-      x:y:zs ->
-        x^.dbPosition.getOmegaPosition.to (\x -> x - 3) /= y^.dbPosition.getOmegaPosition &&
-        isBisAllylic (y:zs)
-      _ -> False
+instance Position a => IsBisAllylic [DoubleBond a] where
+  isBisAllylic dbs = go <$> getPositions dbs
+    where
+      go ps =
+        case ps of
+          [x,y] -> x + 3 == y
+          x:y:zs -> x + 3 == y && go (y:zs)
+          _ -> False
 
-instance IsBisAllylic [DoubleBond (Maybe DeltaPosition)] where
-  isBisAllylic dbs =
-    maybe False isBisAllylic $ traverse sequence dbs
+-- instance IsBisAllylic [DoubleBond OmegaPosition] where
+--   isBisAllylic dbs =
+--     case sort dbs of
+--       [x,y] ->
+--          Just $ x^.dbPosition.getOmegaPosition.to (+3) == y^.dbPosition.getOmegaPosition
+--       x:y:zs ->
+--         liftA2
+--           (&&)
+--           (pure (x^.dbPosition.getOmegaPosition.to (+3) == y^.dbPosition.getOmegaPosition))
+--           (isBisAllylic (y:zs))
+--       _ -> Just False
 
-instance IsBisAllylic [DoubleBond (Maybe OmegaPosition)] where
-  isBisAllylic dbs =
-    maybe False isBisAllylic $ traverse sequence dbs
+-- instance Position a => IsBisAllylic [DoubleBond (Maybe a)] where
+--   isBisAllylic dbs =
+--     isBisAllylic =<< traverse sequence dbs
+
+-- instance IsBisAllylic [DoubleBond (Maybe OmegaPosition)] where
+--   isBisAllylic dbs =
+--     isBisAllylic =<< traverse sequence dbs
 
 -- |MoietyData represents a moiety on a carbon chain.
-data MoietyData a = MoietyData
-  { _moietyPosition :: a
-  , _moiety         :: Moiety
-  } deriving (Show, Read, Eq, Ord, Functor, Foldable, Traversable)
+-- data MoietyData a = MoietyData
+--   { _moietyPosition :: a
+--   , _moiety         :: Moiety
+--   } deriving (Show, Read, Eq, Ord, Functor, Foldable, Traversable)
+--
+-- makeClassy ''MoietyData
+--
+-- instance Shorthand a => Shorthand (MoietyData a) where
+--   shorthand (MoietyData x y) =
+--     shorthand x <> shorthand y
 
-makeClassy ''MoietyData
-
-instance Shorthand a => Shorthand (MoietyData a) where
-  shorthand (MoietyData x y) =
-    shorthand x <> shorthand y
-
+renderCombinedChains :: Show a => a -> [b] -> (b -> String) -> String
 renderCombinedChains x y f =
   show x <> ":" <> show (length y) <> wrapParen dbInfo
     where dbInfo = intercalate "," $ f <$> y
 
 -- |CarbonChain represents a carbon chain.
-data CarbonChain a b = CarbonChain
+data CarbonChain a = CarbonChain
   { _carbons        :: NumCarbons
-  , _moietyDataList :: [MoietyData a]
-  , _doubleBonds    :: [DoubleBond b]
+  --, _moietyDataList :: [MoietyData a]
+  , _doubleBonds    :: [DoubleBond a]
   } deriving (Show, Eq, Ord, Functor, Foldable, Traversable)
 
 makeClassy ''CarbonChain
 
-instance HasNumCarbons (CarbonChain a b) where
+instance HasNumCarbons (CarbonChain a) where
   numCarbons = carbons
 
-instance Shorthand b => Shorthand (CarbonChain a b) where
-  shorthand (CarbonChain x y z) =
-    renderCombinedChains x z shorthand
+instance Shorthand a => Shorthand (CarbonChain a) where
+  shorthand (CarbonChain x dbs) =
+    renderCombinedChains x dbs shorthand
 
-instance NNomenclature b => NNomenclature (CarbonChain a b) where
-  nNomenclature (CarbonChain x y z) =
-    renderCombinedChains x z nNomenclature
+instance NNomenclature a => NNomenclature (CarbonChain a) where
+  nNomenclature (CarbonChain x dbs) =
+    renderCombinedChains x dbs nNomenclature
 
-instance IsBisAllylic [DoubleBond b] => IsBisAllylic (CarbonChain a b) where
+instance IsSaturated (CarbonChain a) where
+  isSaturated (CarbonChain _ dbs) = Just $ null dbs
+
+instance IsMonounsaturated (CarbonChain a) where
+  isMonounsaturated (CarbonChain _ dbs) = Just $ length dbs == 1
+
+instance IsPolyunsaturated (CarbonChain a) where
+  isPolyunsaturated (CarbonChain _ dbs) = Just $ length dbs > 1
+
+instance IsBisAllylic [DoubleBond a] => IsBisAllylic (CarbonChain a) where
   isBisAllylic cc =
     cc^.doubleBonds.to isBisAllylic
+
+renderOmegaPositions :: [DoubleBond OmegaPosition] -> String
+renderOmegaPositions dbs =
+  if fromMaybe False (isBisAllylic dbs)
+    then nNomenclature (maximum dbs)
+    else wrapParen $ intercalate "," (nNomenclature <$> dbs)
 
 -- |CombinedChains represents combined carbon chains. For example,
 -- a diradyl phosphatidylcholine can be written as PC 32:1.
@@ -315,24 +348,41 @@ data SnPosition
 
 makePrisms ''SnPosition
 
-data Radyl a b = Radyl
+data Radyl a = Radyl
    { _radylLinkage     :: Linkage
-   , _radylCarbonChain :: CarbonChain a b }
+   , _radylCarbonChain :: CarbonChain a }
    deriving (Show, Eq, Ord, Functor, Foldable, Traversable)
 
 makeClassy ''Radyl
 
-instance (Shorthand a, Shorthand b) => Shorthand (Radyl a b) where
+instance Shorthand a => Shorthand (Radyl a) where
   shorthand (Radyl x y) =
     shorthand x <> shorthand y
 
-instance (NNomenclature a, NNomenclature b) => NNomenclature (Radyl a b) where
+instance NNomenclature a => NNomenclature (Radyl a) where
   nNomenclature (Radyl x y) =
     shorthand x <> nNomenclature y
 
-instance IsBisAllylic [DoubleBond b] => IsBisAllylic (Radyl a b) where
+instance IsBisAllylic [DoubleBond a] => IsBisAllylic (Radyl a) where
   isBisAllylic r =
     r^.radylCarbonChain.doubleBonds.to isBisAllylic
+
+frequency :: Ord a => [a] -> [(Int, a)]
+frequency list = (length &&& head) <$> group (sort list)
+
+linkageStrList :: [Linkage] -> [(Int, Linkage)]
+linkageStrList = frequency . filter (/= Acyl)
+
+freq2shorthand :: (Eq a, Num a) => (a, Linkage) -> String
+freq2shorthand (x, y)
+   | x == 1 = shorthand y
+   | x == 2 = 'd' : shorthand y
+   | x == 3 = 't' : shorthand y
+   | otherwise = error "Shouldn't happen"
+
+links :: [Linkage] -> String
+links x =
+  intercalate "," $ freq2shorthand <$> linkageStrList x
 
 data TwoCombinedRadyls a = TwoCombinedRadyls
    { _radylLinkages           :: [Linkage]
@@ -341,12 +391,28 @@ data TwoCombinedRadyls a = TwoCombinedRadyls
 
 makeClassy ''TwoCombinedRadyls
 
+instance Shorthand a => Shorthand (TwoCombinedRadyls a) where
+  shorthand (TwoCombinedRadyls x y) =
+    links x <> shorthand y
+
+instance NNomenclature a => NNomenclature (TwoCombinedRadyls a) where
+  nNomenclature (TwoCombinedRadyls x y) =
+    links x <> nNomenclature y
+
 data ThreeCombinedRadyls a = ThreeCombinedRadyls
    { _threeRadylLinkages        :: [Linkage]
    , _threeCombinedCarbonChains :: ThreeCombinedChains a
    } deriving (Show, Eq, Ord, Functor, Foldable, Traversable)
 
 makeClassy ''ThreeCombinedRadyls
+
+instance Shorthand a => Shorthand (ThreeCombinedRadyls a) where
+  shorthand (ThreeCombinedRadyls x y) =
+    links x <> shorthand y
+
+instance NNomenclature a => NNomenclature (ThreeCombinedRadyls a) where
+  nNomenclature (ThreeCombinedRadyls x y) =
+    links x <> nNomenclature y
 
 data PhosphatePosition
   = P3'
@@ -363,29 +429,6 @@ instance Shorthand PhosphatePosition where
        P4' -> "4'"
        P5' -> "5'"
 
-renderOmegaPositions :: [DoubleBond OmegaPosition] -> String
-renderOmegaPositions dbs =
-  if isBisAllylic dbs
-    then nNomenclature (maximum dbs)
-    else wrapParen $ intercalate "," (nNomenclature <$> dbs)
-
--- Helper functions are defined below. frequency function from a Stackoverflow reply.
-frequency :: Ord a => [a] -> [(Int, a)]
-frequency list = (length &&& head) <$> group (sort list)
-
-linkageStrList :: [Linkage] -> [(Int, Linkage)]
-linkageStrList = frequency . filter (/= Acyl)
-
-freq2shorthand :: (Eq a, Num a) => (a, Linkage) -> String
-freq2shorthand (x, y)
-   | x == 1 = shorthand y
-   | x == 2 = 'd' : shorthand y
-   | x == 3 = 't' : shorthand y
-
-links :: [Linkage] -> String
-links x =
-  intercalate "," $ freq2shorthand <$> linkageStrList x
-
-numberOfDoubleBond :: CarbonChain a b -> NumDoubleBonds
+numberOfDoubleBond :: CarbonChain a -> NumDoubleBonds
 numberOfDoubleBond c =
   c^.doubleBonds.to (NumDoubleBonds . fromIntegral . length)
