@@ -56,6 +56,7 @@ import Data.Monoid ((<>))
 import Data.List (sort, group, intercalate)
 import Data.Ord (comparing, Down(..))
 import Data.Maybe (fromMaybe)
+import Data.Bifunctor
 import Control.Arrow ((&&&))
 import Control.Lens
 import Lipid.Format
@@ -432,3 +433,86 @@ instance Shorthand PhosphatePosition where
 numberOfDoubleBond :: CarbonChain a -> NumDoubleBonds
 numberOfDoubleBond c =
   c^.doubleBonds.to (NumDoubleBonds . fromIntegral . length)
+
+data Glycerol a b c = Glycerol
+  { _sn1 :: a
+  , _sn2 :: b
+  , _sn3 :: c
+  } deriving (Show, Read, Eq, Ord, Functor)
+
+makeClassy ''Glycerol
+
+instance Bifunctor (Glycerol a) where
+  bimap f g (Glycerol a b c) = Glycerol a (f b) (g c)
+
+instance Shorthand a => Shorthand (Glycerol (Radyl a) (Radyl a) (Radyl a)) where
+  shorthand (Glycerol r1 r2 r3) =
+    shorthand r1 <> "/" <> shorthand r2 <> "/" <> shorthand r3
+
+instance Shorthand a => Shorthand (Glycerol (Radyl a) (Radyl a) ()) where
+  shorthand (Glycerol r1 r2 _) =
+    shorthand r1 <> "/" <> shorthand r2 <> "/0:0"
+
+instance Shorthand a => Shorthand (Glycerol (Radyl a) () (Radyl a)) where
+  shorthand (Glycerol r1 _ r3) =
+    shorthand r1 <> "/0:0/" <> shorthand r3
+
+instance Shorthand a => Shorthand (Glycerol () (Radyl a) (Radyl a)) where
+  shorthand (Glycerol _ r2 r3) =
+    "0:0/" <> shorthand r2 <> "/" <> shorthand r3
+
+instance Shorthand a => Shorthand (Glycerol (Radyl a) () ()) where
+  shorthand (Glycerol r1 _ _) =
+    shorthand r1 <> "/0:0/0:0"
+
+instance Shorthand a => Shorthand (Glycerol () (Radyl a) ()) where
+  shorthand (Glycerol _ r2 _) =
+    "0:0/" <> shorthand r2 <> "/0:0"
+
+instance Shorthand a => Shorthand (Glycerol () () (Radyl a)) where
+  shorthand (Glycerol _ _ r3) =
+    "0:0/0:0/" <> shorthand r3
+
+instance NNomenclature a
+   => NNomenclature (Glycerol (Radyl a) (Radyl a) (Radyl a)) where
+  nNomenclature (Glycerol r1 r2 r3) =
+    nNomenclature r1 <> "/" <> nNomenclature r2 <> "/" <> nNomenclature r3
+
+instance NNomenclature a
+  => NNomenclature (Glycerol (Radyl a) (Radyl a) ()) where
+  nNomenclature (Glycerol r1 r2 _) =
+    nNomenclature r1 <> "/" <> nNomenclature r2 <> "/0:0"
+
+instance NNomenclature a
+  => NNomenclature (Glycerol (Radyl a) () (Radyl a)) where
+  nNomenclature (Glycerol r1 _ r3) =
+    nNomenclature r1 <> "/0:0/" <> nNomenclature r3
+
+instance NNomenclature a
+  => NNomenclature (Glycerol () (Radyl a) (Radyl a)) where
+  nNomenclature (Glycerol _ r2 r3) =
+    "0:0/" <> nNomenclature r2 <> "/" <> nNomenclature r3
+
+instance NNomenclature a => NNomenclature (Glycerol (Radyl a) () ()) where
+  nNomenclature (Glycerol r1 _ _) =
+    nNomenclature r1 <> "/0:0/0:0"
+
+instance NNomenclature a => NNomenclature (Glycerol () (Radyl a) ()) where
+  nNomenclature (Glycerol _ r2 _) =
+    "0:0/" <> nNomenclature r2 <> "/0:0"
+
+instance NNomenclature a => NNomenclature (Glycerol () () (Radyl a)) where
+  nNomenclature (Glycerol _ _ r3) =
+    "0:0/0:0/" <> nNomenclature r3
+
+data PhosphatidicAcid = PhosphatidicAcid
+  deriving (Show, Read, Eq, Ord)
+
+data Phosphatidylethanolamine = Phosphatidylethanolamine
+  deriving (Show, Read, Eq, Ord)
+
+data Phosphatidylcholine = Phosphatidylcholine
+  deriving (Show, Read, Eq, Ord)
+
+data Phosphatidylserine = Phosphatidylserine
+  deriving (Show, Read, Eq, Ord)

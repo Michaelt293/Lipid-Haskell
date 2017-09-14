@@ -23,10 +23,10 @@ import Data.Monoid ((<>))
 data MG a
   = ClassLevelMG Integer
   | UnknownSn    (Radyl a)
-  | Sn1MG        (Radyl a)
-  | Sn2MG        (Radyl a)
-  | Sn3MG        (Radyl a)
-  deriving (Show, Eq, Ord, Functor, Foldable, Traversable)
+  | Sn1MG        (Glycerol (Radyl a) () ())
+  | Sn2MG        (Glycerol () (Radyl a) ())
+  | Sn3MG        (Glycerol () () (Radyl a))
+  deriving (Show, Eq, Ord)
 
 makePrisms ''MG
 
@@ -34,10 +34,10 @@ data DG a
   = ClassLevelDG     Integer
   | CombinedRadylsDG (TwoCombinedRadyls a)
   | UnknownDG        (Radyl a) (Radyl a)
-  | Sn12DG           (Radyl a) (Radyl a)
-  | Sn13DG           (Radyl a) (Radyl a)
-  | Sn23DG           (Radyl a) (Radyl a)
-  deriving (Show, Eq, Ord, Functor, Foldable, Traversable)
+  | Sn12DG           (Glycerol (Radyl a) (Radyl a) ())
+  | Sn13DG           (Glycerol (Radyl a) () (Radyl a))
+  | Sn23DG           (Glycerol () (Radyl a) (Radyl a))
+  deriving (Show, Eq, Ord)
 
 makePrisms ''DG
 
@@ -45,8 +45,8 @@ data TG a
   = ClassLevelTG     Integer
   | CombinedRadylsTG (ThreeCombinedRadyls a)
   | UnknownSnTG      (Radyl a) (Radyl a) (Radyl a)
-  | KnownSnTG        (Radyl a) (Radyl a) (Radyl a)
-  deriving (Show, Eq, Ord, Functor, Foldable, Traversable)
+  | KnownSnTG        (Glycerol (Radyl a) (Radyl a) (Radyl a))
+  deriving (Show, Eq, Ord)
 
 makePrisms ''TG
 
@@ -55,56 +55,56 @@ instance Shorthand a => Shorthand (MG a) where
       case l of
         ClassLevelMG n -> "MG (" <> show n <> ")"
         UnknownSn r    -> "MG " <> shorthand r
-        Sn1MG r        -> "MG " <> shorthand r <> "/0:0/0:0"
-        Sn2MG r        -> "MG 0:0/" <> shorthand r <> "/0:0"
-        Sn3MG r        -> "MG 0:0/0:0/" <> shorthand r
+        Sn1MG g        -> "MG " <> shorthand g
+        Sn2MG g        -> "MG " <> shorthand g
+        Sn3MG g        -> "MG " <> shorthand g
 
 instance NNomenclature a => NNomenclature (MG a) where
     nNomenclature l =
       case l of
         ClassLevelMG n -> "MG (" <> show n <> ")"
         UnknownSn r    -> "MG " <> nNomenclature r
-        Sn1MG r        -> "MG " <> nNomenclature r <> "/0:0/0:0"
-        Sn2MG r        -> "MG 0:0/" <> nNomenclature r <> "/0:0"
-        Sn3MG r        -> "MG 0:0/0:0/" <> nNomenclature r
+        Sn1MG g        -> "MG " <> nNomenclature g <> "/0:0/0:0"
+        Sn2MG g        -> "MG 0:0/" <> nNomenclature g <> "/0:0"
+        Sn3MG g        -> "MG 0:0/0:0/" <> nNomenclature g
 
 instance Shorthand a => Shorthand (DG a) where
     shorthand l =
       case l of
         ClassLevelDG n      -> "DG (" <> show n <> ")"
-        CombinedRadylsDG rs -> "DG " <> shorthand rs
-        UnknownDG r1 r2     -> "DG " <> shorthand r1 <> "_" <> shorthand r2
-        Sn12DG r1 r2        -> "DG " <> shorthand r1 <> "/" <> shorthand r2 <> "/" <> "0:0"
-        Sn13DG r1 r2        -> "DG " <> shorthand r1 <> "/" <> "0:0" <> "/" <> shorthand r2
-        Sn23DG r1 r2        -> "DG 0:0" <> "/" <> shorthand r1 <> "/" <> shorthand r2
+        CombinedRadylsDG gs -> "DG " <> shorthand gs
+        UnknownDG g1 g2     -> "DG " <> shorthand g1 <> "_" <> shorthand g2
+        Sn12DG g            -> "DG " <> shorthand g
+        Sn13DG g            -> "DG " <> shorthand g
+        Sn23DG g            -> "DG 0:0" <> shorthand g
 
 instance NNomenclature a => NNomenclature (DG a) where
     nNomenclature l =
       case l of
         ClassLevelDG n      -> "DG (" <> show n <> ")"
-        CombinedRadylsDG rs -> "DG " <> nNomenclature rs
-        UnknownDG r1 r2     -> "DG " <> nNomenclature r1 <> "_" <> nNomenclature r2
-        Sn12DG r1 r2        -> "DG " <> nNomenclature r1 <> "/" <> nNomenclature r2 <> "/" <> "0:0"
-        Sn13DG r1 r2        -> "DG " <> nNomenclature r1 <> "/" <> "0:0" <> "/" <> nNomenclature r2
-        Sn23DG r1 r2        -> "DG 0:0" <> "/" <> nNomenclature r1 <> "/" <> nNomenclature r2
+        CombinedRadylsDG gs -> "DG " <> nNomenclature gs
+        UnknownDG g1 g2     -> "DG " <> nNomenclature g1 <> "_" <> nNomenclature g2
+        Sn12DG g            -> "DG " <> nNomenclature g
+        Sn13DG g            -> "DG " <> nNomenclature g
+        Sn23DG g            -> "DG 0:0" <> nNomenclature g
 
 instance Shorthand a => Shorthand (TG a) where
   shorthand l =
     case l of
       ClassLevelTG n       -> "TG (" <> show n <> ")"
-      CombinedRadylsTG rs  -> "TG " <> shorthand rs
-      UnknownSnTG r1 r2 r3 -> renderTG shorthand "_" r1 r2 r3
-      KnownSnTG r1 r2 r3   -> renderTG shorthand "/" r1 r2 r3
+      CombinedRadylsTG gs  -> "TG " <> shorthand gs
+      UnknownSnTG g1 g2 g3 -> renderTG shorthand "_" g1 g2 g3
+      KnownSnTG g          -> shorthand g
 
 instance NNomenclature a => NNomenclature (TG a) where
   nNomenclature l =
     case l of
       ClassLevelTG n       -> "TG (" <> show n <> ")"
-      CombinedRadylsTG rs  -> "TG " <> nNomenclature rs
-      UnknownSnTG r1 r2 r3 -> renderTG nNomenclature "_" r1 r2 r3
-      KnownSnTG r1 r2 r3   -> renderTG nNomenclature "/" r1 r2 r3
+      CombinedRadylsTG gs  -> "TG " <> nNomenclature gs
+      UnknownSnTG g1 g2 g3 -> renderTG nNomenclature "_" g1 g2 g3
+      KnownSnTG g          -> nNomenclature g
 
-renderTG f sep r1 r2 r3  = "TG " <> r1' <> sep <> r2' <> sep <> r3'
-    where r1' = f r1
-          r2' = f r2
-          r3' = f r3
+renderTG f sep g1 g2 g3  = "TG " <> g1' <> sep <> g2' <> sep <> g3'
+    where g1' = f g1
+          g2' = f g2
+          g3' = f g3
