@@ -445,32 +445,29 @@ makeClassy ''Glycerol
 instance Bifunctor (Glycerol a) where
   bimap f g (Glycerol a b c) = Glycerol a (f b) (g c)
 
-class HeadGroup a where
-  showHeadGroup :: a -> String
-
 data PhosphatidicAcid = PhosphatidicAcid
   deriving (Show, Read, Eq, Ord)
 
-instance HeadGroup PhosphatidicAcid where
-  showHeadGroup _ = "PA"
+instance Shorthand PhosphatidicAcid where
+  shorthand _ = "PA"
 
 data Phosphatidylethanolamine = Phosphatidylethanolamine
   deriving (Show, Read, Eq, Ord)
 
-instance HeadGroup Phosphatidylethanolamine where
-  showHeadGroup _ = "PE"
+instance Shorthand Phosphatidylethanolamine where
+  shorthand _ = "PE"
 
 data Phosphatidylcholine = Phosphatidylcholine
   deriving (Show, Read, Eq, Ord)
 
-instance HeadGroup Phosphatidylcholine where
-  showHeadGroup _ = "PC"
+instance Shorthand Phosphatidylcholine where
+  shorthand _ = "PC"
 
 data Phosphatidylserine = Phosphatidylserine
   deriving (Show, Read, Eq, Ord)
 
-instance HeadGroup Phosphatidylserine where
-  showHeadGroup _ = "PS"
+instance Shorthand Phosphatidylserine where
+  shorthand _ = "PS"
 
 data Phosphatidylinositol = Phosphatidylinositol
   deriving (Show, Read, Eq, Ord)
@@ -485,11 +482,11 @@ data PhosphatidylinositolMonophosphate
   | Phosphatidylinositol5Phosphate
   deriving (Show, Read, Eq, Ord, Enum)
 
-instance HeadGroup PhosphatidylinositolMonophosphate where
-  showHeadGroup PhosphatidylinositolMonophosphate = "PIP"
-  showHeadGroup Phosphatidylinositol3Phosphate    = "PIP[3′]"
-  showHeadGroup Phosphatidylinositol4Phosphate    = "PIP[4′]"
-  showHeadGroup Phosphatidylinositol5Phosphate    = "PIP[5′]"
+instance Shorthand PhosphatidylinositolMonophosphate where
+  shorthand PhosphatidylinositolMonophosphate = "PIP"
+  shorthand Phosphatidylinositol3Phosphate    = "PIP[3′]"
+  shorthand Phosphatidylinositol4Phosphate    = "PIP[4′]"
+  shorthand Phosphatidylinositol5Phosphate    = "PIP[5′]"
 
 data PhosphatidylinositolBisphosphate
   = PhosphatidylinositolBisphosphate
@@ -498,38 +495,42 @@ data PhosphatidylinositolBisphosphate
   | Phosphatidylinositol45Bisphosphate
   deriving (Show, Read, Eq, Ord, Enum)
 
-instance HeadGroup PhosphatidylinositolBisphosphate where
-  showHeadGroup PhosphatidylinositolBisphosphate   = "PIP2"
-  showHeadGroup Phosphatidylinositol34Bisphosphate = "PIP2[3′,4′]"
-  showHeadGroup Phosphatidylinositol35Bisphosphate = "PIP2[3′,5′]"
-  showHeadGroup Phosphatidylinositol45Bisphosphate = "PIP2[4′,5′]"
+instance Shorthand PhosphatidylinositolBisphosphate where
+  shorthand PhosphatidylinositolBisphosphate   = "PIP2"
+  shorthand Phosphatidylinositol34Bisphosphate = "PIP2[3′,4′]"
+  shorthand Phosphatidylinositol35Bisphosphate = "PIP2[3′,5′]"
+  shorthand Phosphatidylinositol45Bisphosphate = "PIP2[4′,5′]"
 
 data PhosphatidylinositolTrisphosphate = PhosphatidylinositolTrisphosphate
   deriving (Show, Read, Eq, Ord)
 
-instance HeadGroup PhosphatidylinositolTrisphosphate where
-  showHeadGroup _ = "PI3"
+instance Shorthand PhosphatidylinositolTrisphosphate where
+  shorthand _ = "PI3"
 
-instance (HeadGroup a, Shorthand b) => Shorthand (Glycerol a (Radyl b) (Radyl b)) where
+instance Shorthand a
+  => Shorthand (Glycerol a (Radyl a) (Radyl a)) where
   shorthand (Glycerol h r1 r2) =
-    showHeadGroup h <> " " <> shorthand r1 <> "/" <> shorthand r2
+    shorthand h <> " " <> shorthand r1 <> "/" <> shorthand r2
 
-instance (HeadGroup a, Shorthand b) => Shorthand (Glycerol a (Radyl b) ()) where
+instance Shorthand a => Shorthand (Glycerol a (Radyl a) ()) where
   shorthand (Glycerol h r _) =
-    showHeadGroup h <> " " <> shorthand r <> "/0:0"
+    shorthand h <> " " <> shorthand r <> "/0:0"
 
-instance (HeadGroup a, Shorthand b) => Shorthand (Glycerol a () (Radyl b)) where
+instance Shorthand a => Shorthand (Glycerol a () (Radyl a)) where
   shorthand (Glycerol h _ r) =
-    showHeadGroup h <> " 0:0/" <> shorthand r
+    shorthand h <> " 0:0/" <> shorthand r
 
-instance (HeadGroup a, NNomenclature b) => NNomenclature (Glycerol a (Radyl b) (Radyl b)) where
+instance (Shorthand a, NNomenclature b)
+  => NNomenclature (Glycerol a (Radyl b) (Radyl b)) where
   nNomenclature (Glycerol h r1 r2) =
-    showHeadGroup h <> " " <> nNomenclature r1 <> "/" <> nNomenclature r2
+    shorthand h <> " " <> nNomenclature r1 <> "/" <> nNomenclature r2
 
-instance (HeadGroup a, NNomenclature b) => NNomenclature (Glycerol a (Radyl b) ()) where
+instance (Shorthand a, NNomenclature b)
+  => NNomenclature (Glycerol a (Radyl b) ()) where
   nNomenclature (Glycerol h r _) =
-    showHeadGroup h <> " " <> nNomenclature r <> "/0:0"
+    shorthand h <> " " <> nNomenclature r <> "/0:0"
 
-instance (HeadGroup a, NNomenclature b) => NNomenclature (Glycerol a () (Radyl b)) where
+instance (Shorthand a, NNomenclature b)
+  => NNomenclature (Glycerol a () (Radyl b)) where
   nNomenclature (Glycerol h _ r) =
-    showHeadGroup h <> " 0:0/" <> nNomenclature r
+    shorthand h <> " 0:0/" <> nNomenclature r
