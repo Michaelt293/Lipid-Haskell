@@ -22,6 +22,8 @@ library
                    , Lipid.Blocks
                    , Lipid.FattyAcid
                    , Lipid.Glycerolipid
+                   , Lipid.KnownSn.Glycerolipid
+                   , Lipid.UnknownSn.Glycerolipid
 
   other-modules:
   other-extensions:

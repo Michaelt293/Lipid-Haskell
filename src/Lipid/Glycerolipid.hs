@@ -16,84 +16,104 @@ module Lipid.Glycerolipid where
 
 import Lipid.Blocks
 import Lipid.Format
+import qualified Lipid.UnknownSn.Glycerolipid as UnknownSn.Glycerolipid
+import qualified Lipid.KnownSn.Glycerolipid as KnownSn.Glycerolipid
 import Control.Lens
 import Data.Monoid ((<>))
+import Data.List (sort)
 
 
 data MG a
   = ClassLevelMG Integer
-  | UnknownSn    (Radyl a)
-  | Sn1MG        (Glycerol (Radyl a) () ())
-  | Sn2MG        (Glycerol () (Radyl a) ())
-  | Sn3MG        (Glycerol () () (Radyl a))
-  deriving (Show, Eq, Ord)
+  | UnknownSnMG  (UnknownSn.Glycerolipid.MG a)
+  | Sn1MG        (KnownSn.Glycerolipid.MG1 a)
+  | Sn2MG        (KnownSn.Glycerolipid.MG2 a)
+  | Sn3MG        (KnownSn.Glycerolipid.MG3 a)
+  deriving (Show, Eq, Ord, Functor)
 
 makePrisms ''MG
 
 data DG a
   = ClassLevelDG     Integer
   | CombinedRadylsDG (TwoCombinedRadyls a)
-  | UnknownDG        (Radyl a) (Radyl a)
-  | Sn12DG           (Glycerol (Radyl a) (Radyl a) ())
-  | Sn13DG           (Glycerol (Radyl a) () (Radyl a))
-  | Sn23DG           (Glycerol () (Radyl a) (Radyl a))
-  deriving (Show, Eq, Ord)
+  | UnknownSnDG      (UnknownSn.Glycerolipid.DG a)
+  | Sn12DG           (KnownSn.Glycerolipid.DG12 a)
+  | Sn13DG           (KnownSn.Glycerolipid.DG13 a)
+  | Sn23DG           (KnownSn.Glycerolipid.DG23 a)
+  deriving (Show, Eq, Functor)
 
 makePrisms ''DG
+
+-- instance (Eq a, Ord a) => Eq (DG a) where
+--   ClassLevelDG n1 == ClassLevelDG n2 = n1 == n2
+--   CombinedRadylsDG rs1 == CombinedRadylsDG rs2 = rs1 == rs2
+--   UnknownDG r1 r2 == UnknownDG r3 r4 = sort [r1, r2] == sort [r3, r4]
+--   Sn12DG g1 == Sn12DG g2 = g1 == g2
+--   Sn13DG g1 == Sn13DG g2 = g1 == g2
+--   Sn23DG g1 == Sn23DG g2 = g1 == g2
+--   _ == _ = False
 
 data TG a
   = ClassLevelTG     Integer
   | CombinedRadylsTG (ThreeCombinedRadyls a)
-  | UnknownSnTG      (Radyl a) (Radyl a) (Radyl a)
-  | KnownSnTG        (Glycerol (Radyl a) (Radyl a) (Radyl a))
-  deriving (Show, Eq, Ord)
+  | UnknownSnTG      (UnknownSn.Glycerolipid.TG a)
+  | KnownSnTG        (KnownSn.Glycerolipid.TG a)
+  deriving (Show, Eq, Functor)
 
 makePrisms ''TG
+
+-- instance (Eq a, Ord a) => Eq (TG a) where
+--   ClassLevelTG n1 == ClassLevelTG n2 = n1 == n2
+--   CombinedRadylsTG rs1 == CombinedRadylsTG rs2 = rs1 == rs2
+--   UnknownSnTG r1 r2 r3 == UnknownSnTG r4 r5 r6 =
+--     sort [r1, r2, r3] == sort [r4, r5, r6]
+--   KnownSnTG g1 == KnownSnTG g2 = g1 == g2
+--   _ == _ = False
 
 instance Shorthand a => Shorthand (MG a) where
     shorthand l =
       case l of
         ClassLevelMG n -> "MG (" <> show n <> ")"
-        UnknownSn r    -> "MG " <> shorthand r
-        Sn1MG g        -> "MG " <> shorthand g
-        Sn2MG g        -> "MG " <> shorthand g
-        Sn3MG g        -> "MG " <> shorthand g
+        UnknownSnMG g  -> shorthand g
+        Sn1MG g        -> shorthand g
+        Sn2MG g        -> shorthand g
+        Sn3MG g        -> shorthand g
 
 instance NNomenclature a => NNomenclature (MG a) where
     nNomenclature l =
       case l of
         ClassLevelMG n -> "MG (" <> show n <> ")"
-        UnknownSn r    -> "MG " <> nNomenclature r
-        Sn1MG g        -> "MG " <> nNomenclature g <> "/0:0/0:0"
-        Sn2MG g        -> "MG 0:0/" <> nNomenclature g <> "/0:0"
-        Sn3MG g        -> "MG 0:0/0:0/" <> nNomenclature g
+        UnknownSnMG r  -> nNomenclature r
+        Sn1MG g        -> nNomenclature g
+        Sn2MG g        -> nNomenclature g
+        Sn3MG g        -> nNomenclature g
 
 instance Shorthand a => Shorthand (DG a) where
     shorthand l =
       case l of
         ClassLevelDG n      -> "DG (" <> show n <> ")"
         CombinedRadylsDG gs -> "DG " <> shorthand gs
-        UnknownDG g1 g2     -> "DG " <> shorthand g1 <> "_" <> shorthand g2
-        Sn12DG g            -> "DG " <> shorthand g
-        Sn13DG g            -> "DG " <> shorthand g
-        Sn23DG g            -> "DG 0:0" <> shorthand g
+        UnknownSnDG g       -> shorthand g
+        Sn12DG g            -> shorthand g
+        Sn13DG g            -> shorthand g
+        Sn23DG g            -> shorthand g
 
 instance NNomenclature a => NNomenclature (DG a) where
     nNomenclature l =
       case l of
         ClassLevelDG n      -> "DG (" <> show n <> ")"
         CombinedRadylsDG gs -> "DG " <> nNomenclature gs
-        UnknownDG g1 g2     -> "DG " <> nNomenclature g1 <> "_" <> nNomenclature g2
-        Sn12DG g            -> "DG " <> nNomenclature g
-        Sn13DG g            -> "DG " <> nNomenclature g
-        Sn23DG g            -> "DG 0:0" <> nNomenclature g
+        UnknownSnDG g       -> nNomenclature g
+        Sn12DG g            -> nNomenclature g
+        Sn13DG g            -> nNomenclature g
+        Sn23DG g            -> nNomenclature g
 
 instance Shorthand a => Shorthand (TG a) where
   shorthand l =
     case l of
       ClassLevelTG n       -> "TG (" <> show n <> ")"
       CombinedRadylsTG gs  -> "TG " <> shorthand gs
-      UnknownSnTG g1 g2 g3 -> renderTG shorthand "_" g1 g2 g3
+      UnknownSnTG g        -> shorthand g
       KnownSnTG g          -> shorthand g
 
 instance NNomenclature a => NNomenclature (TG a) where
@@ -101,10 +121,5 @@ instance NNomenclature a => NNomenclature (TG a) where
     case l of
       ClassLevelTG n       -> "TG (" <> show n <> ")"
       CombinedRadylsTG gs  -> "TG " <> nNomenclature gs
-      UnknownSnTG g1 g2 g3 -> renderTG nNomenclature "_" g1 g2 g3
+      UnknownSnTG g        -> nNomenclature g
       KnownSnTG g          -> nNomenclature g
-
-renderTG f sep g1 g2 g3  = "TG " <> g1' <> sep <> g2' <> sep <> g3'
-    where g1' = f g1
-          g2' = f g2
-          g3' = f g3
