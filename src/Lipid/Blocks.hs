@@ -435,9 +435,9 @@ numberOfDoubleBond c =
   c^.doubleBonds.to (NumDoubleBonds . fromIntegral . length)
 
 data Glycerol a b c = Glycerol
-  { _sn1 :: a
-  , _sn2 :: b
-  , _sn3 :: c
+  { _sn1' :: a
+  , _sn2' :: b
+  , _sn3' :: c
   } deriving (Show, Read, Eq, Ord, Functor)
 
 makeClassy ''Glycerol
@@ -462,6 +462,18 @@ data Phosphatidylcholine = Phosphatidylcholine
 
 instance Shorthand Phosphatidylcholine where
   shorthand _ = "PC"
+
+data Phosphatidylglycerol = Phosphatidylglycerol
+  deriving (Show, Read, Eq, Ord)
+
+instance Shorthand Phosphatidylglycerol where
+  shorthand _ = "PG"
+
+data Phosphatidylgylcerolphosphate = Phosphatidylgylcerolphosphate
+  deriving (Show, Read, Eq, Ord)
+
+instance Shorthand Phosphatidylgylcerolphosphate where
+  shorthand _ = "PGP"
 
 data Phosphatidylserine = Phosphatidylserine
   deriving (Show, Read, Eq, Ord)
@@ -507,16 +519,16 @@ data PhosphatidylinositolTrisphosphate = PhosphatidylinositolTrisphosphate
 instance Shorthand PhosphatidylinositolTrisphosphate where
   shorthand _ = "PI3"
 
-instance Shorthand a
-  => Shorthand (Glycerol a (Radyl a) (Radyl a)) where
+instance (Shorthand a, Shorthand b)
+  => Shorthand (Glycerol a (Radyl b) (Radyl b)) where
   shorthand (Glycerol h r1 r2) =
     shorthand h <> " " <> shorthand r1 <> "/" <> shorthand r2
 
-instance Shorthand a => Shorthand (Glycerol a (Radyl a) ()) where
+instance (Shorthand a, Shorthand b) => Shorthand (Glycerol a (Radyl b) ()) where
   shorthand (Glycerol h r _) =
     shorthand h <> " " <> shorthand r <> "/0:0"
 
-instance Shorthand a => Shorthand (Glycerol a () (Radyl a)) where
+instance (Shorthand a, Shorthand b) => Shorthand (Glycerol a () (Radyl b)) where
   shorthand (Glycerol h _ r) =
     shorthand h <> " 0:0/" <> shorthand r
 

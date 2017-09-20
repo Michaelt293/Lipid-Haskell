@@ -8,9 +8,6 @@ Maintainer  : Michael Thomas <Michaelt293@gmail.com>
 Stability   : Experimental
 -}
 {-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE DeriveFunctor #-}
-{-# LANGUAGE DeriveFoldable #-}
-{-# LANGUAGE DeriveTraversable #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 
 module Lipid.KnownSn.Glycerolipid where
@@ -18,8 +15,8 @@ module Lipid.KnownSn.Glycerolipid where
 import Lipid.Blocks
 import Lipid.Format
 import Control.Lens
+import Control.Applicative
 import Data.Monoid ((<>))
-import Data.List (sort)
 
 newtype TG a = TG
   { _getTG :: Glycerol (Radyl a) (Radyl a) (Radyl a)
@@ -28,8 +25,19 @@ newtype TG a = TG
 makeLenses ''TG
 
 instance Functor TG where
-    fmap f (TG (Glycerol r1 r2 r3)) =
-      TG $ Glycerol (f <$> r1) (f <$> r2) (f <$> r3)
+  fmap f (TG (Glycerol r1 r2 r3)) =
+    TG $ Glycerol (f <$> r1) (f <$> r2) (f <$> r3)
+
+instance Foldable TG where
+  foldMap f (TG (Glycerol r1 r2 r3)) =
+    foldMap f r1 <> foldMap f r2 <> foldMap f r3
+
+instance Traversable TG where
+  traverse f (TG (Glycerol r1 r2 r3)) =
+    (\x y z -> TG (Glycerol x y z))
+    <$> traverse f r1
+    <*> traverse f r2
+    <*> traverse f r3
 
 instance HasGlycerol (TG a) (Radyl a) (Radyl a) (Radyl a) where
   glycerol = getTG
@@ -44,6 +52,16 @@ instance Functor DG12 where
     fmap f (DG12 (Glycerol r1 r2 ())) =
       DG12 $ Glycerol (f <$> r1) (f <$> r2) ()
 
+instance Foldable DG12 where
+  foldMap f (DG12 (Glycerol r1 r2 _)) =
+    foldMap f r1 <> foldMap f r2
+
+instance Traversable DG12 where
+  traverse f (DG12 (Glycerol r1 r2 _)) =
+    (\x y -> DG12 (Glycerol x y ()))
+    <$> traverse f r1
+    <*> traverse f r2
+
 instance HasGlycerol (DG12 a) (Radyl a) (Radyl a) () where
   glycerol = getDG12
 
@@ -56,6 +74,16 @@ makeLenses ''DG13
 instance Functor DG13 where
   fmap f (DG13 (Glycerol r1 () r2)) =
     DG13 $ Glycerol (f <$> r1) () (f <$> r2)
+
+instance Foldable DG13 where
+  foldMap f (DG13 (Glycerol r1 _ r2)) =
+    foldMap f r1 <> foldMap f r2
+
+instance Traversable DG13 where
+  traverse f (DG13 (Glycerol r1 _ r2)) =
+    (\x y -> DG13 (Glycerol x () y))
+    <$> traverse f r1
+    <*> traverse f r2
 
 instance HasGlycerol (DG13 a) (Radyl a) () (Radyl a) where
   glycerol = getDG13
@@ -70,6 +98,16 @@ instance Functor DG23 where
   fmap f (DG23 (Glycerol () r1 r2)) =
     DG23 $ Glycerol () (f <$> r1) (f <$> r2)
 
+instance Foldable DG23 where
+  foldMap f (DG23 (Glycerol _ r1 r2)) =
+    foldMap f r1 <> foldMap f r2
+
+instance Traversable DG23 where
+  traverse f (DG23 (Glycerol _ r1 r2)) =
+    (\x y -> DG23 (Glycerol () x y))
+    <$> traverse f r1
+    <*> traverse f r2
+
 instance HasGlycerol (DG23 a) () (Radyl a) (Radyl a) where
   glycerol = getDG23
 
@@ -82,6 +120,14 @@ makeLenses ''MG1
 instance Functor MG1 where
   fmap f (MG1 (Glycerol r () ())) =
     MG1 $ Glycerol (f <$> r) () ()
+
+instance Foldable MG1 where
+  foldMap f (MG1 (Glycerol r _ _)) =
+    foldMap f r
+
+instance Traversable MG1 where
+  traverse f (MG1 (Glycerol r _ _)) =
+    (\x -> MG1 (Glycerol x () ())) <$> traverse f r
 
 instance HasGlycerol (MG1 a) (Radyl a) () () where
   glycerol = getMG1
@@ -96,6 +142,13 @@ instance Functor MG2 where
   fmap f (MG2 (Glycerol () r ())) =
     MG2 $ Glycerol () (f <$> r) ()
 
+instance Foldable MG2 where
+  foldMap f (MG2 (Glycerol _ r _)) = foldMap f r
+
+instance Traversable MG2 where
+  traverse f (MG2 (Glycerol _ r _)) =
+    (\x -> MG2 (Glycerol () x ())) <$> traverse f r
+
 instance HasGlycerol (MG2 a) () (Radyl a) () where
   glycerol = getMG2
 
@@ -108,6 +161,13 @@ makeLenses ''MG3
 instance Functor MG3 where
   fmap f (MG3 (Glycerol () () r)) =
     MG3 $ Glycerol () () (f <$> r)
+
+instance Foldable MG3 where
+  foldMap f (MG3 (Glycerol _ _ r)) = foldMap f r
+
+instance Traversable MG3 where
+  traverse f (MG3 (Glycerol _ _ r)) =
+    (MG3 . Glycerol () ()) <$> traverse f r
 
 instance HasGlycerol (MG3 a) () () (Radyl a) where
   glycerol = getMG3

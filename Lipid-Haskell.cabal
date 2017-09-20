@@ -24,6 +24,8 @@ library
                    , Lipid.Glycerolipid
                    , Lipid.KnownSn.Glycerolipid
                    , Lipid.UnknownSn.Glycerolipid
+                   , Lipid.CombinedRadyl.Glycerolipid
+                   , Lipid.ClassLevel.Glycerolipid
 
   other-modules:
   other-extensions:
