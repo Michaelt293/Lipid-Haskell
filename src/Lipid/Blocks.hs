@@ -546,3 +546,12 @@ instance (Shorthand a, NNomenclature b)
   => NNomenclature (Glycerol a () (Radyl b)) where
   nNomenclature (Glycerol h _ r) =
     shorthand h <> " 0:0/" <> nNomenclature r
+
+newtype ClassLevel = ClassLevel
+  { _getClassLevel :: Integer
+  } deriving (Eq, Ord, Enum, Num)
+
+makeClassy ''ClassLevel
+
+instance Show ClassLevel where
+  show (ClassLevel n) = show n

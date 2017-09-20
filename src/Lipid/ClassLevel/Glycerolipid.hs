@@ -15,15 +15,6 @@ import Lipid.Blocks
 import Control.Lens
 import Data.Monoid ((<>))
 
-newtype ClassLevel = ClassLevel
-  { _getClassLevel :: Integer
-  } deriving (Eq, Ord, Enum, Num)
-
-makeClassy ''ClassLevel
-
-instance Show ClassLevel where
-  show (ClassLevel n) = show n
-
 newtype TG = TG
  { _getTG :: ClassLevel
  } deriving (Show, Eq, Ord)
@@ -58,4 +49,4 @@ instance Shorthand MG where
   shorthand (MG n) = "MG (" <> show n <> ")"
 
 instance HasClassLevel MG where
-   classLevel = getMG 
+   classLevel = getMG

@@ -33,7 +33,7 @@ makeClassy ''MG
 data DG a = DG
   { radyl1DG :: Radyl a
   , radyl2DG :: Radyl a
-  } deriving (Show, Functor, Foldable, Traversable) -- add Ord
+  } deriving (Show, Functor, Foldable, Traversable)
 
 makeClassy ''DG
 
