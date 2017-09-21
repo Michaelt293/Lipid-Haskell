@@ -6,10 +6,6 @@ License     : GPL-3
 Maintainer  : Michael Thomas <Michaelt293@gmail.com>
 Stability   : Experimental
 -}
-{-# LANGUAGE LambdaCase #-}
-{-# LANGUAGE DeriveTraversable #-}
-{-# LANGUAGE DeriveFunctor #-}
-{-# LANGUAGE DeriveFoldable #-}
 {-# LANGUAGE TemplateHaskell #-}
 
 module Lipid.ClassLevel.Glycerophospholipid where

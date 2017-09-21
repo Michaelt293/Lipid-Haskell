@@ -555,3 +555,16 @@ makeClassy ''ClassLevel
 
 instance Show ClassLevel where
   show (ClassLevel n) = show n
+
+data TwoRadyls a = TwoRadyls
+  { radyl1 :: Radyl a
+  , radyl2 :: Radyl a
+  } deriving (Show, Eq, Ord, Functor, Foldable, Traversable)
+
+makeClassy ''TwoRadyls
+
+instance Shorthand a => Shorthand (TwoRadyls a) where
+  shorthand (TwoRadyls r1 r2) = shorthand r1 <> "_" <> shorthand r2
+
+instance NNomenclature a => NNomenclature (TwoRadyls a) where
+  nNomenclature (TwoRadyls r1 r2) = nNomenclature r1 <> "_" <> nNomenclature r2
