@@ -144,7 +144,7 @@ instance HasTwoRadyls (PIP3 a) a where
 data PIP a = PIP
   { _getHeadgroupPIP :: PhosphatidylinositolMonophosphate
   , _getTwoRadylsPIP :: TwoRadyls a
-  } deriving (Show, Eq, Ord)
+  } deriving (Show, Eq, Ord, Functor, Foldable, Traversable)
 
 makeClassy ''PIP
 
@@ -160,7 +160,7 @@ instance HasTwoRadyls (PIP a) a where
 data PIP2 a = PIP2
   { _getHeadgroupPIP2 :: PhosphatidylinositolBisphosphate
   , _getTwoRadylsPIP2 :: TwoRadyls a
-  } deriving (Show, Eq, Ord)
+  } deriving (Show, Eq, Ord, Functor, Foldable, Traversable)
 
 makeClassy ''PIP2
 

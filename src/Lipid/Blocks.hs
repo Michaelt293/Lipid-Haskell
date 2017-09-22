@@ -484,6 +484,9 @@ instance Shorthand Phosphatidylserine where
 data Phosphatidylinositol = Phosphatidylinositol
   deriving (Show, Read, Eq, Ord)
 
+instance Shorthand Phosphatidylinositol where
+  shorthand _ = "PI"
+
 data Phosphate = Phosphate
   deriving (Show, Read, Eq, Ord)
 
@@ -557,14 +560,55 @@ instance Show ClassLevel where
   show (ClassLevel n) = show n
 
 data TwoRadyls a = TwoRadyls
-  { radyl1 :: Radyl a
-  , radyl2 :: Radyl a
-  } deriving (Show, Eq, Ord, Functor, Foldable, Traversable)
+  { radyl1Di :: Radyl a
+  , radyl2Di :: Radyl a
+  } deriving (Show, Functor, Foldable, Traversable)
 
 makeClassy ''TwoRadyls
+
+instance (Eq a, Ord a) => Eq (TwoRadyls a) where
+  TwoRadyls r1 r2 == TwoRadyls r1' r2' =
+    sort [r1, r2] == sort [r1', r2']
+
+instance Ord a => Ord (TwoRadyls a) where
+  TwoRadyls r1 r2 `compare` TwoRadyls r1' r2' =
+    sort [r1, r2] `compare` sort [r1', r2']
 
 instance Shorthand a => Shorthand (TwoRadyls a) where
   shorthand (TwoRadyls r1 r2) = shorthand r1 <> "_" <> shorthand r2
 
 instance NNomenclature a => NNomenclature (TwoRadyls a) where
   nNomenclature (TwoRadyls r1 r2) = nNomenclature r1 <> "_" <> nNomenclature r2
+
+data ThreeRadyls a = ThreeRadyls
+  { radyl1Tri :: Radyl a
+  , radyl2Tri :: Radyl a
+  , radyl3Tri :: Radyl a
+  } deriving (Show, Functor, Foldable, Traversable)
+
+makeClassy ''ThreeRadyls
+
+instance (Eq a, Ord a) => Eq (ThreeRadyls a) where
+  ThreeRadyls r1 r2 r3 == ThreeRadyls r1' r2' r3' =
+    sort [r1, r2, r3] == sort [r1', r2', r3']
+
+instance Ord a => Ord (ThreeRadyls a) where
+  ThreeRadyls r1 r2 r3 `compare` ThreeRadyls r1' r2' r3' =
+    sort [r1, r2, r3] `compare` sort [r1', r2', r3']
+
+instance Shorthand a => Shorthand (ThreeRadyls a) where
+  shorthand (ThreeRadyls r1 r2 r3) =
+    shorthand r1 <> "_" <> shorthand r2 <> shorthand r3
+
+instance NNomenclature a => NNomenclature (ThreeRadyls a) where
+  nNomenclature (ThreeRadyls r1 r2 r3) =
+    nNomenclature r1 <> "_" <> nNomenclature r2 <> nNomenclature r3
+
+class AllRadyls t where
+  allRadyls :: Applicative f => (Radyl a -> f (Radyl b)) -> t a -> f (t b)
+
+instance AllRadyls TwoRadyls where
+  allRadyls f (TwoRadyls a b ) = TwoRadyls <$> f a <*> f b
+
+instance AllRadyls ThreeRadyls where
+  allRadyls f (ThreeRadyls a b c) = ThreeRadyls <$> f a <*> f b <*> f c

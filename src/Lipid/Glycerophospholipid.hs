@@ -17,97 +17,99 @@ module Lipid.Glycerophospholipid where
 
 import Lipid.Blocks
 import Lipid.Format
-import Lipid.ClassLevel
+import qualified Lipid.ClassLevel.Glycerophospholipid as ClassLevel.Glycerophospholipid
+import qualified Lipid.CombinedRadyl.Glycerophospholipid as CombinedRadyl.Glycerophospholipid
+import qualified Lipid.UnknownSn.Glycerophospholipid as UnknownSn.Glycerophospholipid
 import qualified Lipid.KnownSn.Glycerophospholipid as KnownSn.Glycerophospholipid
 import Control.Lens
 import Data.Monoid ((<>))
 
 
 data PA a
-  = ClassLevelPA       ClassLevel
-  | CombinedRadylsPA   (TwoCombinedRadyls a)
-  | UnknownSnPA        (KnownSn.Glycerophospholipid.PA a) -- fix
+  = ClassLevelPA       ClassLevel.Glycerophospholipid.PA
+  | CombinedRadylsPA   (CombinedRadyl.Glycerophospholipid.PA a)
+  | UnknownSnPA        (UnknownSn.Glycerophospholipid.PA a)
   | KnownSnPA          (KnownSn.Glycerophospholipid.PA a)
   deriving (Show, Eq, Ord, Functor, Foldable, Traversable)
 
 makePrisms ''PA
 
 data PC a
-  = ClassLevelPC       ClassLevel
-  | CombinedRadylsPC   (TwoCombinedRadyls a)
-  | UnknownSnPC        (Radyl a) (Radyl a)
+  = ClassLevelPC       ClassLevel.Glycerophospholipid.PC
+  | CombinedRadylsPC   (CombinedRadyl.Glycerophospholipid.PC a)
+  | UnknownSnPC        (UnknownSn.Glycerophospholipid.PC a)
   | KnownSnPC          (KnownSn.Glycerophospholipid.PC a)
   deriving (Show, Eq, Ord, Functor, Foldable, Traversable)
 
 makePrisms ''PC
 
 data PE a
-  = ClassLevelPE       ClassLevel
-  | CombinedRadylsPE   (TwoCombinedRadyls a)
-  | UnknownSnPE        (Radyl a) (Radyl a)
+  = ClassLevelPE       ClassLevel.Glycerophospholipid.PE
+  | CombinedRadylsPE   (CombinedRadyl.Glycerophospholipid.PE a)
+  | UnknownSnPE        (UnknownSn.Glycerophospholipid.PE a)
   | KnownSnPE          (KnownSn.Glycerophospholipid.PE a)
   deriving (Show, Eq, Ord, Functor, Foldable, Traversable)
 
 makePrisms ''ClassLevel
 
 data PG a
-  = ClassLevelPG       ClassLevel
-  | CombinedRadylsPG   (TwoCombinedRadyls a)
-  | UnknownSnPG        (Radyl a) (Radyl a)
+  = ClassLevelPG       ClassLevel.Glycerophospholipid.PG
+  | CombinedRadylsPG   (CombinedRadyl.Glycerophospholipid.PG a)
+  | UnknownSnPG        (UnknownSn.Glycerophospholipid.PG a)
   | KnownSnPG          (KnownSn.Glycerophospholipid.PG a)
   deriving (Show, Eq, Ord, Functor, Foldable, Traversable)
 
 makePrisms ''PG
 
 data PGP a
-  = ClassLevelPGP      ClassLevel
-  | CombinedRadylsPGP  (TwoCombinedRadyls a)
-  | UnknownSnPGP       (Radyl a) (Radyl a)
+  = ClassLevelPGP      ClassLevel.Glycerophospholipid.PGP
+  | CombinedRadylsPGP  (CombinedRadyl.Glycerophospholipid.PGP a)
+  | UnknownSnPGP       (UnknownSn.Glycerophospholipid.PGP a)
   | KnownSnPGP         (KnownSn.Glycerophospholipid.PGP a)
   deriving (Show, Eq, Ord, Functor, Foldable, Traversable)
 
 makePrisms ''PGP
 
 data PI a
-  = ClassLevelPI       ClassLevel
-  | CombinedRadylsPI   (TwoCombinedRadyls a)
-  | UnknownSnPI        (Radyl a) (Radyl a)
+  = ClassLevelPI       ClassLevel.Glycerophospholipid.PI
+  | CombinedRadylsPI   (CombinedRadyl.Glycerophospholipid.PI a)
+  | UnknownSnPI        (UnknownSn.Glycerophospholipid.PI a)
   | KnownSnPI          (KnownSn.Glycerophospholipid.PI a)
   deriving (Show, Eq, Ord, Functor, Foldable, Traversable)
 
 makePrisms ''PI
 
 data PIP a
-  = ClassLevelPIP      ClassLevel
-  | CombinedRadylsPIP  (TwoCombinedRadyls a)
-  | UnknownSnPIP       (Radyl a) (Radyl a)
+  = ClassLevelPIP      ClassLevel.Glycerophospholipid.PIP
+  | CombinedRadylsPIP  (CombinedRadyl.Glycerophospholipid.PIP a)
+  | UnknownSnPIP       (UnknownSn.Glycerophospholipid.PIP a)
   | KnownSnPIP         (KnownSn.Glycerophospholipid.PIP a)
   deriving (Show, Eq, Ord, Functor, Foldable, Traversable)
 
 makePrisms ''PIP
 
 data PIP2 a
-  = ClassLevelPIP2     ClassLevel
-  | CombinedRadylsPIP2 (TwoCombinedRadyls a)
-  | UnknownSnPIP2      (Radyl a) (Radyl a)
+  = ClassLevelPIP2     ClassLevel.Glycerophospholipid.PIP2
+  | CombinedRadylsPIP2 (CombinedRadyl.Glycerophospholipid.PIP2 a)
+  | UnknownSnPIP2      (UnknownSn.Glycerophospholipid.PIP2 a)
   | KnownSnPIP2        (KnownSn.Glycerophospholipid.PIP2 a)
   deriving (Show, Eq, Ord, Functor, Foldable, Traversable)
 
 makePrisms ''PIP2
 
 data PIP3 a
-  = ClassLevelPIP3     ClassLevel
-  | CombinedRadylsPIP3 (TwoCombinedRadyls a)
-  | UnknownSnPIP3      (Radyl a) (Radyl a)
+  = ClassLevelPIP3     ClassLevel.Glycerophospholipid.PIP3
+  | CombinedRadylsPIP3 (CombinedRadyl.Glycerophospholipid.PIP3 a)
+  | UnknownSnPIP3      (UnknownSn.Glycerophospholipid.PIP3 a)
   | KnownSnPIP3        (KnownSn.Glycerophospholipid.PIP3 a)
   deriving (Show, Eq, Ord, Functor, Foldable, Traversable)
 
 makePrisms ''PIP3
 
 data PS a
-  = ClassLevelPS       ClassLevel
-  | CombinedRadylsPS   (TwoCombinedRadyls a)
-  | UnknownSnPS        (Radyl a) (Radyl a)
+  = ClassLevelPS       ClassLevel.Glycerophospholipid.PS
+  | CombinedRadylsPS   (CombinedRadyl.Glycerophospholipid.PS a)
+  | UnknownSnPS        (UnknownSn.Glycerophospholipid.PS a)
   | KnownSnPS          (KnownSn.Glycerophospholipid.PS a)
   deriving (Show, Eq, Ord, Functor, Foldable, Traversable)
 
@@ -128,175 +130,161 @@ makePrisms ''PS
 instance Shorthand a => Shorthand (PA a) where
   shorthand =
     \case
-      ClassLevelPA n      -> "PA (" <> show n <> ")"
-      CombinedRadylsPA rs -> "PA " <> shorthand rs
-      UnknownSnPA r1 r2   -> renderDiradylPL shorthand "PA" "_" r1 r2
+      ClassLevelPA n      -> shorthand n
+      CombinedRadylsPA rs -> shorthand rs
+      UnknownSnPA rs      -> shorthand rs
       KnownSnPA g         -> shorthand g
 
 instance NNomenclature a => NNomenclature (PA a) where
   nNomenclature =
     \case
-      ClassLevelPA n      -> "PA (" <> show n <> ")"
-      CombinedRadylsPA rs -> "PA " <> nNomenclature rs
-      UnknownSnPA r1 r2   -> renderDiradylPL nNomenclature "PA" "_" r1 r2
+      ClassLevelPA n      -> shorthand n
+      CombinedRadylsPA rs -> nNomenclature rs
+      UnknownSnPA rs      -> nNomenclature rs
       KnownSnPA g         -> nNomenclature g
 
 instance Shorthand a => Shorthand (PC a) where
   shorthand =
     \case
-      ClassLevelPC n      -> "PC (" <> show n <> ")"
-      CombinedRadylsPC rs -> "PC " <> shorthand rs
-      UnknownSnPC r1 r2   -> renderDiradylPL shorthand "PC" "_" r1 r2
+      ClassLevelPC n      -> shorthand n
+      CombinedRadylsPC rs -> shorthand rs
+      UnknownSnPC rs      -> shorthand rs
       KnownSnPC g         -> shorthand g
 
 instance NNomenclature a => NNomenclature (PC a) where
   nNomenclature =
     \case
-      ClassLevelPC n      -> "PC (" <> show n <> ")"
-      CombinedRadylsPC rs -> "PC " <> nNomenclature rs
-      UnknownSnPC r1 r2   -> renderDiradylPL nNomenclature "PC" "_" r1 r2
+      ClassLevelPC n      -> shorthand n
+      CombinedRadylsPC rs -> nNomenclature rs
+      UnknownSnPC rs      -> nNomenclature rs
       KnownSnPC g         -> nNomenclature g
 
 instance Shorthand a => Shorthand (PE a) where
   shorthand =
     \case
-      ClassLevelPE n      -> "PE (" <> show n <> ")"
-      CombinedRadylsPE rs -> "PE " <> shorthand rs
-      UnknownSnPE r1 r2   -> renderDiradylPL shorthand "PE" "_" r1 r2
+      ClassLevelPE n      -> shorthand n
+      CombinedRadylsPE rs -> shorthand rs
+      UnknownSnPE rs      -> shorthand rs
       KnownSnPE g         -> shorthand g
 
 instance NNomenclature a => NNomenclature (PE a) where
   nNomenclature =
     \case
-      ClassLevelPE n      -> "PE (" <> show n <> ")"
-      CombinedRadylsPE rs -> "PE " <> nNomenclature rs
-      UnknownSnPE r1 r2   -> renderDiradylPL nNomenclature "PE" "_" r1 r2
+      ClassLevelPE n      -> shorthand n
+      CombinedRadylsPE rs -> nNomenclature rs
+      UnknownSnPE rs      -> nNomenclature rs
       KnownSnPE g         -> nNomenclature g
 
 instance Shorthand a => Shorthand (PG a) where
   shorthand =
     \case
-      ClassLevelPG n      -> "PG (" <> show n <> ")"
-      CombinedRadylsPG rs -> "PG " <> shorthand rs
-      UnknownSnPG r1 r2   -> renderDiradylPL shorthand "PG" "_" r1 r2
+      ClassLevelPG n      -> shorthand n
+      CombinedRadylsPG rs -> shorthand rs
+      UnknownSnPG rs      -> shorthand rs
       KnownSnPG g         -> shorthand g
 
 instance NNomenclature a => NNomenclature (PG a) where
   nNomenclature =
     \case
-      ClassLevelPG n      -> "PG (" <> show n <> ")"
-      CombinedRadylsPG rs -> "PG " <> nNomenclature rs
-      UnknownSnPG r1 r2   -> renderDiradylPL nNomenclature "PG" "_" r1 r2
+      ClassLevelPG n      -> shorthand n
+      CombinedRadylsPG rs -> nNomenclature rs
+      UnknownSnPG rs      -> nNomenclature rs
       KnownSnPG g         -> nNomenclature g
 
 instance Shorthand a => Shorthand (PGP a) where
   shorthand =
     \case
-      ClassLevelPGP n      -> "PGP (" <> show n <> ")"
-      CombinedRadylsPGP rs -> "PGP " <> shorthand rs
-      UnknownSnPGP r1 r2   -> renderDiradylPL shorthand "PGP" "_" r1 r2
+      ClassLevelPGP n      -> shorthand n
+      CombinedRadylsPGP rs -> shorthand rs
+      UnknownSnPGP rs      -> shorthand rs
       KnownSnPGP g         -> shorthand g
 
 instance NNomenclature a => NNomenclature (PGP a) where
   nNomenclature =
     \case
-      ClassLevelPGP n      -> "PGP (" <> show n <> ")"
-      CombinedRadylsPGP rs -> "PGP " <> nNomenclature rs
-      UnknownSnPGP r1 r2   -> renderDiradylPL nNomenclature "PGP" "_" r1 r2
+      ClassLevelPGP n      -> shorthand n
+      CombinedRadylsPGP rs -> nNomenclature rs
+      UnknownSnPGP rs      -> nNomenclature rs
       KnownSnPGP g         -> nNomenclature g
 
 instance Shorthand a => Shorthand (PI a) where
   shorthand =
     \case
-      ClassLevelPI n      -> "PI (" <> show n <> ")"
-      CombinedRadylsPI rs -> "PI " <> shorthand rs
-      UnknownSnPI r1 r2   -> renderDiradylPL shorthand "PI" "_" r1 r2
+      ClassLevelPI n      -> shorthand n
+      CombinedRadylsPI rs -> shorthand rs
+      UnknownSnPI rs      -> shorthand rs
       KnownSnPI g         -> shorthand g
 
 instance NNomenclature a => NNomenclature (PI a) where
   nNomenclature =
     \case
-      ClassLevelPI n      -> "PI (" <> show n <> ")"
-      CombinedRadylsPI rs -> "PI " <> nNomenclature rs
-      UnknownSnPI r1 r2   -> renderDiradylPL nNomenclature "PI" "_" r1 r2
+      ClassLevelPI n      -> shorthand n
+      CombinedRadylsPI rs -> nNomenclature rs
+      UnknownSnPI rs      -> nNomenclature rs
       KnownSnPI g         -> nNomenclature g
 
 instance Shorthand a => Shorthand (PIP a) where
   shorthand =
     \case
-      ClassLevelPIP n        ->   "PIP (" <> show n <> ")"
-      CombinedRadylsPIP rs p ->   "PIP" <> renderPO4 p <> " " <> shorthand rs
-      UnknownSnPIP r1 r2 p   -> renderPIPs shorthand renderPO4 "_" r1 r2 p
-      KnownSnPIP g           -> shorthand g
+      ClassLevelPIP n      -> shorthand n
+      CombinedRadylsPIP rs -> shorthand rs
+      UnknownSnPIP rs      -> shorthand rs
+      KnownSnPIP g         -> shorthand g
 
 instance NNomenclature a => NNomenclature (PIP a) where
   nNomenclature =
     \case
-      ClassLevelPIP n        ->   "PIP (" <> show n <> ")"
-      CombinedRadylsPIP rs p ->   "PIP" <> renderPO4 p <> " " <> nNomenclature rs
-      UnknownSnPIP r1 r2 p   -> renderPIPs nNomenclature renderPO4 "_" r1 r2 p
-      KnownSnPIP g           -> nNomenclature g
+      ClassLevelPIP n      -> shorthand n
+      CombinedRadylsPIP rs -> nNomenclature rs
+      UnknownSnPIP rs      -> nNomenclature rs
+      KnownSnPIP g         -> nNomenclature g
 
 instance Shorthand a => Shorthand (PIP2 a) where
   shorthand =
     \case
-      ClassLevelPIP2 n         -> "PIP2 (" <> show n <> ")"
-      CombinedRadylsPIP2 rs ps -> "PIP2" <> renderPO4s ps <> " " <> shorthand rs
-      UnknownSnPIP2 r1 r2 ps   -> renderPIPs shorthand renderPO4s "_" r1 r2 ps
-      KnownSnPIP2 g            -> shorthand g
+      ClassLevelPIP2 n      -> shorthand n
+      CombinedRadylsPIP2 rs -> shorthand rs
+      UnknownSnPIP2 rs      -> shorthand rs
+      KnownSnPIP2 g         -> shorthand g
 
 instance NNomenclature a => NNomenclature (PIP2 a) where
   nNomenclature =
     \case
-      ClassLevelPIP2 n         -> "PIP (" <> show n <> ")"
-      CombinedRadylsPIP2 rs ps -> "PIP" <> renderPO4s ps <> " " <> nNomenclature rs
-      UnknownSnPIP2 r1 r2 ps   -> renderPIPs nNomenclature renderPO4s "_" r1 r2 ps
-      KnownSnPIP2 g            -> nNomenclature g
-
-renderPIPs f1 f2 sep r1 r2 p  = "PIP" <> f2 p <> " " <> r1' <> "_" <> r2'
-    where r1' = f1 r1
-          r2' = f1 r2
-
-renderPO4 p =
-  case p of
-    Nothing  -> ""
-    (Just p') -> wrapBrackets $ shorthand p'
-
-renderPO4s ps =
-  case ps of
-    (Just p1, Just p2) -> wrapBrackets $ shorthand p1 <> "," <> shorthand p2
-    (_, _)  -> ""
+      ClassLevelPIP2 n      -> shorthand n
+      CombinedRadylsPIP2 rs -> nNomenclature rs
+      UnknownSnPIP2 rs      -> nNomenclature rs
+      KnownSnPIP2 g         -> nNomenclature g
 
 instance Shorthand a => Shorthand (PIP3 a) where
   shorthand =
     \case
-      ClassLevelPIP3 n      -> "PIP3 (" <> show n <> ")"
-      CombinedRadylsPIP3 rs -> "PIP3 " <> shorthand rs
-      UnknownSnPIP3 r1 r2   -> renderDiradylPL shorthand "PS" "_" r1 r2
+      ClassLevelPIP3 n      -> shorthand n
+      CombinedRadylsPIP3 rs -> shorthand rs
+      UnknownSnPIP3 rs      -> shorthand rs
       KnownSnPIP3 g         -> shorthand g
 
 instance NNomenclature a => NNomenclature (PIP3 a) where
   nNomenclature =
     \case
-      ClassLevelPIP3 n      -> "PIP3 (" <> show n <> ")"
-      CombinedRadylsPIP3 rs -> "PIP3 " <> nNomenclature rs
-      UnknownSnPIP3 r1 r2   -> renderDiradylPL nNomenclature "PS" "_" r1 r2
+      ClassLevelPIP3 n      -> shorthand n
+      CombinedRadylsPIP3 rs -> nNomenclature rs
+      UnknownSnPIP3 rs      -> nNomenclature rs
       KnownSnPIP3 g         -> nNomenclature g
 
 instance Shorthand a => Shorthand (PS a) where
   shorthand =
     \case
-      ClassLevelPS n      -> "PS (" <> show n <> ")"
-      CombinedRadylsPS rs -> "PS " <> shorthand rs
-      UnknownSnPS r1 r2   -> renderDiradylPL shorthand "PS" "_" r1 r2
+      ClassLevelPS n      -> shorthand n
+      CombinedRadylsPS rs -> shorthand rs
+      UnknownSnPS rs      -> shorthand rs
       KnownSnPS g         -> shorthand g
 
 instance NNomenclature a => NNomenclature (PS a) where
   nNomenclature =
     \case
-      ClassLevelPS n      -> "PS (" <> show n <> ")"
-      CombinedRadylsPS rs -> "PS " <> nNomenclature rs
-      UnknownSnPS r1 r2   -> renderDiradylPL nNomenclature "PS" "_" r1 r2
+      ClassLevelPS n      -> shorthand n
+      CombinedRadylsPS rs -> nNomenclature rs
+      UnknownSnPS rs      -> nNomenclature rs
       KnownSnPS g         -> nNomenclature g
 
 -- instance Shorthand CL where

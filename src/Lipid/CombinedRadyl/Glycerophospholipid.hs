@@ -151,6 +151,9 @@ makeClassy ''PIP
 instance Shorthand a => Shorthand (PIP a) where
   shorthand (PIP h rs) = shorthand h <> shorthand rs
 
+instance NNomenclature a => NNomenclature (PIP a) where
+  nNomenclature (PIP h rs) = shorthand h <> nNomenclature rs
+
 instance HasTwoCombinedRadyls (PIP a) a where
   twoCombinedRadyls = twoCombinedRadylsPIP
 

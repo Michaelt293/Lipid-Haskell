@@ -39,6 +39,13 @@ instance Traversable TG where
     <*> traverse f r2
     <*> traverse f r3
 
+instance AllRadyls TG where
+  allRadyls f (TG (Glycerol r1 r2 r3)) =
+    (\x y z -> TG (Glycerol x y z))
+    <$> f r1
+    <*> f r2
+    <*> f r3
+
 instance HasGlycerol (TG a) (Radyl a) (Radyl a) (Radyl a) where
   glycerol = getTG
 

@@ -20,7 +20,6 @@ import Control.Lens (makeLenses)
 import Data.Monoid ((<>))
 import Data.List (sort)
 
-
 newtype TG a = TG
   { _getTG :: ThreeCombinedRadyls a
   } deriving (Show, Eq, Ord, Functor, Foldable, Traversable)
