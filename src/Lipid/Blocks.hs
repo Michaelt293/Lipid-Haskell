@@ -52,6 +52,7 @@ module Lipid.Blocks where
 --    , numberOfCarbonsAdd
  --) where
 
+import Isotope
 import Data.Monoid ((<>))
 import Data.List (sort, group, intercalate)
 import Data.Ord (comparing, Down(..))
@@ -91,7 +92,7 @@ class IsBisAllylic a where
 -- |Carbons represents the number of carbons in a single carbon chain or
 -- two or more combined chains.
 newtype NumCarbons = NumCarbons { _getNumCarbons :: Integer }
-                   deriving (Eq, Ord, Enum, Num)
+                   deriving (Eq, Ord, Enum, Num, Real, Integral)
 
 makeClassy ''NumCarbons
 
@@ -288,6 +289,14 @@ renderOmegaPositions dbs =
     then nNomenclature (maximum dbs)
     else wrapParen $ intercalate "," (nNomenclature <$> dbs)
 
+instance ToElementalComposition (CarbonChain a) where
+  toElementalComposition (CarbonChain n dbs) =
+    mkElementalComposition
+      [ (C, fromIntegral n)
+      , (H, 2 * fromIntegral n + 1 - 2 * length dbs)
+      ]
+  charge _ = Just 0
+
 -- |CombinedChains represents combined carbon chains. For example,
 -- a diradyl phosphatidylcholine can be written as PC 32:1.
 data TwoCombinedChains a = TwoCombinedChains
@@ -308,6 +317,14 @@ instance NNomenclature a => NNomenclature (TwoCombinedChains a) where
   nNomenclature (TwoCombinedChains x y) =
     renderCombinedChains x (concat y) nNomenclature
 
+instance ToElementalComposition (TwoCombinedChains a) where
+  toElementalComposition (TwoCombinedChains n dbs) =
+    mkElementalComposition
+      [ (C, fromIntegral n)
+      , (H, 2 * fromIntegral n + 2 - 2 * (length . concat) dbs)
+      ]
+  charge _ = Just 0
+
 data ThreeCombinedChains a = ThreeCombinedChains
    { _threeCombinedNumCarbons     :: NumCarbons
    , _threeCombinedNumDoubleBonds :: [[DoubleBond a]] }
@@ -326,6 +343,14 @@ instance NNomenclature a => NNomenclature (ThreeCombinedChains a) where
   nNomenclature (ThreeCombinedChains x y) =
     renderCombinedChains x (concat y) nNomenclature
 
+instance ToElementalComposition (ThreeCombinedChains a) where
+  toElementalComposition (ThreeCombinedChains n dbs) =
+    mkElementalComposition
+      [ (C, fromIntegral n)
+      , (H, 2 * fromIntegral n + 3 - 2 * (length . concat) dbs)
+      ]
+  charge _ = Just 0
+
 data Linkage
   = Acyl
   | Alkyl
@@ -340,6 +365,14 @@ instance Shorthand Linkage where
       Acyl    -> ""
       Alkyl   -> "O-"
       Alkenyl -> "P-"
+
+instance ToElementalComposition Linkage where
+  toElementalComposition =
+    \case
+      Acyl    -> mkElementalComposition [(O, 2), (H, -2)]
+      Alkyl   -> mkElementalComposition [(O, 1)]
+      Alkenyl -> mkElementalComposition [(O, 1), (H, -2)]
+  charge _ = Just 0
 
 data SnPosition
   = Sn1
@@ -367,6 +400,11 @@ instance NNomenclature a => NNomenclature (Radyl a) where
 instance IsBisAllylic [DoubleBond a] => IsBisAllylic (Radyl a) where
   isBisAllylic r =
     r^.radylCarbonChain.doubleBonds.to isBisAllylic
+
+instance ToElementalComposition (Radyl a) where
+  toElementalComposition (Radyl l cc) =
+    toElementalComposition l <> toElementalComposition cc
+  charge _ = Just 0
 
 frequency :: Ord a => [a] -> [(Int, a)]
 frequency list = (length &&& head) <$> group (sort list)
@@ -400,6 +438,11 @@ instance NNomenclature a => NNomenclature (TwoCombinedRadyls a) where
   nNomenclature (TwoCombinedRadyls x y) =
     links x <> nNomenclature y
 
+instance ToElementalComposition (TwoCombinedRadyls a) where
+  toElementalComposition (TwoCombinedRadyls l cc) =
+    foldMap toElementalComposition l <> toElementalComposition cc
+  charge _ = Just 0
+
 data ThreeCombinedRadyls a = ThreeCombinedRadyls
    { _threeRadylLinkages        :: [Linkage]
    , _threeCombinedCarbonChains :: ThreeCombinedChains a
@@ -414,6 +457,11 @@ instance Shorthand a => Shorthand (ThreeCombinedRadyls a) where
 instance NNomenclature a => NNomenclature (ThreeCombinedRadyls a) where
   nNomenclature (ThreeCombinedRadyls x y) =
     links x <> nNomenclature y
+
+instance ToElementalComposition (ThreeCombinedRadyls a) where
+  toElementalComposition (ThreeCombinedRadyls l cc) =
+    foldMap toElementalComposition l <> toElementalComposition cc
+  charge _ = Just 0
 
 data PhosphatePosition
   = P3'
@@ -442,8 +490,41 @@ data Glycerol a b c = Glycerol
 
 makeClassy ''Glycerol
 
+instance ( ToElementalComposition a
+         , ToElementalComposition b
+         , ToElementalComposition c
+         ) => ToElementalComposition (Glycerol a b c) where
+  toElementalComposition (Glycerol a b c) =
+    mkElementalComposition [(C, 3), (H, 5)]
+    <> toElementalComposition a
+    <> toElementalComposition b
+    <> toElementalComposition b
+  charge (Glycerol a b c) = charge a +++ charge b +++ charge c
+
+(+++) (Just x) (Just y) = Just (x + y)
+(+++) (Just x) Nothing  = Just x
+(+++) Nothing (Just y)  = Just y
+(+++) _ _               = Nothing
+
+
 instance Bifunctor (Glycerol a) where
   bimap f g (Glycerol a b c) = Glycerol a (f b) (g c)
+
+newtype Phosphate a = Phosphate a
+  deriving (Show, Read, Eq, Ord)
+
+instance ToElementalComposition a => ToElementalComposition (Phosphate a) where
+  toElementalComposition (Phosphate a) =
+     mkElementalComposition [(P, 1), (O, 4), (H, 1)]
+     <> toElementalComposition a
+  charge (Phosphate a) = charge a
+
+data Hydrogen = Hydrogen
+  deriving (Show, Read, Eq, Ord)
+
+instance ToElementalComposition Hydrogen where
+  toElementalComposition _ = mkElementalComposition [(H, 1)]
+  charge _ = Just 0
 
 data PhosphatidicAcid = PhosphatidicAcid
   deriving (Show, Read, Eq, Ord)
@@ -486,9 +567,6 @@ data Phosphatidylinositol = Phosphatidylinositol
 
 instance Shorthand Phosphatidylinositol where
   shorthand _ = "PI"
-
-data Phosphate = Phosphate
-  deriving (Show, Read, Eq, Ord)
 
 data PhosphatidylinositolMonophosphate
   = PhosphatidylinositolMonophosphate

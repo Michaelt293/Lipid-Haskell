@@ -38,6 +38,12 @@ instance Traversable PA where
     <$> traverse f r1
     <*> traverse f r2
 
+instance AllRadyls PA where
+  allRadyls f (PA (Glycerol h r1 r2)) =
+    (\x y -> PA (Glycerol h x y))
+    <$> f r1
+    <*> f r2
+
 instance Shorthand a => Shorthand (PA a) where
   shorthand (PA (Glycerol h r1 r2)) =
     shorthand h <> " " <> shorthand r1 <> "/" <> shorthand r2
@@ -68,6 +74,12 @@ instance Traversable PC where
     (\x y -> PC (Glycerol h x y))
     <$> traverse f r1
     <*> traverse f r2
+
+instance AllRadyls PC where
+  allRadyls f (PC (Glycerol h r1 r2)) =
+    (\x y -> PC (Glycerol h x y))
+    <$> f r1
+    <*> f r2
 
 instance Shorthand a => Shorthand (PC a) where
   shorthand (PC (Glycerol h r1 r2)) =
@@ -100,6 +112,12 @@ instance Traversable PE where
     <$> traverse f r1
     <*> traverse f r2
 
+instance AllRadyls PE where
+  allRadyls f (PE (Glycerol h r1 r2)) =
+    (\x y -> PE (Glycerol h x y))
+    <$> f r1
+    <*> f r2
+
 instance Shorthand a => Shorthand (PE a) where
   shorthand (PE (Glycerol h r1 r2)) =
     shorthand h <> " " <> shorthand r1 <> "/" <> shorthand r2
@@ -130,6 +148,12 @@ instance Traversable PG where
     (\x y -> PG (Glycerol h x y))
     <$> traverse f r1
     <*> traverse f r2
+
+instance AllRadyls PG where
+  allRadyls f (PG (Glycerol h r1 r2)) =
+    (\x y -> PG (Glycerol h x y))
+    <$> f r1
+    <*> f r2
 
 instance Shorthand a => Shorthand (PG a) where
   shorthand (PG (Glycerol h r1 r2)) =
@@ -162,6 +186,12 @@ instance Traversable PGP where
     <$> traverse f r1
     <*> traverse f r2
 
+instance AllRadyls PGP where
+  allRadyls f (PGP (Glycerol h r1 r2)) =
+    (\x y -> PGP (Glycerol h x y))
+    <$> f r1
+    <*> f r2
+
 instance Shorthand a => Shorthand (PGP a) where
   shorthand (PGP (Glycerol h r1 r2)) =
     shorthand h <> " " <> shorthand r1 <> "/" <> shorthand r2
@@ -192,6 +222,13 @@ instance Traversable PI where
     (\x y -> PI (Glycerol h x y))
     <$> traverse f r1
     <*> traverse f r2
+
+instance AllRadyls PI where
+  allRadyls f (PI (Glycerol h r1 r2)) =
+    (\x y -> PI (Glycerol h x y))
+    <$> f r1
+    <*> f r2
+
 instance Shorthand a => Shorthand (PI a) where
   shorthand (PI (Glycerol h r1 r2)) =
     shorthand h <> " " <> shorthand r1 <> "/" <> shorthand r2
@@ -199,7 +236,7 @@ instance Shorthand a => Shorthand (PI a) where
 instance NNomenclature a => NNomenclature (PI a) where
   nNomenclature (PI (Glycerol h r1 r2)) =
     shorthand h <> " " <> nNomenclature r1 <> "/" <> nNomenclature r2
-    
+
 instance HasGlycerol (PI a) Phosphatidylinositol (Radyl a) (Radyl a) where
   glycerol = getPI
 
@@ -222,6 +259,12 @@ instance Traversable PIP where
     (\x y -> PIP (Glycerol h x y))
     <$> traverse f r1
     <*> traverse f r2
+
+instance AllRadyls PIP where
+  allRadyls f (PIP (Glycerol h r1 r2)) =
+    (\x y -> PIP (Glycerol h x y))
+    <$> f r1
+    <*> f r2
 
 instance Shorthand a => Shorthand (PIP a) where
   shorthand (PIP (Glycerol h r1 r2)) =
@@ -254,6 +297,12 @@ instance Traversable PIP2 where
     <$> traverse f r1
     <*> traverse f r2
 
+instance AllRadyls PIP2 where
+  allRadyls f (PIP2 (Glycerol h r1 r2)) =
+    (\x y -> PIP2 (Glycerol h x y))
+    <$> f r1
+    <*> f r2
+
 instance Shorthand a => Shorthand (PIP2 a) where
   shorthand (PIP2 (Glycerol h r1 r2)) =
     shorthand h <> " " <> shorthand r1 <> "/" <> shorthand r2
@@ -285,6 +334,12 @@ instance Traversable PIP3 where
     <$> traverse f r1
     <*> traverse f r2
 
+instance AllRadyls PIP3 where
+  allRadyls f (PIP3 (Glycerol h r1 r2)) =
+    (\x y -> PIP3 (Glycerol h x y))
+    <$> f r1
+    <*> f r2
+
 instance Shorthand a => Shorthand (PIP3 a) where
   shorthand (PIP3 (Glycerol h r1 r2)) =
     shorthand h <> " " <> shorthand r1 <> "/" <> shorthand r2
@@ -315,6 +370,12 @@ instance Traversable PS where
     (\x y -> PS (Glycerol h x y))
     <$> traverse f r1
     <*> traverse f r2
+
+instance AllRadyls PS where
+  allRadyls f (PS (Glycerol h r1 r2)) =
+    (\x y -> PS (Glycerol h x y))
+    <$> f r1
+    <*> f r2
 
 instance Shorthand a => Shorthand (PS a) where
   shorthand (PS (Glycerol h r1 r2)) =

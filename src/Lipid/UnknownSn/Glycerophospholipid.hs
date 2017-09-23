@@ -14,7 +14,6 @@ Stability   : Experimental
 {-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE FlexibleInstances #-}
 
-
 module Lipid.UnknownSn.Glycerophospholipid where
 
 import Lipid.Blocks
@@ -33,6 +32,10 @@ instance Shorthand a => Shorthand (PA a) where
 instance NNomenclature a => NNomenclature (PA a) where
   nNomenclature (PA rs) = "PA " <> nNomenclature rs
 
+instance AllRadyls PA where
+  allRadyls f (PA (TwoRadyls r1 r2)) =
+    (\x y -> PA (TwoRadyls x y)) <$> f r1 <*> f r2
+
 instance HasTwoRadyls (PA a) a where
   twoRadyls = getTwoRadylsPA
 
@@ -47,6 +50,10 @@ instance Shorthand a => Shorthand (PE a) where
 
 instance NNomenclature a => NNomenclature (PE a) where
   nNomenclature (PE rs) = "PE " <> nNomenclature rs
+
+instance AllRadyls PE where
+  allRadyls f (PE (TwoRadyls r1 r2)) =
+    (\x y -> PE (TwoRadyls x y)) <$> f r1 <*> f r2
 
 instance HasTwoRadyls (PE a) a where
   twoRadyls = getTwoRadylsPE
@@ -63,6 +70,10 @@ instance Shorthand a => Shorthand (PC a) where
 instance NNomenclature a => NNomenclature (PC a) where
   nNomenclature (PC rs) = "PC " <> nNomenclature rs
 
+instance AllRadyls PC where
+  allRadyls f (PC (TwoRadyls r1 r2)) =
+    (\x y -> PC (TwoRadyls x y)) <$> f r1 <*> f r2
+
 instance HasTwoRadyls (PC a) a where
   twoRadyls = getTwoRadylsPC
 
@@ -77,6 +88,10 @@ instance Shorthand a => Shorthand (PG a) where
 
 instance NNomenclature a => NNomenclature (PG a) where
   nNomenclature (PG rs) = "PG " <> nNomenclature rs
+
+instance AllRadyls PG where
+  allRadyls f (PG (TwoRadyls r1 r2)) =
+    (\x y -> PG (TwoRadyls x y)) <$> f r1 <*> f r2
 
 instance HasTwoRadyls (PG a) a where
   twoRadyls = getTwoRadylsPG
@@ -93,6 +108,10 @@ instance Shorthand a => Shorthand (PGP a) where
 instance NNomenclature a => NNomenclature (PGP a) where
   nNomenclature (PGP rs) = "PGP " <> nNomenclature rs
 
+instance AllRadyls PGP where
+  allRadyls f (PGP (TwoRadyls r1 r2)) =
+    (\x y -> PGP (TwoRadyls x y)) <$> f r1 <*> f r2
+
 instance HasTwoRadyls (PGP a) a where
   twoRadyls = getTwoRadylsPGP
 
@@ -107,6 +126,10 @@ instance Shorthand a => Shorthand (PI a) where
 
 instance NNomenclature a => NNomenclature (PI a) where
   nNomenclature (PI rs) = "PI " <> nNomenclature rs
+
+instance AllRadyls PI where
+  allRadyls f (PI (TwoRadyls r1 r2)) =
+    (\x y -> PI (TwoRadyls x y)) <$> f r1 <*> f r2
 
 instance HasTwoRadyls (PI a) a where
   twoRadyls = getTwoRadylsPI
@@ -123,6 +146,10 @@ instance Shorthand a => Shorthand (PS a) where
 instance NNomenclature a => NNomenclature (PS a) where
   nNomenclature (PS rs) = "PS " <> nNomenclature rs
 
+instance AllRadyls PS where
+  allRadyls f (PS (TwoRadyls r1 r2)) =
+    (\x y -> PS (TwoRadyls x y)) <$> f r1 <*> f r2
+
 instance HasTwoRadyls (PS a) a where
   twoRadyls = getTwoRadylsPS
 
@@ -137,6 +164,10 @@ instance Shorthand a => Shorthand (PIP3 a) where
 
 instance NNomenclature a => NNomenclature (PIP3 a) where
   nNomenclature (PIP3 rs) = "PIP3 " <> nNomenclature rs
+
+instance AllRadyls PIP3 where
+  allRadyls f (PIP3 (TwoRadyls r1 r2)) =
+    (\x y -> PIP3 (TwoRadyls x y)) <$> f r1 <*> f r2
 
 instance HasTwoRadyls (PIP3 a) a where
   twoRadyls = getTwoRadylsPIP3
@@ -154,6 +185,10 @@ instance Shorthand a => Shorthand (PIP a) where
 instance NNomenclature a => NNomenclature (PIP a) where
   nNomenclature (PIP h rs) = shorthand h <> nNomenclature rs
 
+instance AllRadyls PIP where
+  allRadyls f (PIP h (TwoRadyls r1 r2)) =
+    (\x y -> PIP h (TwoRadyls x y)) <$> f r1 <*> f r2
+
 instance HasTwoRadyls (PIP a) a where
   twoRadyls = getTwoRadylsPIP
 
@@ -169,6 +204,10 @@ instance Shorthand a => Shorthand (PIP2 a) where
 
 instance NNomenclature a => NNomenclature (PIP2 a) where
   nNomenclature (PIP2 h rs) = shorthand h <> nNomenclature rs
+
+instance AllRadyls PIP2 where
+  allRadyls f (PIP2 h (TwoRadyls r1 r2)) =
+    (\x y -> PIP2 h (TwoRadyls x y)) <$> f r1 <*> f r2
 
 instance HasTwoRadyls (PIP2 a) a where
   twoRadyls = getTwoRadylsPIP2

@@ -13,7 +13,7 @@ Stability   : Experimental
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE FlexibleInstances #-}
--- {-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
 
 module Lipid.UnknownSn.Glycerolipid where
@@ -25,22 +25,36 @@ import Data.Monoid ((<>))
 import Data.List (sort)
 
 newtype MG a = MG
-  { radyl :: Radyl a
+  { _radylMG :: Radyl a
   } deriving (Show, Eq, Ord, Functor, Foldable, Traversable)
 
 makeClassy ''MG
 
 newtype DG a = DG
-  { twoRadylsDG :: TwoRadyls a
+  { _twoRadylsDG :: TwoRadyls a
   } deriving (Show, Eq, Ord, Functor, Foldable, Traversable)
 
 makeClassy ''DG
 
+instance HasTwoRadyls (DG a) a where
+  twoRadyls = twoRadylsDG
+
+instance AllRadyls DG where
+  allRadyls f (DG (TwoRadyls r1 r2)) =
+    (\x y -> DG (TwoRadyls x y)) <$> f r1 <*> f r2
+
 newtype TG a = TG
-  { threeRadyls :: ThreeRadyls a
+  { _threeRadylsTG :: ThreeRadyls a
   } deriving (Show, Eq, Ord, Functor, Foldable, Traversable)
 
 makeClassy ''TG
+
+instance HasThreeRadyls (TG a) a where
+  threeRadyls = threeRadylsTG
+
+instance AllRadyls TG where
+  allRadyls f (TG (ThreeRadyls r1 r2 r3)) =
+    (\x y z -> TG (ThreeRadyls x y z)) <$> f r1 <*> f r2 <*> f r3
 
 instance Shorthand a => Shorthand (MG a) where
   shorthand (MG r) = "MG " <> shorthand r

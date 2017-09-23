@@ -69,6 +69,12 @@ instance Traversable DG12 where
     <$> traverse f r1
     <*> traverse f r2
 
+instance AllRadyls DG12 where
+  allRadyls f (DG12 (Glycerol r1 r2 _)) =
+    (\x y -> DG12 (Glycerol x y ()))
+    <$> f r1
+    <*> f r2
+
 instance HasGlycerol (DG12 a) (Radyl a) (Radyl a) () where
   glycerol = getDG12
 
@@ -91,6 +97,12 @@ instance Traversable DG13 where
     (\x y -> DG13 (Glycerol x () y))
     <$> traverse f r1
     <*> traverse f r2
+
+instance AllRadyls DG13 where
+  allRadyls f (DG13 (Glycerol r1 _ r2)) =
+    (\x y -> DG13 (Glycerol x () y))
+    <$> f r1
+    <*> f r2
 
 instance HasGlycerol (DG13 a) (Radyl a) () (Radyl a) where
   glycerol = getDG13
@@ -115,6 +127,12 @@ instance Traversable DG23 where
     <$> traverse f r1
     <*> traverse f r2
 
+instance AllRadyls DG23 where
+  allRadyls f (DG23 (Glycerol _ r1 r2)) =
+    (\x y -> DG23 (Glycerol () x y))
+    <$> f r1
+    <*> f r2
+
 instance HasGlycerol (DG23 a) () (Radyl a) (Radyl a) where
   glycerol = getDG23
 
@@ -136,6 +154,10 @@ instance Traversable MG1 where
   traverse f (MG1 (Glycerol r _ _)) =
     (\x -> MG1 (Glycerol x () ())) <$> traverse f r
 
+instance AllRadyls MG1 where
+  allRadyls f (MG1 (Glycerol r _ _)) =
+    (\x -> MG1 (Glycerol x () ())) <$> f r
+
 instance HasGlycerol (MG1 a) (Radyl a) () () where
   glycerol = getMG1
 
@@ -155,6 +177,10 @@ instance Foldable MG2 where
 instance Traversable MG2 where
   traverse f (MG2 (Glycerol _ r _)) =
     (\x -> MG2 (Glycerol () x ())) <$> traverse f r
+
+instance AllRadyls MG2 where
+  allRadyls f (MG2 (Glycerol _ r _)) =
+    (\x -> MG2 (Glycerol () x ())) <$> f r
 
 instance HasGlycerol (MG2 a) () (Radyl a) () where
   glycerol = getMG2
@@ -176,61 +202,65 @@ instance Traversable MG3 where
   traverse f (MG3 (Glycerol _ _ r)) =
     (MG3 . Glycerol () ()) <$> traverse f r
 
+instance AllRadyls MG3 where
+  allRadyls f (MG3 (Glycerol _ _ r)) =
+    (MG3 . Glycerol () ()) <$> f r
+
 instance HasGlycerol (MG3 a) () () (Radyl a) where
   glycerol = getMG3
 
 instance Shorthand a => Shorthand (TG a) where
   shorthand (TG (Glycerol r1 r2 r3)) =
-    shorthand r1 <> "/" <> shorthand r2 <> "/" <> shorthand r3
+    "TG " <> shorthand r1 <> "/" <> shorthand r2 <> "/" <> shorthand r3
 
 instance Shorthand a => Shorthand (DG12 a) where
   shorthand (DG12 (Glycerol r1 r2 _)) =
-    shorthand r1 <> "/" <> shorthand r2 <> "/0:0"
+    "DG " <> shorthand r1 <> "/" <> shorthand r2 <> "/0:0"
 
 instance Shorthand a => Shorthand (DG13 a) where
   shorthand (DG13 (Glycerol r1 _ r3)) =
-    shorthand r1 <> "/0:0/" <> shorthand r3
+    "DG " <> shorthand r1 <> "/0:0/" <> shorthand r3
 
 instance Shorthand a => Shorthand (DG23 a) where
   shorthand (DG23 (Glycerol _ r2 r3)) =
-    "0:0/" <> shorthand r2 <> "/" <> shorthand r3
+    "DG 0:0/" <> shorthand r2 <> "/" <> shorthand r3
 
 instance Shorthand a => Shorthand (MG1 a) where
   shorthand (MG1 (Glycerol r1 _ _)) =
-    shorthand r1 <> "/0:0/0:0"
+    "MG " <> shorthand r1 <> "/0:0/0:0"
 
 instance Shorthand a => Shorthand (MG2 a) where
   shorthand (MG2 (Glycerol _ r2 _)) =
-    "0:0/" <> shorthand r2 <> "/0:0"
+    "MG 0:0/" <> shorthand r2 <> "/0:0"
 
 instance Shorthand a => Shorthand (MG3 a) where
   shorthand (MG3 (Glycerol _ _ r3)) =
-    "0:0/0:0/" <> shorthand r3
+    "MG 0:0/0:0/" <> shorthand r3
 
 instance NNomenclature a => NNomenclature (TG a) where
   nNomenclature (TG (Glycerol r1 r2 r3)) =
-    nNomenclature r1 <> "/" <> nNomenclature r2 <> "/" <> nNomenclature r3
+    "TG" <> nNomenclature r1 <> "/" <> nNomenclature r2 <> "/" <> nNomenclature r3
 
 instance NNomenclature a => NNomenclature (DG12 a) where
   nNomenclature (DG12 (Glycerol r1 r2 _)) =
-    nNomenclature r1 <> "/" <> nNomenclature r2 <> "/0:0"
+    "DG " <> nNomenclature r1 <> "/" <> nNomenclature r2 <> "/0:0"
 
 instance NNomenclature a => NNomenclature (DG13 a) where
   nNomenclature (DG13 (Glycerol r1 _ r3)) =
-    nNomenclature r1 <> "/0:0/" <> nNomenclature r3
+    "DG " <> nNomenclature r1 <> "/0:0/" <> nNomenclature r3
 
 instance NNomenclature a => NNomenclature (DG23 a) where
   nNomenclature (DG23 (Glycerol _ r2 r3)) =
-    "0:0/" <> nNomenclature r2 <> "/" <> nNomenclature r3
+    "DG 0:0/" <> nNomenclature r2 <> "/" <> nNomenclature r3
 
 instance NNomenclature a => NNomenclature (MG1 a) where
   nNomenclature (MG1 (Glycerol r1 _ _)) =
-    nNomenclature r1 <> "/0:0/0:0"
+    "MG " <> nNomenclature r1 <> "/0:0/0:0"
 
 instance NNomenclature a => NNomenclature (MG2 a) where
   nNomenclature (MG2 (Glycerol _ r2 _)) =
-    "0:0/" <> nNomenclature r2 <> "/0:0"
+    "MG 0:0/" <> nNomenclature r2 <> "/0:0"
 
 instance NNomenclature a => NNomenclature (MG3 a) where
   nNomenclature (MG3 (Glycerol _ _ r3)) =
-    "0:0/0:0/" <> nNomenclature r3
+    "MG 0:0/0:0/" <> nNomenclature r3
