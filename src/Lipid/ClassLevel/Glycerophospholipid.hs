@@ -135,3 +135,15 @@ instance Shorthand PIP2 where
 
 instance HasClassLevel PIP2 where
   classLevel = getPIP2
+
+newtype CL = CL
+  { _getCL :: ClassLevel
+  } deriving (Show, Eq, Ord)
+
+makeClassy ''CL
+
+instance Shorthand CL where
+  shorthand (CL n) = "CL (" <> show n <> ")"
+
+instance HasClassLevel CL where
+  classLevel = getCL

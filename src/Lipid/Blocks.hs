@@ -351,6 +351,32 @@ instance ToElementalComposition (ThreeCombinedChains a) where
       ]
   charge _ = Just 0
 
+data FourCombinedChains a = FourCombinedChains
+   { _fourCombinedNumCarbons     :: NumCarbons
+   , _fourCombinedNumDoubleBonds :: [[DoubleBond a]] }
+   deriving (Show, Eq, Ord, Functor, Foldable, Traversable)
+
+makeClassy ''FourCombinedChains
+
+instance HasNumCarbons (FourCombinedChains a) where
+  numCarbons = fourCombinedNumCarbons
+
+instance Shorthand a => Shorthand (FourCombinedChains a ) where
+  shorthand (FourCombinedChains x y) =
+    renderCombinedChains x (concat y) shorthand
+
+instance NNomenclature a => NNomenclature (FourCombinedChains a) where
+  nNomenclature (FourCombinedChains x y) =
+    renderCombinedChains x (concat y) nNomenclature
+
+instance ToElementalComposition (FourCombinedChains a) where
+  toElementalComposition (FourCombinedChains n dbs) =
+    mkElementalComposition
+      [ (C, fromIntegral n)
+      , (H, 2 * fromIntegral n + 4 - 2 * (length . concat) dbs)
+      ]
+  charge _ = Just 0
+
 data Linkage
   = Acyl
   | Alkyl
@@ -374,7 +400,7 @@ instance ToElementalComposition Linkage where
       Alkenyl -> mkElementalComposition [(O, 1), (H, -2)]
   charge _ = Just 0
 
-data SnPosition
+data SnPosition -- delete?
   = Sn1
   | Sn2
   | Sn3
@@ -463,7 +489,27 @@ instance ToElementalComposition (ThreeCombinedRadyls a) where
     foldMap toElementalComposition l <> toElementalComposition cc
   charge _ = Just 0
 
-data PhosphatePosition
+data FourCombinedRadyls a = FourCombinedRadyls
+   { _fourRadylLinkages        :: [Linkage]
+   , _fourCombinedCarbonChains :: FourCombinedChains a
+   } deriving (Show, Eq, Ord, Functor, Foldable, Traversable)
+
+makeClassy ''FourCombinedRadyls
+
+instance Shorthand a => Shorthand (FourCombinedRadyls a) where
+  shorthand (FourCombinedRadyls x y) =
+    links x <> shorthand y
+
+instance NNomenclature a => NNomenclature (FourCombinedRadyls a) where
+  nNomenclature (FourCombinedRadyls x y) =
+    links x <> nNomenclature y
+
+instance ToElementalComposition (FourCombinedRadyls a) where
+  toElementalComposition (FourCombinedRadyls l cc) =
+    foldMap toElementalComposition l <> toElementalComposition cc
+  charge _ = Just 0
+
+data PhosphatePosition -- delete?
   = P3'
   | P4'
   | P5'
@@ -471,7 +517,7 @@ data PhosphatePosition
 
 makePrisms ''PhosphatePosition
 
-instance Shorthand PhosphatePosition where
+instance Shorthand PhosphatePosition where -- delete?
    shorthand =
      \case
        P3' -> "3'"
@@ -483,9 +529,9 @@ numberOfDoubleBond c =
   c^.doubleBonds.to (NumDoubleBonds . fromIntegral . length)
 
 data Glycerol a b c = Glycerol
-  { _sn1' :: a
-  , _sn2' :: b
-  , _sn3' :: c
+  { _sn1 :: a
+  , _sn2 :: b
+  , _sn3 :: c
   } deriving (Show, Read, Eq, Ord, Functor)
 
 makeClassy ''Glycerol
@@ -501,16 +547,13 @@ instance ( ToElementalComposition a
     <> toElementalComposition b
   charge (Glycerol a b c) = charge a +++ charge b +++ charge c
 
-(+++) (Just x) (Just y) = Just (x + y)
-(+++) (Just x) Nothing  = Just x
-(+++) Nothing (Just y)  = Just y
-(+++) _ _               = Nothing
-
+Just x +++ Just y = Just $ x + y
+_ +++ _               = Nothing
 
 instance Bifunctor (Glycerol a) where
   bimap f g (Glycerol a b c) = Glycerol a (f b) (g c)
 
-newtype Phosphate a = Phosphate a
+newtype Phosphate a = Phosphate a -- delete?
   deriving (Show, Read, Eq, Ord)
 
 instance ToElementalComposition a => ToElementalComposition (Phosphate a) where
@@ -519,10 +562,10 @@ instance ToElementalComposition a => ToElementalComposition (Phosphate a) where
      <> toElementalComposition a
   charge (Phosphate a) = charge a
 
-data Hydrogen = Hydrogen
+data Hydrogen = Hydrogen -- delete?
   deriving (Show, Read, Eq, Ord)
 
-instance ToElementalComposition Hydrogen where
+instance ToElementalComposition Hydrogen where -- delete?
   toElementalComposition _ = mkElementalComposition [(H, 1)]
   charge _ = Just 0
 
@@ -532,11 +575,19 @@ data PhosphatidicAcid = PhosphatidicAcid
 instance Shorthand PhosphatidicAcid where
   shorthand _ = "PA"
 
+instance ToElementalComposition PhosphatidicAcid where
+  toElementalComposition _ = mkElementalComposition [(H, 1)]
+  charge _ = Just 0
+
 data Phosphatidylethanolamine = Phosphatidylethanolamine
   deriving (Show, Read, Eq, Ord)
 
 instance Shorthand Phosphatidylethanolamine where
   shorthand _ = "PE"
+
+instance ToElementalComposition Phosphatidylethanolamine where
+  toElementalComposition _ = mkElementalComposition [(H, 1)]
+  charge _ = Just 0
 
 data Phosphatidylcholine = Phosphatidylcholine
   deriving (Show, Read, Eq, Ord)
@@ -544,11 +595,19 @@ data Phosphatidylcholine = Phosphatidylcholine
 instance Shorthand Phosphatidylcholine where
   shorthand _ = "PC"
 
+instance ToElementalComposition Phosphatidylcholine where
+  toElementalComposition _ = mkElementalComposition [(H, 1)]
+  charge _ = Just 0
+
 data Phosphatidylglycerol = Phosphatidylglycerol
   deriving (Show, Read, Eq, Ord)
 
 instance Shorthand Phosphatidylglycerol where
   shorthand _ = "PG"
+
+instance ToElementalComposition Phosphatidylglycerol where
+  toElementalComposition _ = mkElementalComposition [(H, 1)]
+  charge _ = Just 0
 
 data Phosphatidylgylcerolphosphate = Phosphatidylgylcerolphosphate
   deriving (Show, Read, Eq, Ord)
@@ -556,17 +615,29 @@ data Phosphatidylgylcerolphosphate = Phosphatidylgylcerolphosphate
 instance Shorthand Phosphatidylgylcerolphosphate where
   shorthand _ = "PGP"
 
+instance ToElementalComposition Phosphatidylgylcerolphosphate where
+  toElementalComposition _ = mkElementalComposition [(H, 1)]
+  charge _ = Just 0
+
 data Phosphatidylserine = Phosphatidylserine
   deriving (Show, Read, Eq, Ord)
 
 instance Shorthand Phosphatidylserine where
   shorthand _ = "PS"
 
+instance ToElementalComposition Phosphatidylserine where
+  toElementalComposition _ = mkElementalComposition [(H, 1)]
+  charge _ = Just 0
+
 data Phosphatidylinositol = Phosphatidylinositol
   deriving (Show, Read, Eq, Ord)
 
 instance Shorthand Phosphatidylinositol where
   shorthand _ = "PI"
+
+instance ToElementalComposition Phosphatidylinositol where
+  toElementalComposition _ = mkElementalComposition [(H, 1)]
+  charge _ = Just 0
 
 data PhosphatidylinositolMonophosphate
   = PhosphatidylinositolMonophosphate
@@ -581,6 +652,10 @@ instance Shorthand PhosphatidylinositolMonophosphate where
   shorthand Phosphatidylinositol4Phosphate    = "PIP[4′]"
   shorthand Phosphatidylinositol5Phosphate    = "PIP[5′]"
 
+instance ToElementalComposition PhosphatidylinositolMonophosphate where
+  toElementalComposition _ = mkElementalComposition [(H, 1)]
+  charge _ = Just 0
+
 data PhosphatidylinositolBisphosphate
   = PhosphatidylinositolBisphosphate
   | Phosphatidylinositol34Bisphosphate
@@ -594,11 +669,24 @@ instance Shorthand PhosphatidylinositolBisphosphate where
   shorthand Phosphatidylinositol35Bisphosphate = "PIP2[3′,5′]"
   shorthand Phosphatidylinositol45Bisphosphate = "PIP2[4′,5′]"
 
+instance ToElementalComposition PhosphatidylinositolBisphosphate where
+  toElementalComposition _ = mkElementalComposition [(H, 1)]
+  charge _ = Just 0
+
 data PhosphatidylinositolTrisphosphate = PhosphatidylinositolTrisphosphate
   deriving (Show, Read, Eq, Ord)
 
 instance Shorthand PhosphatidylinositolTrisphosphate where
   shorthand _ = "PI3"
+
+instance ToElementalComposition PhosphatidylinositolTrisphosphate where
+  toElementalComposition _ = mkElementalComposition [(H, 1)]
+  charge _ = Just 0
+
+data Cardiolipin a = Cardiolipin
+  { sn1' :: Radyl a
+  , sn2' :: Radyl a
+  } deriving (Show, Eq, Ord, Functor, Foldable, Traversable)
 
 instance (Shorthand a, Shorthand b)
   => Shorthand (Glycerol a (Radyl b) (Radyl b)) where

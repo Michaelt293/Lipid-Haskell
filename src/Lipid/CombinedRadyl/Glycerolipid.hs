@@ -15,6 +15,7 @@ Stability   : Experimental
 
 module Lipid.CombinedRadyl.Glycerolipid where
 
+import Isotope
 import Lipid.Blocks
 import Control.Lens (makeLenses)
 import Data.Monoid ((<>))
@@ -35,6 +36,12 @@ instance NNomenclature a => NNomenclature (TG a) where
 instance HasThreeCombinedRadyls (TG a) a where
   threeCombinedRadyls = getTG
 
+instance ToElementalComposition (TG a) where
+  toElementalComposition (TG rs) =
+    toElementalComposition rs
+    <> mkElementalComposition [(C, 3), (H, 5)]
+  charge _ = Just 0
+
 newtype DG a = DG
   { _getDG :: TwoCombinedRadyls a
   } deriving (Show, Eq, Ord, Functor, Foldable, Traversable)
@@ -49,3 +56,9 @@ instance NNomenclature a => NNomenclature (DG a) where
 
 instance HasTwoCombinedRadyls (DG a) a where
   twoCombinedRadyls = getDG
+
+instance ToElementalComposition (DG a) where
+  toElementalComposition (DG rs) =
+    toElementalComposition rs
+    <> mkElementalComposition [(C, 3), (H, 6), (O, 1)]
+  charge _ = Just 0
