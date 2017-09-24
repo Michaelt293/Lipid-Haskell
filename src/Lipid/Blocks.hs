@@ -688,16 +688,29 @@ data Cardiolipin a = Cardiolipin
   , sn2' :: Radyl a
   } deriving (Show, Eq, Ord, Functor, Foldable, Traversable)
 
+data GlycerolHydroxyl = GlycerolHydroxyl
+  deriving (Show, Read, Eq, Ord)
+
+instance Shorthand GlycerolHydroxyl where
+  shorthand _ = "0:0"
+
+instance NNomenclature GlycerolHydroxyl where
+  nNomenclature = shorthand
+
+instance ToElementalComposition GlycerolHydroxyl where
+  toElementalComposition _ = mkElementalComposition [(O, 1), (H, 1)]
+  charge _ = Just 0
+
 instance (Shorthand a, Shorthand b)
   => Shorthand (Glycerol a (Radyl b) (Radyl b)) where
   shorthand (Glycerol h r1 r2) =
     shorthand h <> " " <> shorthand r1 <> "/" <> shorthand r2
 
-instance (Shorthand a, Shorthand b) => Shorthand (Glycerol a (Radyl b) ()) where
+instance (Shorthand a, Shorthand b) => Shorthand (Glycerol a (Radyl b) GlycerolHydroxyl) where
   shorthand (Glycerol h r _) =
     shorthand h <> " " <> shorthand r <> "/0:0"
 
-instance (Shorthand a, Shorthand b) => Shorthand (Glycerol a () (Radyl b)) where
+instance (Shorthand a, Shorthand b) => Shorthand (Glycerol a GlycerolHydroxyl (Radyl b)) where
   shorthand (Glycerol h _ r) =
     shorthand h <> " 0:0/" <> shorthand r
 
@@ -707,12 +720,12 @@ instance (Shorthand a, NNomenclature b)
     shorthand h <> " " <> nNomenclature r1 <> "/" <> nNomenclature r2
 
 instance (Shorthand a, NNomenclature b)
-  => NNomenclature (Glycerol a (Radyl b) ()) where
+  => NNomenclature (Glycerol a (Radyl b) GlycerolHydroxyl) where
   nNomenclature (Glycerol h r _) =
     shorthand h <> " " <> nNomenclature r <> "/0:0"
 
 instance (Shorthand a, NNomenclature b)
-  => NNomenclature (Glycerol a () (Radyl b)) where
+  => NNomenclature (Glycerol a GlycerolHydroxyl (Radyl b)) where
   nNomenclature (Glycerol h _ r) =
     shorthand h <> " 0:0/" <> nNomenclature r
 
@@ -746,6 +759,11 @@ instance Shorthand a => Shorthand (TwoRadyls a) where
 instance NNomenclature a => NNomenclature (TwoRadyls a) where
   nNomenclature (TwoRadyls r1 r2) = nNomenclature r1 <> "_" <> nNomenclature r2
 
+instance ToElementalComposition (TwoRadyls a) where
+  toElementalComposition (TwoRadyls r1 r2) =
+    toElementalComposition r1 <> toElementalComposition r2
+  charge _ = Just 0
+
 data ThreeRadyls a = ThreeRadyls
   { radyl1Tri :: Radyl a
   , radyl2Tri :: Radyl a
@@ -770,11 +788,18 @@ instance NNomenclature a => NNomenclature (ThreeRadyls a) where
   nNomenclature (ThreeRadyls r1 r2 r3) =
     nNomenclature r1 <> "_" <> nNomenclature r2 <> nNomenclature r3
 
+instance ToElementalComposition (ThreeRadyls a) where
+  toElementalComposition (ThreeRadyls r1 r2 r3) =
+    toElementalComposition r1
+    <> toElementalComposition r2
+    <> toElementalComposition r3
+  charge _ = Just 0
+
 class AllRadyls t where
   allRadyls :: Applicative f => (Radyl a -> f (Radyl b)) -> t a -> f (t b)
 
 instance AllRadyls TwoRadyls where
-  allRadyls f (TwoRadyls a b ) = TwoRadyls <$> f a <*> f b
+  allRadyls f (TwoRadyls a b) = TwoRadyls <$> f a <*> f b
 
 instance AllRadyls ThreeRadyls where
   allRadyls f (ThreeRadyls a b c) = ThreeRadyls <$> f a <*> f b <*> f c

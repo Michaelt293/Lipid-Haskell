@@ -12,6 +12,7 @@ Stability   : Experimental
 
 module Lipid.KnownSn.Glycerophospholipid where
 
+import Isotope
 import Lipid.Blocks
 import Lipid.Format
 import Control.Lens
@@ -19,371 +20,411 @@ import Data.Monoid ((<>))
 
 
 newtype PA a = PA
-  { _getPA :: Glycerol PhosphatidicAcid (Radyl a) (Radyl a)
+  { _getPA :: Glycerol (Radyl a) (Radyl a) PhosphatidicAcid
   } deriving (Show, Eq, Ord)
 
 makeLenses ''PA
 
 instance Functor PA where
-    fmap f (PA (Glycerol h r1 r2)) =
-      PA $ Glycerol h (f <$> r1) (f <$> r2)
+    fmap f (PA (Glycerol r1 r2 h)) =
+      PA $ Glycerol (f <$> r1) (f <$> r2) h
 
 instance Foldable PA where
-  foldMap f (PA (Glycerol _ r1 r2)) =
+  foldMap f (PA (Glycerol r1 r2 _)) =
     foldMap f r1 <> foldMap f r2
 
 instance Traversable PA where
-  traverse f (PA (Glycerol h r1 r2)) =
-    (\x y -> PA (Glycerol h x y))
+  traverse f (PA (Glycerol r1 r2 h)) =
+    (\x y -> PA (Glycerol x y h))
     <$> traverse f r1
     <*> traverse f r2
 
 instance AllRadyls PA where
-  allRadyls f (PA (Glycerol h r1 r2)) =
-    (\x y -> PA (Glycerol h x y))
+  allRadyls f (PA (Glycerol r1 r2 h)) =
+    (\x y -> PA (Glycerol x y h))
     <$> f r1
     <*> f r2
 
 instance Shorthand a => Shorthand (PA a) where
-  shorthand (PA (Glycerol h r1 r2)) =
+  shorthand (PA (Glycerol r1 r2 h)) =
     shorthand h <> " " <> shorthand r1 <> "/" <> shorthand r2
 
 instance NNomenclature a => NNomenclature (PA a) where
-  nNomenclature (PA (Glycerol h r1 r2)) =
+  nNomenclature (PA (Glycerol r1 r2 h)) =
     shorthand h <> " " <> nNomenclature r1 <> "/" <> nNomenclature r2
 
-instance HasGlycerol (PA a) PhosphatidicAcid (Radyl a) (Radyl a) where
+instance HasGlycerol (PA a) (Radyl a) (Radyl a) PhosphatidicAcid where
   glycerol = getPA
 
+instance ToElementalComposition (PA a) where
+  toElementalComposition (PA g) = toElementalComposition g
+  charge (PA g) = charge g
+
 newtype PC a = PC
-  { _getPC :: Glycerol Phosphatidylcholine (Radyl a) (Radyl a)
+  { _getPC :: Glycerol (Radyl a) (Radyl a) Phosphatidylcholine
   } deriving (Show, Eq, Ord)
 
 makeLenses ''PC
 
 instance Functor PC where
-    fmap f (PC (Glycerol h r1 r2)) =
-      PC $ Glycerol h (f <$> r1) (f <$> r2)
+    fmap f (PC (Glycerol r1 r2 h)) =
+      PC $ Glycerol (f <$> r1) (f <$> r2) h
 
 instance Foldable PC where
-  foldMap f (PC (Glycerol _ r1 r2)) =
+  foldMap f (PC (Glycerol r1 r2 _)) =
     foldMap f r1 <> foldMap f r2
 
 instance Traversable PC where
-  traverse f (PC (Glycerol h r1 r2)) =
-    (\x y -> PC (Glycerol h x y))
+  traverse f (PC (Glycerol r1 r2 h)) =
+    (\x y -> PC (Glycerol x y h))
     <$> traverse f r1
     <*> traverse f r2
 
 instance AllRadyls PC where
-  allRadyls f (PC (Glycerol h r1 r2)) =
-    (\x y -> PC (Glycerol h x y))
+  allRadyls f (PC (Glycerol r1 r2 h)) =
+    (\x y -> PC (Glycerol x y h))
     <$> f r1
     <*> f r2
 
 instance Shorthand a => Shorthand (PC a) where
-  shorthand (PC (Glycerol h r1 r2)) =
+  shorthand (PC (Glycerol r1 r2 h)) =
     shorthand h <> " " <> shorthand r1 <> "/" <> shorthand r2
 
 instance NNomenclature a => NNomenclature (PC a) where
-  nNomenclature (PC (Glycerol h r1 r2)) =
+  nNomenclature (PC (Glycerol r1 r2 h)) =
     shorthand h <> " " <> nNomenclature r1 <> "/" <> nNomenclature r2
 
-instance HasGlycerol (PC a) Phosphatidylcholine (Radyl a) (Radyl a) where
+instance HasGlycerol (PC a) (Radyl a) (Radyl a) Phosphatidylcholine where
   glycerol = getPC
 
+instance ToElementalComposition (PC a) where
+  toElementalComposition (PC g) = toElementalComposition g
+  charge (PC g) = charge g
+
 newtype PE a = PE
-  { _getPE :: Glycerol Phosphatidylethanolamine (Radyl a) (Radyl a)
+  { _getPE :: Glycerol (Radyl a) (Radyl a) Phosphatidylethanolamine
   } deriving (Show, Eq, Ord)
 
 makeLenses ''PE
 
 instance Functor PE where
-    fmap f (PE (Glycerol h r1 r2)) =
-      PE $ Glycerol h (f <$> r1) (f <$> r2)
+    fmap f (PE (Glycerol r1 r2 h)) =
+      PE $ Glycerol (f <$> r1) (f <$> r2) h
 
 instance Foldable PE where
-  foldMap f (PE (Glycerol _ r1 r2)) =
+  foldMap f (PE (Glycerol r1 r2 _)) =
     foldMap f r1 <> foldMap f r2
 
 instance Traversable PE where
-  traverse f (PE (Glycerol h r1 r2)) =
-    (\x y -> PE (Glycerol h x y))
+  traverse f (PE (Glycerol r1 r2 h)) =
+    (\x y -> PE (Glycerol x y h))
     <$> traverse f r1
     <*> traverse f r2
 
 instance AllRadyls PE where
-  allRadyls f (PE (Glycerol h r1 r2)) =
-    (\x y -> PE (Glycerol h x y))
+  allRadyls f (PE (Glycerol r1 r2 h)) =
+    (\x y -> PE (Glycerol x y h))
     <$> f r1
     <*> f r2
 
 instance Shorthand a => Shorthand (PE a) where
-  shorthand (PE (Glycerol h r1 r2)) =
+  shorthand (PE (Glycerol r1 r2 h)) =
     shorthand h <> " " <> shorthand r1 <> "/" <> shorthand r2
 
 instance NNomenclature a => NNomenclature (PE a) where
-  nNomenclature (PE (Glycerol h r1 r2)) =
+  nNomenclature (PE (Glycerol r1 r2 h)) =
     shorthand h <> " " <> nNomenclature r1 <> "/" <> nNomenclature r2
 
-instance HasGlycerol (PE a) Phosphatidylethanolamine (Radyl a) (Radyl a) where
+instance HasGlycerol (PE a) (Radyl a) (Radyl a) Phosphatidylethanolamine where
   glycerol = getPE
 
+instance ToElementalComposition (PE a) where
+  toElementalComposition (PE g) = toElementalComposition g
+  charge (PE g) = charge g
+
 newtype PG a = PG
-  { _getPG :: Glycerol Phosphatidylglycerol (Radyl a) (Radyl a)
+  { _getPG :: Glycerol (Radyl a) (Radyl a) Phosphatidylglycerol
   } deriving (Show, Eq, Ord)
 
 makeLenses ''PG
 
 instance Functor PG where
-    fmap f (PG (Glycerol h r1 r2)) =
-      PG $ Glycerol h (f <$> r1) (f <$> r2)
+    fmap f (PG (Glycerol r1 r2 h)) =
+      PG $ Glycerol (f <$> r1) (f <$> r2) h
 
 instance Foldable PG where
-  foldMap f (PG (Glycerol _ r1 r2)) =
+  foldMap f (PG (Glycerol r1 r2 _)) =
     foldMap f r1 <> foldMap f r2
 
 instance Traversable PG where
-  traverse f (PG (Glycerol h r1 r2)) =
-    (\x y -> PG (Glycerol h x y))
+  traverse f (PG (Glycerol r1 r2 h)) =
+    (\x y -> PG (Glycerol x y h))
     <$> traverse f r1
     <*> traverse f r2
 
 instance AllRadyls PG where
-  allRadyls f (PG (Glycerol h r1 r2)) =
-    (\x y -> PG (Glycerol h x y))
+  allRadyls f (PG (Glycerol r1 r2 h)) =
+    (\x y -> PG (Glycerol x y h))
     <$> f r1
     <*> f r2
 
 instance Shorthand a => Shorthand (PG a) where
-  shorthand (PG (Glycerol h r1 r2)) =
+  shorthand (PG (Glycerol r1 r2 h)) =
     shorthand h <> " " <> shorthand r1 <> "/" <> shorthand r2
 
 instance NNomenclature a => NNomenclature (PG a) where
-  nNomenclature (PG (Glycerol h r1 r2)) =
+  nNomenclature (PG (Glycerol r1 r2 h)) =
     shorthand h <> " " <> nNomenclature r1 <> "/" <> nNomenclature r2
 
-instance HasGlycerol (PG a) Phosphatidylglycerol (Radyl a) (Radyl a) where
+instance HasGlycerol (PG a) (Radyl a) (Radyl a) Phosphatidylglycerol where
   glycerol = getPG
 
+instance ToElementalComposition (PG a) where
+  toElementalComposition (PG g) = toElementalComposition g
+  charge (PG g) = charge g
+
 newtype PGP a = PGP
-  { _getPGP :: Glycerol Phosphatidylgylcerolphosphate (Radyl a) (Radyl a)
+  { _getPGP :: Glycerol (Radyl a) (Radyl a) Phosphatidylgylcerolphosphate
   } deriving (Show, Eq, Ord)
 
 makeLenses ''PGP
 
 instance Functor PGP where
-    fmap f (PGP (Glycerol h r1 r2)) =
-      PGP $ Glycerol h (f <$> r1) (f <$> r2)
+    fmap f (PGP (Glycerol r1 r2 h)) =
+      PGP $ Glycerol (f <$> r1) (f <$> r2) h
 
 instance Foldable PGP where
-  foldMap f (PGP (Glycerol _ r1 r2)) =
+  foldMap f (PGP (Glycerol r1 r2 _)) =
     foldMap f r1 <> foldMap f r2
 
 instance Traversable PGP where
-  traverse f (PGP (Glycerol h r1 r2)) =
-    (\x y -> PGP (Glycerol h x y))
+  traverse f (PGP (Glycerol r1 r2 h)) =
+    (\x y -> PGP (Glycerol x y h))
     <$> traverse f r1
     <*> traverse f r2
 
 instance AllRadyls PGP where
-  allRadyls f (PGP (Glycerol h r1 r2)) =
-    (\x y -> PGP (Glycerol h x y))
+  allRadyls f (PGP (Glycerol r1 r2 h)) =
+    (\x y -> PGP (Glycerol x y h))
     <$> f r1
     <*> f r2
 
 instance Shorthand a => Shorthand (PGP a) where
-  shorthand (PGP (Glycerol h r1 r2)) =
+  shorthand (PGP (Glycerol r1 r2 h)) =
     shorthand h <> " " <> shorthand r1 <> "/" <> shorthand r2
 
 instance NNomenclature a => NNomenclature (PGP a) where
-  nNomenclature (PGP (Glycerol h r1 r2)) =
+  nNomenclature (PGP (Glycerol r1 r2 h)) =
     shorthand h <> " " <> nNomenclature r1 <> "/" <> nNomenclature r2
 
-instance HasGlycerol (PGP a) Phosphatidylgylcerolphosphate (Radyl a) (Radyl a) where
+instance HasGlycerol (PGP a) (Radyl a) (Radyl a) Phosphatidylgylcerolphosphate where
   glycerol = getPGP
 
+instance ToElementalComposition (PGP a) where
+  toElementalComposition (PGP g) = toElementalComposition g
+  charge (PGP g) = charge g
+
 newtype PI a = PI
-  { _getPI :: Glycerol Phosphatidylinositol (Radyl a) (Radyl a)
+  { _getPI :: Glycerol (Radyl a) (Radyl a) Phosphatidylinositol
   } deriving (Show, Eq, Ord)
 
 makeLenses ''PI
 
 instance Functor PI where
-    fmap f (PI (Glycerol h r1 r2)) =
-      PI $ Glycerol h (f <$> r1) (f <$> r2)
+    fmap f (PI (Glycerol r1 r2 h)) =
+      PI $ Glycerol (f <$> r1) (f <$> r2) h
 
 instance Foldable PI where
-  foldMap f (PI (Glycerol _ r1 r2)) =
+  foldMap f (PI (Glycerol r1 r2 _)) =
     foldMap f r1 <> foldMap f r2
 
 instance Traversable PI where
-  traverse f (PI (Glycerol h r1 r2)) =
-    (\x y -> PI (Glycerol h x y))
+  traverse f (PI (Glycerol r1 r2 h)) =
+    (\x y -> PI (Glycerol x y h))
     <$> traverse f r1
     <*> traverse f r2
 
 instance AllRadyls PI where
-  allRadyls f (PI (Glycerol h r1 r2)) =
-    (\x y -> PI (Glycerol h x y))
+  allRadyls f (PI (Glycerol r1 r2 h)) =
+    (\x y -> PI (Glycerol x y h))
     <$> f r1
     <*> f r2
 
 instance Shorthand a => Shorthand (PI a) where
-  shorthand (PI (Glycerol h r1 r2)) =
+  shorthand (PI (Glycerol r1 r2 h)) =
     shorthand h <> " " <> shorthand r1 <> "/" <> shorthand r2
 
 instance NNomenclature a => NNomenclature (PI a) where
-  nNomenclature (PI (Glycerol h r1 r2)) =
+  nNomenclature (PI (Glycerol r1 r2 h)) =
     shorthand h <> " " <> nNomenclature r1 <> "/" <> nNomenclature r2
 
-instance HasGlycerol (PI a) Phosphatidylinositol (Radyl a) (Radyl a) where
+instance HasGlycerol (PI a) (Radyl a) (Radyl a) Phosphatidylinositol where
   glycerol = getPI
 
+instance ToElementalComposition (PI a) where
+  toElementalComposition (PI g) = toElementalComposition g
+  charge (PI g) = charge g
+
 newtype PIP a = PIP
-  { _getPIP :: Glycerol PhosphatidylinositolMonophosphate (Radyl a) (Radyl a)
+  { _getPIP :: Glycerol (Radyl a) (Radyl a) PhosphatidylinositolMonophosphate
   } deriving (Show, Eq, Ord)
 
 makeLenses ''PIP
 
 instance Functor PIP where
-    fmap f (PIP (Glycerol h r1 r2)) =
-      PIP $ Glycerol h (f <$> r1) (f <$> r2)
+    fmap f (PIP (Glycerol r1 r2 h)) =
+      PIP $ Glycerol (f <$> r1) (f <$> r2) h
 
 instance Foldable PIP where
-  foldMap f (PIP (Glycerol _ r1 r2)) =
+  foldMap f (PIP (Glycerol r1 r2 _)) =
     foldMap f r1 <> foldMap f r2
 
 instance Traversable PIP where
-  traverse f (PIP (Glycerol h r1 r2)) =
-    (\x y -> PIP (Glycerol h x y))
+  traverse f (PIP (Glycerol r1 r2 h)) =
+    (\x y -> PIP (Glycerol x y h))
     <$> traverse f r1
     <*> traverse f r2
 
 instance AllRadyls PIP where
-  allRadyls f (PIP (Glycerol h r1 r2)) =
-    (\x y -> PIP (Glycerol h x y))
+  allRadyls f (PIP (Glycerol r1 r2 h)) =
+    (\x y -> PIP (Glycerol x y h))
     <$> f r1
     <*> f r2
 
 instance Shorthand a => Shorthand (PIP a) where
-  shorthand (PIP (Glycerol h r1 r2)) =
+  shorthand (PIP (Glycerol r1 r2 h)) =
     shorthand h <> " " <> shorthand r1 <> "/" <> shorthand r2
 
 instance NNomenclature a => NNomenclature (PIP a) where
-  nNomenclature (PIP (Glycerol h r1 r2)) =
+  nNomenclature (PIP (Glycerol r1 r2 h)) =
     shorthand h <> " " <> nNomenclature r1 <> "/" <> nNomenclature r2
 
-instance HasGlycerol (PIP a) PhosphatidylinositolMonophosphate (Radyl a) (Radyl a) where
+instance HasGlycerol (PIP a) (Radyl a) (Radyl a) PhosphatidylinositolMonophosphate where
   glycerol = getPIP
 
+instance ToElementalComposition (PIP a) where
+  toElementalComposition (PIP g) = toElementalComposition g
+  charge (PIP g) = charge g
+
 newtype PIP2 a = PIP2
-  { _getPIP2 :: Glycerol PhosphatidylinositolBisphosphate (Radyl a) (Radyl a)
+  { _getPIP2 :: Glycerol (Radyl a) (Radyl a) PhosphatidylinositolBisphosphate
   } deriving (Show, Eq, Ord)
 
 makeLenses ''PIP2
 
 instance Functor PIP2 where
-    fmap f (PIP2 (Glycerol h r1 r2)) =
-      PIP2 $ Glycerol h (f <$> r1) (f <$> r2)
+    fmap f (PIP2 (Glycerol r1 r2 h)) =
+      PIP2 $ Glycerol (f <$> r1) (f <$> r2) h
 
 instance Foldable PIP2 where
-  foldMap f (PIP2 (Glycerol _ r1 r2)) =
+  foldMap f (PIP2 (Glycerol r1 r2 _)) =
     foldMap f r1 <> foldMap f r2
 
 instance Traversable PIP2 where
-  traverse f (PIP2 (Glycerol h r1 r2)) =
-    (\x y -> PIP2 (Glycerol h x y))
+  traverse f (PIP2 (Glycerol r1 r2 h)) =
+    (\x y -> PIP2 (Glycerol x y h))
     <$> traverse f r1
     <*> traverse f r2
 
 instance AllRadyls PIP2 where
-  allRadyls f (PIP2 (Glycerol h r1 r2)) =
-    (\x y -> PIP2 (Glycerol h x y))
+  allRadyls f (PIP2 (Glycerol r1 r2 h)) =
+    (\x y -> PIP2 (Glycerol x y h))
     <$> f r1
     <*> f r2
 
 instance Shorthand a => Shorthand (PIP2 a) where
-  shorthand (PIP2 (Glycerol h r1 r2)) =
+  shorthand (PIP2 (Glycerol r1 r2 h)) =
     shorthand h <> " " <> shorthand r1 <> "/" <> shorthand r2
 
 instance NNomenclature a => NNomenclature (PIP2 a) where
-  nNomenclature (PIP2 (Glycerol h r1 r2)) =
+  nNomenclature (PIP2 (Glycerol r1 r2 h)) =
     shorthand h <> " " <> nNomenclature r1 <> "/" <> nNomenclature r2
 
-instance HasGlycerol (PIP2 a) PhosphatidylinositolBisphosphate (Radyl a) (Radyl a) where
+instance HasGlycerol (PIP2 a) (Radyl a) (Radyl a) PhosphatidylinositolBisphosphate where
   glycerol = getPIP2
 
+instance ToElementalComposition (PIP2 a) where
+  toElementalComposition (PIP2 g) = toElementalComposition g
+  charge (PIP2 g) = charge g
+
 newtype PIP3 a = PIP3
-  { _getPIP3 :: Glycerol PhosphatidylinositolTrisphosphate (Radyl a) (Radyl a)
+  { _getPIP3 :: Glycerol (Radyl a) (Radyl a) PhosphatidylinositolTrisphosphate
   } deriving (Show, Eq, Ord)
 
 makeLenses ''PIP3
 
 instance Functor PIP3 where
-    fmap f (PIP3 (Glycerol h r1 r2)) =
-      PIP3 $ Glycerol h (f <$> r1) (f <$> r2)
+    fmap f (PIP3 (Glycerol r1 r2 h)) =
+      PIP3 $ Glycerol (f <$> r1) (f <$> r2) h
 
 instance Foldable PIP3 where
-  foldMap f (PIP3 (Glycerol _ r1 r2)) =
+  foldMap f (PIP3 (Glycerol r1 r2 _)) =
     foldMap f r1 <> foldMap f r2
 
 instance Traversable PIP3 where
-  traverse f (PIP3 (Glycerol h r1 r2)) =
-    (\x y -> PIP3 (Glycerol h x y))
+  traverse f (PIP3 (Glycerol r1 r2 h)) =
+    (\x y -> PIP3 (Glycerol x y h))
     <$> traverse f r1
     <*> traverse f r2
 
 instance AllRadyls PIP3 where
-  allRadyls f (PIP3 (Glycerol h r1 r2)) =
-    (\x y -> PIP3 (Glycerol h x y))
+  allRadyls f (PIP3 (Glycerol r1 r2 h)) =
+    (\x y -> PIP3 (Glycerol x y h))
     <$> f r1
     <*> f r2
 
 instance Shorthand a => Shorthand (PIP3 a) where
-  shorthand (PIP3 (Glycerol h r1 r2)) =
+  shorthand (PIP3 (Glycerol r1 r2 h)) =
     shorthand h <> " " <> shorthand r1 <> "/" <> shorthand r2
 
 instance NNomenclature a => NNomenclature (PIP3 a) where
-  nNomenclature (PIP3 (Glycerol h r1 r2)) =
+  nNomenclature (PIP3 (Glycerol r1 r2 h)) =
     shorthand h <> " " <> nNomenclature r1 <> "/" <> nNomenclature r2
 
-instance HasGlycerol (PIP3 a) PhosphatidylinositolTrisphosphate (Radyl a) (Radyl a) where
+instance HasGlycerol (PIP3 a) (Radyl a) (Radyl a) PhosphatidylinositolTrisphosphate where
   glycerol = getPIP3
 
+instance ToElementalComposition (PIP3 a) where
+  toElementalComposition (PIP3 g) = toElementalComposition g
+  charge (PIP3 g) = charge g
+
 newtype PS a = PS
-  { _getPS :: Glycerol Phosphatidylserine (Radyl a) (Radyl a)
+  { _getPS :: Glycerol (Radyl a) (Radyl a) Phosphatidylserine
   } deriving (Show, Eq, Ord)
 
 makeLenses ''PS
 
 instance Functor PS where
-    fmap f (PS (Glycerol h r1 r2)) =
-      PS $ Glycerol h (f <$> r1) (f <$> r2)
+    fmap f (PS (Glycerol r1 r2 h)) =
+      PS $ Glycerol (f <$> r1) (f <$> r2) h
 
 instance Foldable PS where
-  foldMap f (PS (Glycerol _ r1 r2)) =
+  foldMap f (PS (Glycerol r1 r2 _)) =
     foldMap f r1 <> foldMap f r2
 
 instance Traversable PS where
-  traverse f (PS (Glycerol h r1 r2)) =
-    (\x y -> PS (Glycerol h x y))
+  traverse f (PS (Glycerol r1 r2 h)) =
+    (\x y -> PS (Glycerol x y h))
     <$> traverse f r1
     <*> traverse f r2
 
 instance AllRadyls PS where
-  allRadyls f (PS (Glycerol h r1 r2)) =
-    (\x y -> PS (Glycerol h x y))
+  allRadyls f (PS (Glycerol r1 r2 h)) =
+    (\x y -> PS (Glycerol x y h))
     <$> f r1
     <*> f r2
 
 instance Shorthand a => Shorthand (PS a) where
-  shorthand (PS (Glycerol h r1 r2)) =
+  shorthand (PS (Glycerol r1 r2 h)) =
     shorthand h <> " " <> shorthand r1 <> "/" <> shorthand r2
 
 instance NNomenclature a => NNomenclature (PS a) where
-  nNomenclature (PS (Glycerol h r1 r2)) =
+  nNomenclature (PS (Glycerol r1 r2 h)) =
     shorthand h <> " " <> nNomenclature r1 <> "/" <> nNomenclature r2
 
-instance HasGlycerol (PS a) Phosphatidylserine (Radyl a) (Radyl a) where
+instance HasGlycerol (PS a) (Radyl a) (Radyl a) Phosphatidylserine where
   glycerol = getPS
+
+instance ToElementalComposition (PS a) where
+  toElementalComposition (PS g) = toElementalComposition g
+  charge (PS g) = charge g
