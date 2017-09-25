@@ -29,7 +29,8 @@ library
                    , Lipid.CombinedRadyl.Glycerophospholipid
                    , Lipid.ClassLevel.Glycerophospholipid
                    , Lipid.KnownSn.Glycerophospholipid
-
+                   , Lipid.Parsers.Blocks
+                   ,Lipid.Parsers.KnownSn.Glycerolipid
   other-modules:
   other-extensions:
   build-depends:       base

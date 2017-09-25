@@ -69,14 +69,6 @@ class Shorthand a where
 class NNomenclature a where
   nNomenclature :: a -> String
 
-instance Shorthand a => Shorthand (Maybe a) where
-  shorthand Nothing = ""
-  shorthand (Just x) = shorthand x
-
-instance NNomenclature a => NNomenclature (Maybe a) where
-  nNomenclature Nothing = ""
-  nNomenclature (Just x) = nNomenclature x
-
 class IsSaturated a where
   isSaturated :: a -> Maybe Bool
 
@@ -132,6 +124,10 @@ newtype OmegaPosition = OmegaPosition
 
 makeClassy ''OmegaPosition
 
+instance NNomenclature (Maybe OmegaPosition) where
+  nNomenclature Nothing = "?"
+  nNomenclature (Just x) = nNomenclature x
+
 instance NNomenclature OmegaPosition where
   nNomenclature (OmegaPosition x) = "n-" <> show x
 
@@ -150,8 +146,13 @@ makeClassy ''DeltaPosition
 instance Shorthand DeltaPosition where
   shorthand (DeltaPosition x) = show x
 
+instance Shorthand (Maybe DeltaPosition) where
+  shorthand Nothing = "?"
+  shorthand (Just x) = shorthand x
+
 instance Position DeltaPosition where
   getPosition = Just . _getDeltaPosition
+
 -- |Geometry represent the geometry of carbon-carbon double bonds.
 data Geometry
   = Cis
@@ -160,12 +161,16 @@ data Geometry
 
 makePrisms ''Geometry
 
-instance NNomenclature Geometry where
-  nNomenclature _ = ""
+-- instance NNomenclature Geometry where
+--   nNomenclature _ = ""
 
 instance Shorthand Geometry where
   shorthand Cis   = "Z"
   shorthand Trans = "E"
+
+instance Shorthand (Maybe Geometry) where
+  shorthand Nothing = ""
+  shorthand (Just x) = shorthand x
 
 -- |Moiety represents moieties commonly found on carbon chains
 -- data Moiety
@@ -198,8 +203,8 @@ instance Shorthand a => Shorthand (DoubleBond a) where
     shorthand p <> shorthand g
 
 instance NNomenclature a => NNomenclature (DoubleBond a) where
-  nNomenclature (DoubleBond p g) =
-    nNomenclature p <> nNomenclature g
+  nNomenclature (DoubleBond p _) =
+    nNomenclature p
 
 instance Position a => Position (DoubleBond a) where
   getPosition (DoubleBond p _) = getPosition p
@@ -245,10 +250,12 @@ instance Position a => IsBisAllylic [DoubleBond a] where
 --   shorthand (MoietyData x y) =
 --     shorthand x <> shorthand y
 
-renderCombinedChains :: Show a => a -> [b] -> (b -> String) -> String
-renderCombinedChains x y f =
-  show x <> ":" <> show (length y) <> wrapParen dbInfo
-    where dbInfo = intercalate "," $ f <$> y
+renderChain :: Show a => a -> [b] -> (b -> String) -> String
+renderChain x dbs f =
+  show x <> ":" <> show (length dbs) <> wrapParen dbInfo
+    where
+      dbsAsStr = f <$> dbs
+      dbInfo = intercalate "," $ f <$> dbs
 
 -- |CarbonChain represents a carbon chain.
 data CarbonChain a = CarbonChain
@@ -264,11 +271,11 @@ instance HasNumCarbons (CarbonChain a) where
 
 instance Shorthand a => Shorthand (CarbonChain a) where
   shorthand (CarbonChain x dbs) =
-    renderCombinedChains x dbs shorthand
+    renderChain x dbs shorthand
 
 instance NNomenclature a => NNomenclature (CarbonChain a) where
   nNomenclature (CarbonChain x dbs) =
-    renderCombinedChains x dbs nNomenclature
+    renderChain x dbs nNomenclature
 
 instance IsSaturated (CarbonChain a) where
   isSaturated (CarbonChain _ dbs) = Just $ null dbs
@@ -311,11 +318,11 @@ instance HasNumCarbons (TwoCombinedChains a) where
 
 instance Shorthand a => Shorthand (TwoCombinedChains a ) where
   shorthand (TwoCombinedChains x y) =
-    renderCombinedChains x (concat y) shorthand
+    renderChain x (concat y) shorthand
 
 instance NNomenclature a => NNomenclature (TwoCombinedChains a) where
   nNomenclature (TwoCombinedChains x y) =
-    renderCombinedChains x (concat y) nNomenclature
+    renderChain x (concat y) nNomenclature
 
 instance ToElementalComposition (TwoCombinedChains a) where
   toElementalComposition (TwoCombinedChains n dbs) =
@@ -337,11 +344,11 @@ instance HasNumCarbons (ThreeCombinedChains a) where
 
 instance Shorthand a => Shorthand (ThreeCombinedChains a ) where
   shorthand (ThreeCombinedChains x y) =
-    renderCombinedChains x (concat y) shorthand
+    renderChain x (concat y) shorthand
 
 instance NNomenclature a => NNomenclature (ThreeCombinedChains a) where
   nNomenclature (ThreeCombinedChains x y) =
-    renderCombinedChains x (concat y) nNomenclature
+    renderChain x (concat y) nNomenclature
 
 instance ToElementalComposition (ThreeCombinedChains a) where
   toElementalComposition (ThreeCombinedChains n dbs) =
@@ -363,11 +370,11 @@ instance HasNumCarbons (FourCombinedChains a) where
 
 instance Shorthand a => Shorthand (FourCombinedChains a ) where
   shorthand (FourCombinedChains x y) =
-    renderCombinedChains x (concat y) shorthand
+    renderChain x (concat y) shorthand
 
 instance NNomenclature a => NNomenclature (FourCombinedChains a) where
   nNomenclature (FourCombinedChains x y) =
-    renderCombinedChains x (concat y) nNomenclature
+    renderChain x (concat y) nNomenclature
 
 instance ToElementalComposition (FourCombinedChains a) where
   toElementalComposition (FourCombinedChains n dbs) =

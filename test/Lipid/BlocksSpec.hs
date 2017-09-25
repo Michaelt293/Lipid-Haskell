@@ -20,7 +20,7 @@ spec = do
       `shouldBe` "n-9"
     it "Nothing should be \"\"" $
       nNomenclature (Nothing :: Maybe OmegaPosition)
-      `shouldBe` ""
+      `shouldBe` "?"
 
   describe "Shorthand (DoubleBond a)" .
     it "DeltaPosition 9 Cis should be \"9Z\"" $
