@@ -1,31 +1,52 @@
 {-|
 Module      : FattyAcid
-Description : FA data type and instances of Shorthand and Nomenclature defined.
-Copyright   : Michael Thomas 
+Description : FA data type and instances of Shorthand and NNomenclature defined.
+Copyright   : Michael Thomas
 License     : GPL-3
 Maintainer  : Michael Thomas <Michaelt293@gmail.com>
 Stability   : experimental
 -}
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE DeriveFoldable #-}
+{-# LANGUAGE DeriveTraversable #-}
 
 module Lipid.FattyAcid
-    (
-      FA(..)
+    ( FA(..)
     ) where
 
-import ElementIsotopes
 import Lipid.Blocks
+import Lipid.Format
+import Data.Monoid ((<>))
+import Control.Lens
 
+data FA a
+  = ClassLevelFA Integer
+  | FA           (CarbonChain a)
+  deriving (Show, Eq, Ord, Functor, Foldable, Traversable)
 
-data FA = ClassLevelFA IntegerMass
-        | FA           CarbonChain
-        deriving (Show, Eq, Ord)
+makePrisms ''FA
 
+instance Shorthand a => Shorthand (FA a) where
+    shorthand (ClassLevelFA x) = "FA " <> wrapParen (show x)
+    shorthand (FA x)           = "FA " <> shorthand x
 
-instance Shorthand FA where
-    showShorthand (ClassLevelFA x) = "FA (" ++ show x ++ ")"
-    showShorthand (FA x) = "FA " ++ showShorthand x
+instance NNomenclature a => NNomenclature (FA a) where
+    nNomenclature (ClassLevelFA x) = "FA " <> wrapParen (show x)
+    nNomenclature (FA x)           = "FA " <> nNomenclature x
 
-instance Nomenclature FA where
-    showNnomenclature (ClassLevelFA x) = "FA (" ++ show x ++ ")"
-    showNnomenclature (FA x)           = "FA " ++ showNnomenclature x
+instance IsSaturated (FA a) where
+  isSaturated (ClassLevelFA _) = Nothing
+  isSaturated (FA cc) = isSaturated cc
 
+instance IsMonounsaturated (FA a) where
+  isMonounsaturated (ClassLevelFA cc) = Nothing
+  isMonounsaturated (FA cc) = isMonounsaturated cc
+
+instance IsPolyunsaturated (FA a) where
+  isPolyunsaturated (ClassLevelFA cc) = Nothing
+  isPolyunsaturated (FA cc) = isPolyunsaturated cc
+
+instance Position a => IsBisAllylic (FA a) where
+  isBisAllylic (ClassLevelFA cc) = Nothing
+  isBisAllylic (FA cc) = isBisAllylic cc

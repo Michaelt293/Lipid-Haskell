@@ -8,20 +8,21 @@ Stability   : Experimental
 -}
 
 module Lipid.Format
-    (
-      wrap
+    ( wrap
     , wrapParen
     , wrapBrackets
     ) where
 
-wrap :: [Char] -> [Char] -> [Char] -> [Char]
-wrap open close str = if length str == 0
-                         then ""
-                         else open ++ str ++ close
+import Data.Monoid ((<>))
 
-wrapParen :: [Char] -> [Char]
-wrapParen str = wrap "(" ")" str
+wrap :: String -> String -> String -> String
+wrap open close str =
+  if null str
+    then ""
+    else open <> str <> close
 
-wrapBrackets :: [Char] -> [Char]
-wrapBrackets str = wrap "[" "]" str
+wrapParen :: String -> String
+wrapParen = wrap "(" ")"
 
+wrapBrackets :: String -> String
+wrapBrackets = wrap "[" "]"

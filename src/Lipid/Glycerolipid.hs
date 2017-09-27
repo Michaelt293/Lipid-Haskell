@@ -1,111 +1,109 @@
 {-|
 Module      : Lipid.Glycerolipid
 Description : Glycerolipid data type and instances of Shorthand and
-              Nomenclature defined.
+              NNomenclature defined.
 Copyright   : Michael Thomas
 License     : GPL-3
 Maintainer  : Michael Thomas <Michaelt293@gmail.com>
 Stability   : Experimental
 -}
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE DeriveFoldable #-}
+{-# LANGUAGE DeriveTraversable #-}
 
-module Lipid.Glycerolipid
-    (
-      MG(..)
-    , DG(..)
-    , TG(..)
-    ) where
+module Lipid.Glycerolipid where
 
-import ElementIsotopes
 import Lipid.Blocks
-import Lipid.Format
+import qualified Lipid.UnknownSn.Glycerolipid as UnknownSn.Glycerolipid
+import qualified Lipid.KnownSn.Glycerolipid as KnownSn.Glycerolipid
+import qualified Lipid.CombinedRadyl.Glycerolipid as CombinedRadyl.Glycerolipid
+import qualified Lipid.ClassLevel.Glycerolipid as ClassLevel.Glycerolipid
+import Control.Lens (makePrisms)
+import Data.Monoid ((<>))
+import Data.List (sort)
 
 
-data MG = ClassLevelMG       IntegerMass
-        | UnknownSn          Radyl
-        | Sn1MG              Radyl
-        | Sn2MG              Radyl
-        | Sn3MG              Radyl
-        deriving (Show, Eq, Ord)
+data MG a
+  = ClassLevelMG ClassLevel.Glycerolipid.MG
+  | UnknownSnMG  (UnknownSn.Glycerolipid.MG a)
+  | Sn1MG        (KnownSn.Glycerolipid.MG1 a)
+  | Sn2MG        (KnownSn.Glycerolipid.MG2 a)
+  | Sn3MG        (KnownSn.Glycerolipid.MG3 a)
+  deriving (Show, Eq, Ord, Functor, Foldable, Traversable)
 
-data DG = ClassLevelDG       IntegerMass
-        | CombinedRadylsDG   TwoCombinedRadyls
-        | UnknownDG          Radyl Radyl
-        | Sn12DG             Radyl Radyl
-        | Sn13DG             Radyl Radyl
-        | Sn23DG             Radyl Radyl
-        deriving (Show, Eq, Ord)
+makePrisms ''MG
 
-data TG = ClassLevelTG       IntegerMass
-        | CombinedRadylsTG   ThreeCombinedRadyls
-        | UnknownSnTG        Radyl Radyl Radyl
-        | KnownSnTG          Radyl Radyl Radyl
-        deriving (Show, Eq, Ord)
+data DG a
+  = ClassLevelDG     ClassLevel.Glycerolipid.DG
+  | CombinedRadylsDG (CombinedRadyl.Glycerolipid.DG a)
+  | UnknownSnDG      (UnknownSn.Glycerolipid.DG a)
+  | Sn12DG           (KnownSn.Glycerolipid.DG12 a)
+  | Sn13DG           (KnownSn.Glycerolipid.DG13 a)
+  | Sn23DG           (KnownSn.Glycerolipid.DG23 a)
+  deriving (Show, Eq, Ord, Functor, Foldable, Traversable)
 
+makePrisms ''DG
 
-instance Shorthand MG where
-    showShorthand l =
+data TG a
+  = ClassLevelTG     ClassLevel.Glycerolipid.DG
+  | CombinedRadylsTG (CombinedRadyl.Glycerolipid.TG a)
+  | UnknownSnTG      (UnknownSn.Glycerolipid.TG a)
+  | KnownSnTG        (KnownSn.Glycerolipid.TG a)
+  deriving (Show, Eq, Ord, Functor, Foldable, Traversable)
+
+makePrisms ''TG
+
+instance Shorthand a => Shorthand (MG a) where
+    shorthand l =
       case l of
-        (ClassLevelMG n) -> "MG (" ++ show n ++ ")"
-        (UnknownSn r)    -> "MG " ++ showShorthand r
-        (Sn1MG r)        -> "MG " ++ showShorthand r ++ "/0:0/0:0"
-        (Sn2MG r)        -> "MG 0:0/" ++ showShorthand r ++ "/0:0"
-        (Sn3MG r)        -> "MG 0:0/0:0/" ++ showShorthand r
+        ClassLevelMG c -> shorthand c
+        UnknownSnMG r  -> shorthand r
+        Sn1MG g        -> shorthand g
+        Sn2MG g        -> shorthand g
+        Sn3MG g        -> shorthand g
 
-instance Nomenclature MG where
-    showNnomenclature l =
+instance NNomenclature a => NNomenclature (MG a) where
+    nNomenclature l =
       case l of
-        (ClassLevelMG n) -> "MG (" ++ show n ++ ")"
-        (UnknownSn r)    -> "MG " ++ showNnomenclature r
-        (Sn1MG r)        -> "MG " ++ showNnomenclature r ++ "/0:0/0:0"
-        (Sn2MG r)        -> "MG 0:0/" ++ showNnomenclature r ++ "/0:0"
-        (Sn3MG r)        -> "MG 0:0/0:0/" ++ showNnomenclature r
+        ClassLevelMG c -> shorthand c
+        UnknownSnMG g  -> nNomenclature g
+        Sn1MG g        -> nNomenclature g
+        Sn2MG g        -> nNomenclature g
+        Sn3MG g        -> nNomenclature g
 
-instance Shorthand DG where
-    showShorthand l =
+instance Shorthand a => Shorthand (DG a) where
+    shorthand l =
       case l of
-        (ClassLevelDG n)      -> "DG (" ++ show n ++ ")"
-        (CombinedRadylsDG rs) -> "DG " ++ showShorthand rs
-        (UnknownDG r1 r2)     -> renderDG showShorthand "unknown" "_" r1 r2
-        (Sn12DG r1 r2)        -> renderDG showShorthand "12" "/" r1 r2
-        (Sn13DG r1 r2)        -> renderDG showShorthand "13" "/" r1 r2
-        (Sn23DG r1 r2)        -> renderDG showShorthand "23" "/" r1 r2
+        ClassLevelDG c      -> shorthand c
+        CombinedRadylsDG rs -> shorthand rs
+        UnknownSnDG g       -> shorthand g
+        Sn12DG g            -> shorthand g
+        Sn13DG g            -> shorthand g
+        Sn23DG g            -> shorthand g
 
-instance Nomenclature DG where
-    showNnomenclature l =
+instance NNomenclature a => NNomenclature (DG a) where
+    nNomenclature l =
       case l of
-        (ClassLevelDG n)     -> "DG (" ++ show n ++ ")"
-        (CombinedRadylsDG rs) -> "DG " ++ showNnomenclature rs
-        (UnknownDG r1 r2)    -> renderDG showNnomenclature "unknown" "_" r1 r2
-        (Sn12DG r1 r2)       -> renderDG showNnomenclature "12" "/" r1 r2
-        (Sn13DG r1 r2)       -> renderDG showNnomenclature "13" "/" r1 r2
-        (Sn23DG r1 r2)       -> renderDG showNnomenclature "23" "/" r1 r2
+        ClassLevelDG c      -> shorthand c
+        CombinedRadylsDG rs -> nNomenclature rs
+        UnknownSnDG g       -> nNomenclature g
+        Sn12DG g            -> nNomenclature g
+        Sn13DG g            -> nNomenclature g
+        Sn23DG g            -> nNomenclature g
 
-renderDG f sn sep r1 r2 =
-  case sn of
-    "unknown" -> "DG " ++ r1' ++ sep ++ r2'
-    "12" -> "DG " ++ r1' ++ sep ++ r2' ++ sep ++ "0:0"
-    "13" -> "DG " ++ r1' ++ sep ++ "0:0" ++ sep ++ r2'
-    "23" -> "DG 0:0" ++ sep ++ r1' ++ sep ++ r2'
-    where r1' = f r1
-          r2' = f r2
-
-instance Shorthand TG where
-  showShorthand l =
+instance Shorthand a => Shorthand (TG a) where
+  shorthand l =
     case l of
-      (ClassLevelTG n)       -> "TG (" ++ show n ++ ")"
-      (CombinedRadylsTG rs)  -> "TG " ++ showShorthand rs
-      (UnknownSnTG r1 r2 r3) -> renderTG showNnomenclature "_" r1 r2 r3
-      (KnownSnTG r1 r2 r3)   -> renderTG showShorthand "/" r1 r2 r3
+      ClassLevelTG c       -> shorthand c
+      CombinedRadylsTG rs  -> shorthand rs
+      UnknownSnTG g        -> shorthand g
+      KnownSnTG g          -> shorthand g
 
-instance Nomenclature TG where
-  showNnomenclature l =
+instance NNomenclature a => NNomenclature (TG a) where
+  nNomenclature l =
     case l of
-      (ClassLevelTG n)       -> "TG (" ++ show n ++ ")"
-      (CombinedRadylsTG rs)  -> "TG " ++ showNnomenclature rs
-      (UnknownSnTG r1 r2 r3) -> renderTG showNnomenclature "_" r1 r2 r3
-      (KnownSnTG r1 r2 r3)   -> renderTG showNnomenclature "/" r1 r2 r3
-
-renderTG f sep r1 r2 r3  = "TG " ++ r1' ++ sep ++ r2' ++ sep ++ r3'
-    where r1' = f r1
-          r2' = f r2
-          r3' = f r3
+      ClassLevelTG c       -> shorthand c
+      CombinedRadylsTG rs  -> nNomenclature rs
+      UnknownSnTG g        -> nNomenclature g
+      KnownSnTG g          -> nNomenclature g
