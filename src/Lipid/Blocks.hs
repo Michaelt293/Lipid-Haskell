@@ -55,7 +55,7 @@ module Lipid.Blocks where
 import Isotope
 import Data.Monoid ((<>))
 import Data.List (sort, group, intercalate)
-import Data.Ord (comparing, Down(..))
+-- import Data.Ord (comparing, Down(..))
 import Data.Maybe (fromMaybe)
 import Data.Bifunctor
 import Control.Arrow ((&&&))
@@ -99,7 +99,7 @@ instance Monoid NumCarbons where
 -- on a carbon chain.
 newtype NumDoubleBonds = NumDoubleBonds
   { _getNumDoubleBonds :: Integer
-  } deriving (Eq, Ord, Enum)
+  } deriving (Eq, Ord, Enum, Num, Real, Integral)
 
 makeClassy ''NumDoubleBonds
 
@@ -290,10 +290,10 @@ instance IsBisAllylic [DoubleBond a] => IsBisAllylic (CarbonChain a) where
   isBisAllylic cc =
     cc^.doubleBonds.to isBisAllylic
 
-renderOmegaPositions :: [DoubleBond OmegaPosition] -> String
+renderOmegaPositions :: (NNomenclature a, Position a, Ord a) => [DoubleBond a] -> String
 renderOmegaPositions dbs =
   if fromMaybe False (isBisAllylic dbs)
-    then nNomenclature (maximum dbs)
+    then wrapParen $ nNomenclature (minimum dbs)
     else wrapParen $ intercalate "," (nNomenclature <$> dbs)
 
 instance ToElementalComposition (CarbonChain a) where
@@ -551,11 +551,11 @@ instance ( ToElementalComposition a
     mkElementalComposition [(C, 3), (H, 5)]
     <> toElementalComposition a
     <> toElementalComposition b
-    <> toElementalComposition b
+    <> toElementalComposition c
   charge (Glycerol a b c) = charge a +++ charge b +++ charge c
 
 Just x +++ Just y = Just $ x + y
-_ +++ _               = Nothing
+_ +++ _           = Nothing
 
 instance Bifunctor (Glycerol a) where
   bimap f g (Glycerol a b c) = Glycerol a (f b) (g c)
