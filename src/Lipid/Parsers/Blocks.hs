@@ -31,7 +31,7 @@ deltaPositionP = DeltaPosition <$> L.integer
 
 maybeDeltaPositionP :: Parser (Maybe DeltaPosition)
 maybeDeltaPositionP =
-  (char '?' >> return Nothing) <|> (Just <$> deltaPositionP)
+  (char '?' >> pure Nothing) <|> (Just <$> deltaPositionP)
 
 omegaPositionP :: Parser OmegaPosition
 omegaPositionP = string "n-" *> (OmegaPosition <$> L.integer)
@@ -41,7 +41,7 @@ maybeOmegaPositionP =
   (char '?' >> return Nothing) <|> (Just <$> omegaPositionP)
 
 geometryP :: Parser Geometry
-geometryP = (char 'Z' >> return Cis) <|> (char 'E' >> return Trans)
+geometryP = (char 'Z' >> pure Cis) <|> (char 'E' >> pure Trans)
 
 doubleBondWithGeometryP :: Parser a -> Parser (DoubleBond a)
 doubleBondWithGeometryP p = do
@@ -113,9 +113,9 @@ linkageP :: Parser Linkage
 linkageP = do
   oOrP <- optional $ string "O-" <|> string "P-"
   case oOrP of
-    (Just "O-") -> return Alkyl
-    (Just "P-") -> return Alkenyl
-    _ -> return Acyl
+    (Just "O-") -> pure Alkyl
+    (Just "P-") -> pure Alkenyl
+    _ -> pure Acyl
 
 radylDeltaP :: Parser (Radyl DeltaPosition)
 radylDeltaP = do
@@ -140,3 +140,6 @@ radylMaybeOmegaP = do
   link <- linkageP
   chain <- carbonChainMaybeOmegaP
   return $ Radyl link chain
+
+glycerolHydroxylP :: Parser GlycerolHydroxyl
+glycerolHydroxylP = string "0:0" >> pure GlycerolHydroxyl
