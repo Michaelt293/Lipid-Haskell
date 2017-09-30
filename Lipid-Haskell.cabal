@@ -30,7 +30,10 @@ library
                    , Lipid.ClassLevel.Glycerophospholipid
                    , Lipid.KnownSn.Glycerophospholipid
                    , Lipid.Parsers.Blocks
+                   , Lipid.Parsers.ClassLevel.Glycerolipid
+                   , Lipid.Parsers.ClassLevel.Glycerophospholipid
                    , Lipid.Parsers.KnownSn.Glycerolipid
+                   , Lipid.Parsers.KnownSn.Glycerophospholipid
   other-modules:
   other-extensions:
   build-depends:       base

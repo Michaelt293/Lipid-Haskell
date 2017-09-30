@@ -684,7 +684,7 @@ data PhosphatidylinositolTrisphosphate = PhosphatidylinositolTrisphosphate
   deriving (Show, Read, Eq, Ord)
 
 instance Shorthand PhosphatidylinositolTrisphosphate where
-  shorthand _ = "PI3"
+  shorthand _ = "PIP3"
 
 instance ToElementalComposition PhosphatidylinositolTrisphosphate where
   toElementalComposition _ = mkElementalComposition [(H, 1)]

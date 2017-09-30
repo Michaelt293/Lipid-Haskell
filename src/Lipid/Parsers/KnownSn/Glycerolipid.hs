@@ -228,11 +228,6 @@ mgOmegaP = mgP radylOmegaP
 mgMaybeOmegaP :: Parser (MG (Maybe OmegaPosition))
 mgMaybeOmegaP = mgP radylMaybeOmegaP
 
--- Helper function used in QuasiQuoters
-notHandled :: String -> String -> a
-notHandled feature quoterName =
-  error $ feature <> " are not handled by the" <> quoterName <> "quasiquoter."
-
 quoteMgDelta :: String -> Q Exp
 quoteMgDelta s =
   case parse (tgDeltaP <* eof) "" s of
@@ -243,9 +238,9 @@ quoteMgDelta s =
 mgDelta :: QuasiQuoter
 mgDelta = QuasiQuoter
   { quoteExp = quoteMgDelta
-  , quotePat  = notHandled "patterns" "mgDelta"
-  , quoteType = notHandled "types" "mgDelta"
-  , quoteDec  = notHandled "declarations" "mgDelta"
+  , quotePat  = notHandled "patterns"
+  , quoteType = notHandled "types"
+  , quoteDec  = notHandled "declarations"
   }
 
 quoteMgMaybeDelta :: String -> Q Exp
@@ -258,9 +253,9 @@ quoteMgMaybeDelta s =
 mgMaybeDelta :: QuasiQuoter
 mgMaybeDelta = QuasiQuoter
   { quoteExp  = quoteMgMaybeDelta
-  , quotePat  = notHandled "patterns" "mgMaybeDelta"
-  , quoteType = notHandled "types" "mgMaybeDelta"
-  , quoteDec  = notHandled "declarations" "mgMaybeDelta"
+  , quotePat  = notHandled "patterns"
+  , quoteType = notHandled "types"
+  , quoteDec  = notHandled "declarations"
   }
 
 quoteMgOmega :: String -> Q Exp
@@ -273,9 +268,9 @@ quoteMgOmega s =
 mgOmega :: QuasiQuoter
 mgOmega = QuasiQuoter
   { quoteExp  = quoteMgOmega
-  , quotePat  = notHandled "patterns" "mgOmega"
-  , quoteType = notHandled "types" "mgOmega"
-  , quoteDec  = notHandled "declarations" "mgOmega"
+  , quotePat  = notHandled "patterns"
+  , quoteType = notHandled "types"
+  , quoteDec  = notHandled "declarations"
   }
 
 quoteMgMaybeOmega :: String -> Q Exp
@@ -288,30 +283,10 @@ quoteMgMaybeOmega s =
 mgMaybeOmega :: QuasiQuoter
 mgMaybeOmega = QuasiQuoter
   { quoteExp  = quoteMgMaybeOmega
-  , quotePat  = notHandled "patterns" "mgMaybeOmega"
-  , quoteType = notHandled "types" "mgMaybeOmega"
-  , quoteDec  = notHandled "declarations" "mgMaybeOmega"
+  , quotePat  = notHandled "patterns"
+  , quoteType = notHandled "types"
+  , quoteDec  = notHandled "declarations"
   }
-
-$(deriveLift ''DeltaPosition)
-
-$(deriveLift ''OmegaPosition)
-
-$(deriveLift ''Glycerol)
-
-$(deriveLift ''Radyl)
-
-$(deriveLift ''CarbonChain)
-
-$(deriveLift ''Linkage)
-
-$(deriveLift ''DoubleBond)
-
-$(deriveLift ''NumCarbons)
-
-$(deriveLift ''Geometry)
-
-$(deriveLift ''GlycerolHydroxyl)
 
 $(deriveLift ''TG)
 
