@@ -19,7 +19,7 @@ import Lipid.Parsers.ClassLevel.Glycerolipid
 
 spec :: Spec
 spec =
-  describe "tg" $ do
+  describe "Test for quasiquoters and Shorthand instances" $ do
     it "QuasiQuoter for TG (830)" $
       shorthand [tg|TG (830)|] `shouldBe` "TG (830)"
     it "QuasiQuoter for DG (630)" $
