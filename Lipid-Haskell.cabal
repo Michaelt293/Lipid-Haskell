@@ -23,17 +23,22 @@ library
                    , Lipid.FattyAcid
                    , Lipid.Glycerolipid
                    , Lipid.KnownSn.Glycerolipid
-                   , Lipid.UnknownSn.Glycerolipid
-                   , Lipid.CombinedRadyl.Glycerolipid
-                   , Lipid.ClassLevel.Glycerolipid
-                   , Lipid.CombinedRadyl.Glycerophospholipid
-                   , Lipid.ClassLevel.Glycerophospholipid
                    , Lipid.KnownSn.Glycerophospholipid
+                   , Lipid.UnknownSn.Glycerolipid
+                   , Lipid.UnknownSn.Glycerophospholipid
+                   , Lipid.CombinedRadyl.Glycerolipid
+                   , Lipid.CombinedRadyl.Glycerophospholipid
+                   , Lipid.ClassLevel.Glycerolipid
+                   , Lipid.ClassLevel.Glycerophospholipid
                    , Lipid.Parsers.Blocks
                    , Lipid.Parsers.ClassLevel.Glycerolipid
                    , Lipid.Parsers.ClassLevel.Glycerophospholipid
+                   , Lipid.Parsers.CombinedRadyl.Glycerolipid
+                   , Lipid.Parsers.CombinedRadyl.Glycerophospholipid
                    , Lipid.Parsers.KnownSn.Glycerolipid
                    , Lipid.Parsers.KnownSn.Glycerophospholipid
+                   , Lipid.Parsers.UnknownSn.Glycerolipid
+                   , Lipid.Parsers.UnknownSn.Glycerophospholipid
   other-modules:
   other-extensions:
   build-depends:       base

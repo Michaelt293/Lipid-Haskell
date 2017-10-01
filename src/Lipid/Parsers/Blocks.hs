@@ -146,6 +146,22 @@ radylMaybeOmegaP = do
   chain <- carbonChainMaybeOmegaP
   return $ Radyl link chain
 
+twoRadylsP :: Parser (Radyl a) -> Parser (TwoRadyls a)
+twoRadylsP p = do
+  r1 <- p
+  _ <- char '_'
+  r2 <- p
+  return $ TwoRadyls r1 r2
+
+threeRadylsP :: Parser (Radyl a) -> Parser (ThreeRadyls a)
+threeRadylsP p = do
+  r1 <- p
+  _ <- char '_'
+  r2 <- p
+  _ <- char '_'
+  r3 <- p
+  return $ ThreeRadyls r1 r2 r3
+
 glycerolHydroxylP :: Parser GlycerolHydroxyl
 glycerolHydroxylP = string "0:0" >> pure GlycerolHydroxyl
 
@@ -190,6 +206,24 @@ phosphatidylinositolTrisphosphateP :: Parser PhosphatidylinositolTrisphosphate
 phosphatidylinositolTrisphosphateP =
   string "PIP3" >> pure PhosphatidylinositolTrisphosphate
 
+combinedRadylP :: Parser a -> Parser ([Linkage], NumCarbons, [[DoubleBond a]])
+combinedRadylP p = do
+  ls <- sepBy linkageP (char ',')
+  cs <- numCarbonsP
+  _ <- char ':'
+  dbs <- many . list $ doubleBondWithGeometryP p
+  return (ls, cs, dbs)
+
+twoCombinedRadylsP :: Parser a -> Parser (TwoCombinedRadyls a)
+twoCombinedRadylsP p = do
+  (ls, cs, dbs) <- combinedRadylP p
+  return . TwoCombinedRadyls ls $ TwoCombinedChains cs dbs
+
+threeCombinedRadylsP :: Parser a -> Parser (ThreeCombinedRadyls a)
+threeCombinedRadylsP p = do
+  (ls, cs, dbs) <- combinedRadylP p
+  return . ThreeCombinedRadyls ls $ ThreeCombinedChains cs dbs
+
 -- Helper function used in QuasiQuoters
 notHandled :: String -> a
 notHandled feature =
@@ -221,7 +255,19 @@ $(deriveLift ''Glycerol)
 
 $(deriveLift ''Radyl)
 
+$(deriveLift ''TwoRadyls)
+
+$(deriveLift ''ThreeRadyls)
+
+$(deriveLift ''TwoCombinedRadyls)
+
+$(deriveLift ''ThreeCombinedRadyls)
+
 $(deriveLift ''CarbonChain)
+
+$(deriveLift ''TwoCombinedChains)
+
+$(deriveLift ''ThreeCombinedChains)
 
 $(deriveLift ''Linkage)
 

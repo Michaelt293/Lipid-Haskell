@@ -454,7 +454,7 @@ freq2shorthand (x, y)
 
 links :: [Linkage] -> String
 links x =
-  intercalate "," $ freq2shorthand <$> linkageStrList x
+  intercalate "," . filter (not . null) $ freq2shorthand <$> linkageStrList x
 
 data TwoCombinedRadyls a = TwoCombinedRadyls
    { _radylLinkages           :: [Linkage]
