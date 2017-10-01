@@ -21,7 +21,7 @@ newtype TG = TG
 makeClassy ''TG
 
 instance Shorthand TG where
-  shorthand (TG n) = "MG (" <> show n <> ")"
+  shorthand (TG n) = "TG (" <> show n <> ")"
 
 instance HasClassLevel TG where
    classLevel = getTG

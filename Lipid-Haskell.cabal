@@ -57,6 +57,7 @@ test-suite Lipid-Haskell-test
   other-modules:       Lipid.BlocksSpec
                      , Lipid.FattyAcidSpec
                      , Lipid.GlycerolipidSpec
+                     , Lipid.Parsers.ClassLevel.GlycerolipidSpec
   main-is:             Spec.hs
   build-depends:       base
                      , Lipid-Haskell

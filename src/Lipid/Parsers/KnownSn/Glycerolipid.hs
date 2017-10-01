@@ -58,9 +58,9 @@ quoteTgDelta s =
 tgDelta :: QuasiQuoter
 tgDelta = QuasiQuoter
   { quoteExp = quoteTgDelta
-  , quotePat  = notHandled "patterns" "tgDelta"
-  , quoteType = notHandled "types" "tgDelta"
-  , quoteDec  = notHandled "declarations" "tgDelta"
+  , quotePat  = notHandled "patterns"
+  , quoteType = notHandled "types"
+  , quoteDec  = notHandled "declarations"
   }
 
 quoteTgMaybeDelta :: String -> Q Exp
@@ -73,7 +73,7 @@ quoteTgMaybeDelta s =
 tgMaybeDelta :: QuasiQuoter
 tgMaybeDelta = QuasiQuoter
   { quoteExp  = quoteTgMaybeDelta
-  , quotePat  = notHandled "patterns" "tgMaybeDelta"
+  , quotePat  = notHandled "patterns" 
   , quoteType = notHandled "types" "tgMaybeDelta"
   , quoteDec  = notHandled "declarations" "tgMaybeDelta"
   }
