@@ -24,17 +24,20 @@ import Language.Haskell.TH.Lift
 tgP :: Parser a -> Parser (TG a)
 tgP p = TG <$> (string "TG " *> threeCombinedRadylsP p)
 
+tgMaybeP :: Parser (Maybe a) -> Parser (TG (Maybe a))
+tgMaybeP p = TG <$> (string "TG " *> threeCombinedRadylsMaybeP p)
+
 tgDeltaP :: Parser (TG DeltaPosition)
 tgDeltaP = tgP deltaPositionP
 
 tgMaybeDeltaP :: Parser (TG (Maybe DeltaPosition))
-tgMaybeDeltaP = tgP maybeDeltaPositionP
+tgMaybeDeltaP = tgMaybeP maybeDeltaPositionP
 
 tgOmegaP :: Parser (TG OmegaPosition)
 tgOmegaP = tgP omegaPositionP
 
 tgMaybeOmegaP :: Parser (TG (Maybe OmegaPosition))
-tgMaybeOmegaP = tgP maybeOmegaPositionP
+tgMaybeOmegaP = tgMaybeP maybeOmegaPositionP
 
 tgDelta :: QuasiQuoter
 tgDelta = qQuoter tgDeltaP
@@ -51,17 +54,20 @@ tgMaybeOmega = qQuoter tgMaybeOmegaP
 dgP :: Parser a -> Parser (DG a)
 dgP p = DG <$> (string "DG " *> twoCombinedRadylsP p)
 
+dgMaybeP :: Parser (Maybe a) -> Parser (DG (Maybe a))
+dgMaybeP p = DG <$> (string "DG " *> twoCombinedRadylsMaybeP p)
+
 dgDeltaP :: Parser (DG DeltaPosition)
 dgDeltaP = dgP deltaPositionP
 
 dgMaybeDeltaP :: Parser (DG (Maybe DeltaPosition))
-dgMaybeDeltaP = dgP maybeDeltaPositionP
+dgMaybeDeltaP = dgMaybeP maybeDeltaPositionP
 
 dgOmegaP :: Parser (DG OmegaPosition)
 dgOmegaP = dgP omegaPositionP
 
 dgMaybeOmegaP :: Parser (DG (Maybe OmegaPosition))
-dgMaybeOmegaP = dgP maybeOmegaPositionP
+dgMaybeOmegaP = dgMaybeP maybeOmegaPositionP
 
 dgDelta :: QuasiQuoter
 dgDelta = qQuoter dgDeltaP

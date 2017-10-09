@@ -81,7 +81,7 @@ spec = do
                    , DoubleBond (Just (DeltaPosition 15)) (Just Cis)
                    ]
        `shouldBe` Nothing
-       
+
   describe "renderOmegaPositions" $ do
     it "" $
       renderOmegaPositions [ DoubleBond (OmegaPosition 3) (Just Cis)
@@ -96,7 +96,7 @@ spec = do
                            ]
         `shouldBe` "(n-3,n-7,n-9)"
     it "Delta 9, ?, 15 should be (n-9,?,n-15)" $
-      renderOmegaPositions [ DoubleBond (Just (OmegaPosition 9))  (Just Cis)
+      renderMaybeOmegaPositions [ DoubleBond (Just (OmegaPosition 9))  (Just Cis)
                            , DoubleBond Nothing (Just Cis)
                            , DoubleBond (Just (OmegaPosition 15)) (Just Cis)
                            ]

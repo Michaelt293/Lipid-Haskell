@@ -7,6 +7,7 @@ Maintainer  : Michael Thomas <Michaelt293@gmail.com>
 Stability   : Experimental
 -}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE MultiWayIf #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE FunctionalDependencies #-}
@@ -250,12 +251,34 @@ instance Position a => IsBisAllylic [DoubleBond a] where
 --   shorthand (MoietyData x y) =
 --     shorthand x <> shorthand y
 
-renderChain :: Show a => a -> [b] -> (b -> String) -> String
-renderChain x dbs f =
-  show x <> ":" <> show (length dbs) <> wrapParen dbInfo
-    where
-      dbsAsStr = f <$> dbs
-      dbInfo = intercalate "," $ f <$> dbs
+renderNumCarbonNumDbs :: NumCarbons -> [DoubleBond a] -> String
+renderNumCarbonNumDbs x dbs =
+  show x <> ":" <> show (length dbs)
+
+renderPositions :: (a -> String) -> [a] -> String
+renderPositions f dbs =
+  wrapParen . intercalate "," $ f <$> dbs
+
+renderDeltaPositions :: [DoubleBond DeltaPosition] -> String
+renderDeltaPositions = renderPositions shorthand
+
+renderMaybeDeltaPositions :: [DoubleBond (Maybe DeltaPosition)] -> String
+renderMaybeDeltaPositions dbs =
+  if all (\x -> x == (Nothing :: Maybe DeltaPosition)) (dbs^..traverse.dbPosition)
+    then ""
+    else renderPositions shorthand dbs
+
+renderOmegaPositions :: [DoubleBond OmegaPosition] -> String
+renderOmegaPositions dbs =
+  if fromMaybe False (isBisAllylic dbs)
+    then wrapParen $ nNomenclature (minimum dbs)
+    else renderPositions nNomenclature dbs
+
+renderMaybeOmegaPositions :: [DoubleBond (Maybe OmegaPosition)] -> String
+renderMaybeOmegaPositions dbs =
+  if | all (\x -> x == (Nothing :: Maybe OmegaPosition)) (dbs^..traverse.dbPosition) -> ""
+     | fromMaybe False (isBisAllylic dbs) -> wrapParen $ nNomenclature (minimum dbs)
+     | otherwise -> renderPositions nNomenclature dbs
 
 -- |CarbonChain represents a carbon chain.
 data CarbonChain a = CarbonChain
@@ -269,13 +292,21 @@ makeClassy ''CarbonChain
 instance HasNumCarbons (CarbonChain a) where
   numCarbons = carbons
 
-instance Shorthand a => Shorthand (CarbonChain a) where
-  shorthand (CarbonChain x dbs) =
-    renderChain x dbs shorthand
+instance Shorthand (CarbonChain DeltaPosition) where
+  shorthand (CarbonChain n dbs) =
+    renderNumCarbonNumDbs n dbs <> renderDeltaPositions dbs
 
-instance NNomenclature a => NNomenclature (CarbonChain a) where
-  nNomenclature (CarbonChain x dbs) =
-    renderChain x dbs nNomenclature
+instance Shorthand (CarbonChain (Maybe DeltaPosition)) where
+  shorthand (CarbonChain n dbs) =
+    renderNumCarbonNumDbs n dbs <> renderMaybeDeltaPositions dbs
+
+instance NNomenclature (CarbonChain OmegaPosition) where
+  nNomenclature (CarbonChain n dbs) =
+    renderNumCarbonNumDbs n dbs <> renderOmegaPositions dbs
+
+instance NNomenclature (CarbonChain (Maybe OmegaPosition)) where
+  nNomenclature (CarbonChain n dbs) =
+    renderNumCarbonNumDbs n dbs <> renderMaybeOmegaPositions dbs
 
 instance IsSaturated (CarbonChain a) where
   isSaturated (CarbonChain _ dbs) = Just $ null dbs
@@ -290,12 +321,6 @@ instance IsBisAllylic [DoubleBond a] => IsBisAllylic (CarbonChain a) where
   isBisAllylic cc =
     cc^.doubleBonds.to isBisAllylic
 
-renderOmegaPositions :: (NNomenclature a, Position a, Ord a) => [DoubleBond a] -> String
-renderOmegaPositions dbs =
-  if fromMaybe False (isBisAllylic dbs)
-    then wrapParen $ nNomenclature (minimum dbs)
-    else wrapParen $ intercalate "," (nNomenclature <$> dbs)
-
 instance ToElementalComposition (CarbonChain a) where
   toElementalComposition (CarbonChain n dbs) =
     mkElementalComposition
@@ -308,33 +333,46 @@ instance ToElementalComposition (CarbonChain a) where
 -- a diradyl phosphatidylcholine can be written as PC 32:1.
 data TwoCombinedChains a = TwoCombinedChains
    { _combinedNumCarbons     :: NumCarbons
-   , _combinedNumDoubleBonds :: [[DoubleBond a]] }
+   , _combinedNumDoubleBonds :: NumDoubleBonds
+   , _combinedDoubleBonds :: [[DoubleBond a]] }
    deriving (Show, Eq, Ord, Functor, Foldable, Traversable)
 
 makeClassy ''TwoCombinedChains
 
+renderNumCarbonCombinedNumDbs cs dbs =
+  show cs <> ":" <> show dbs
+
 instance HasNumCarbons (TwoCombinedChains a) where
   numCarbons = combinedNumCarbons
 
-instance Shorthand a => Shorthand (TwoCombinedChains a ) where
-  shorthand (TwoCombinedChains x y) =
-    renderChain x (concat y) shorthand
+instance Shorthand (TwoCombinedChains DeltaPosition) where
+  shorthand (TwoCombinedChains n numDbs dbs) =
+    renderNumCarbonCombinedNumDbs n numDbs <> foldMap (renderPositions shorthand) dbs
 
-instance NNomenclature a => NNomenclature (TwoCombinedChains a) where
-  nNomenclature (TwoCombinedChains x y) =
-    renderChain x (concat y) nNomenclature
+instance Shorthand (TwoCombinedChains (Maybe DeltaPosition)) where
+  shorthand (TwoCombinedChains n numDbs dbs) =
+    renderNumCarbonCombinedNumDbs n numDbs <> foldMap (renderPositions shorthand) dbs
+
+instance NNomenclature (TwoCombinedChains OmegaPosition) where
+  nNomenclature (TwoCombinedChains n numDbs dbs) =
+    renderNumCarbonCombinedNumDbs n numDbs <> foldMap (renderPositions nNomenclature) dbs
+
+instance NNomenclature (TwoCombinedChains (Maybe OmegaPosition)) where
+  nNomenclature (TwoCombinedChains n numDbs dbs) =
+    renderNumCarbonCombinedNumDbs n numDbs <> foldMap (renderPositions nNomenclature) dbs
 
 instance ToElementalComposition (TwoCombinedChains a) where
-  toElementalComposition (TwoCombinedChains n dbs) =
+  toElementalComposition (TwoCombinedChains n numDbs _) =
     mkElementalComposition
       [ (C, fromIntegral n)
-      , (H, 2 * fromIntegral n + 2 - 2 * (length . concat) dbs)
+      , (H, 2 * fromIntegral n + 2 - 2 * fromIntegral numDbs)
       ]
   charge _ = Just 0
 
 data ThreeCombinedChains a = ThreeCombinedChains
    { _threeCombinedNumCarbons     :: NumCarbons
-   , _threeCombinedNumDoubleBonds :: [[DoubleBond a]] }
+   , _threeCombinedNumDoubleBonds :: NumDoubleBonds
+   , _threeCombinedDoubleBonds :: [[DoubleBond a]] }
    deriving (Show, Eq, Ord, Functor, Foldable, Traversable)
 
 makeClassy ''ThreeCombinedChains
@@ -342,25 +380,34 @@ makeClassy ''ThreeCombinedChains
 instance HasNumCarbons (ThreeCombinedChains a) where
   numCarbons = threeCombinedNumCarbons
 
-instance Shorthand a => Shorthand (ThreeCombinedChains a ) where
-  shorthand (ThreeCombinedChains x y) =
-    renderChain x (concat y) shorthand
+instance Shorthand (ThreeCombinedChains DeltaPosition) where
+  shorthand (ThreeCombinedChains n numDbs dbs) =
+    renderNumCarbonCombinedNumDbs n numDbs <> foldMap (renderPositions shorthand) dbs
 
-instance NNomenclature a => NNomenclature (ThreeCombinedChains a) where
-  nNomenclature (ThreeCombinedChains x y) =
-    renderChain x (concat y) nNomenclature
+instance NNomenclature (ThreeCombinedChains OmegaPosition) where
+  nNomenclature (ThreeCombinedChains n numDbs dbs) =
+    renderNumCarbonCombinedNumDbs n numDbs <> foldMap (renderPositions nNomenclature) dbs
+
+instance Shorthand (ThreeCombinedChains (Maybe DeltaPosition)) where
+  shorthand (ThreeCombinedChains n numDbs dbs) =
+    renderNumCarbonCombinedNumDbs n numDbs <> foldMap (renderPositions shorthand) dbs
+
+instance NNomenclature (ThreeCombinedChains (Maybe OmegaPosition)) where
+  nNomenclature (ThreeCombinedChains n numDbs dbs) =
+    renderNumCarbonCombinedNumDbs n numDbs <> foldMap (renderPositions nNomenclature) dbs
 
 instance ToElementalComposition (ThreeCombinedChains a) where
-  toElementalComposition (ThreeCombinedChains n dbs) =
+  toElementalComposition (ThreeCombinedChains n numDbs _) =
     mkElementalComposition
       [ (C, fromIntegral n)
-      , (H, 2 * fromIntegral n + 3 - 2 * (length . concat) dbs)
+      , (H, 2 * fromIntegral n + 3 - 2 * fromIntegral numDbs)
       ]
   charge _ = Just 0
 
 data FourCombinedChains a = FourCombinedChains
    { _fourCombinedNumCarbons     :: NumCarbons
-   , _fourCombinedNumDoubleBonds :: [[DoubleBond a]] }
+   , _fourCombinedNumDoubleBonds :: NumDoubleBonds
+   , _fourCombinedDoubleBonds    :: [[DoubleBond a]] }
    deriving (Show, Eq, Ord, Functor, Foldable, Traversable)
 
 makeClassy ''FourCombinedChains
@@ -368,19 +415,27 @@ makeClassy ''FourCombinedChains
 instance HasNumCarbons (FourCombinedChains a) where
   numCarbons = fourCombinedNumCarbons
 
-instance Shorthand a => Shorthand (FourCombinedChains a ) where
-  shorthand (FourCombinedChains x y) =
-    renderChain x (concat y) shorthand
+instance Shorthand (FourCombinedChains DeltaPosition) where
+  shorthand (FourCombinedChains n numDbs dbs) =
+    renderNumCarbonCombinedNumDbs n numDbs <> foldMap (renderPositions shorthand) dbs
 
-instance NNomenclature a => NNomenclature (FourCombinedChains a) where
-  nNomenclature (FourCombinedChains x y) =
-    renderChain x (concat y) nNomenclature
+instance NNomenclature (FourCombinedChains OmegaPosition) where
+  nNomenclature (FourCombinedChains n numDbs dbs) =
+    renderNumCarbonCombinedNumDbs n numDbs <> foldMap (renderPositions nNomenclature) dbs
+
+instance Shorthand (FourCombinedChains (Maybe DeltaPosition)) where
+  shorthand (FourCombinedChains n numDbs dbs) =
+    renderNumCarbonCombinedNumDbs n numDbs <> foldMap (renderPositions shorthand) dbs
+
+instance NNomenclature (FourCombinedChains (Maybe OmegaPosition)) where
+  nNomenclature (FourCombinedChains n numDbs dbs) =
+    renderNumCarbonCombinedNumDbs n numDbs <> foldMap (renderPositions nNomenclature) dbs
 
 instance ToElementalComposition (FourCombinedChains a) where
-  toElementalComposition (FourCombinedChains n dbs) =
+  toElementalComposition (FourCombinedChains n numDbs _) =
     mkElementalComposition
       [ (C, fromIntegral n)
-      , (H, 2 * fromIntegral n + 4 - 2 * (length . concat) dbs)
+      , (H, 2 * fromIntegral n + 4 - 2 * fromIntegral numDbs)
       ]
   charge _ = Just 0
 
@@ -422,11 +477,11 @@ data Radyl a = Radyl
 
 makeClassy ''Radyl
 
-instance Shorthand a => Shorthand (Radyl a) where
+instance Shorthand (CarbonChain a) => Shorthand (Radyl a) where
   shorthand (Radyl x y) =
     shorthand x <> shorthand y
 
-instance NNomenclature a => NNomenclature (Radyl a) where
+instance NNomenclature (CarbonChain a) => NNomenclature (Radyl a) where
   nNomenclature (Radyl x y) =
     shorthand x <> nNomenclature y
 
@@ -463,11 +518,11 @@ data TwoCombinedRadyls a = TwoCombinedRadyls
 
 makeClassy ''TwoCombinedRadyls
 
-instance Shorthand a => Shorthand (TwoCombinedRadyls a) where
+instance Shorthand (TwoCombinedChains a) => Shorthand (TwoCombinedRadyls a) where
   shorthand (TwoCombinedRadyls x y) =
     links x <> shorthand y
 
-instance NNomenclature a => NNomenclature (TwoCombinedRadyls a) where
+instance (NNomenclature (TwoCombinedChains a)) => NNomenclature (TwoCombinedRadyls a) where
   nNomenclature (TwoCombinedRadyls x y) =
     links x <> nNomenclature y
 
@@ -483,11 +538,11 @@ data ThreeCombinedRadyls a = ThreeCombinedRadyls
 
 makeClassy ''ThreeCombinedRadyls
 
-instance Shorthand a => Shorthand (ThreeCombinedRadyls a) where
+instance Shorthand (ThreeCombinedChains a) => Shorthand (ThreeCombinedRadyls a) where
   shorthand (ThreeCombinedRadyls x y) =
     links x <> shorthand y
 
-instance NNomenclature a => NNomenclature (ThreeCombinedRadyls a) where
+instance (NNomenclature (ThreeCombinedChains a)) => NNomenclature (ThreeCombinedRadyls a) where
   nNomenclature (ThreeCombinedRadyls x y) =
     links x <> nNomenclature y
 
@@ -503,11 +558,11 @@ data FourCombinedRadyls a = FourCombinedRadyls
 
 makeClassy ''FourCombinedRadyls
 
-instance Shorthand a => Shorthand (FourCombinedRadyls a) where
+instance Shorthand (FourCombinedChains a) => Shorthand (FourCombinedRadyls a) where
   shorthand (FourCombinedRadyls x y) =
     links x <> shorthand y
 
-instance NNomenclature a => NNomenclature (FourCombinedRadyls a) where
+instance (NNomenclature (FourCombinedChains a)) => NNomenclature (FourCombinedRadyls a) where
   nNomenclature (FourCombinedRadyls x y) =
     links x <> nNomenclature y
 
@@ -708,30 +763,30 @@ instance ToElementalComposition GlycerolHydroxyl where
   toElementalComposition _ = mkElementalComposition [(O, 1), (H, 1)]
   charge _ = Just 0
 
-instance (Shorthand a, Shorthand b)
+instance (Shorthand a, Shorthand (Radyl b))
   => Shorthand (Glycerol a (Radyl b) (Radyl b)) where
   shorthand (Glycerol h r1 r2) =
     shorthand h <> " " <> shorthand r1 <> "/" <> shorthand r2
 
-instance (Shorthand a, Shorthand b) => Shorthand (Glycerol a (Radyl b) GlycerolHydroxyl) where
+instance (Shorthand a, Shorthand (Radyl b)) => Shorthand (Glycerol a (Radyl b) GlycerolHydroxyl) where
   shorthand (Glycerol h r _) =
     shorthand h <> " " <> shorthand r <> "/0:0"
 
-instance (Shorthand a, Shorthand b) => Shorthand (Glycerol a GlycerolHydroxyl (Radyl b)) where
+instance (Shorthand a, Shorthand (Radyl b)) => Shorthand (Glycerol a GlycerolHydroxyl (Radyl b)) where
   shorthand (Glycerol h _ r) =
     shorthand h <> " 0:0/" <> shorthand r
 
-instance (Shorthand a, NNomenclature b)
+instance (Shorthand a, NNomenclature (Radyl b))
   => NNomenclature (Glycerol a (Radyl b) (Radyl b)) where
   nNomenclature (Glycerol h r1 r2) =
     shorthand h <> " " <> nNomenclature r1 <> "/" <> nNomenclature r2
 
-instance (Shorthand a, NNomenclature b)
+instance (Shorthand a, NNomenclature (Radyl b))
   => NNomenclature (Glycerol a (Radyl b) GlycerolHydroxyl) where
   nNomenclature (Glycerol h r _) =
     shorthand h <> " " <> nNomenclature r <> "/0:0"
 
-instance (Shorthand a, NNomenclature b)
+instance (Shorthand a, NNomenclature (Radyl b))
   => NNomenclature (Glycerol a GlycerolHydroxyl (Radyl b)) where
   nNomenclature (Glycerol h _ r) =
     shorthand h <> " 0:0/" <> nNomenclature r
@@ -760,10 +815,10 @@ instance Ord a => Ord (TwoRadyls a) where
   TwoRadyls r1 r2 `compare` TwoRadyls r1' r2' =
     sort [r1, r2] `compare` sort [r1', r2']
 
-instance Shorthand a => Shorthand (TwoRadyls a) where
+instance Shorthand (Radyl a) => Shorthand (TwoRadyls a) where
   shorthand (TwoRadyls r1 r2) = shorthand r1 <> "_" <> shorthand r2
 
-instance NNomenclature a => NNomenclature (TwoRadyls a) where
+instance (NNomenclature (Radyl a)) => NNomenclature (TwoRadyls a) where
   nNomenclature (TwoRadyls r1 r2) = nNomenclature r1 <> "_" <> nNomenclature r2
 
 instance ToElementalComposition (TwoRadyls a) where
@@ -787,11 +842,11 @@ instance Ord a => Ord (ThreeRadyls a) where
   ThreeRadyls r1 r2 r3 `compare` ThreeRadyls r1' r2' r3' =
     sort [r1, r2, r3] `compare` sort [r1', r2', r3']
 
-instance Shorthand a => Shorthand (ThreeRadyls a) where
+instance Shorthand (Radyl a) => Shorthand (ThreeRadyls a) where
   shorthand (ThreeRadyls r1 r2 r3) =
     shorthand r1 <> "_" <> shorthand r2 <> shorthand r3
 
-instance NNomenclature a => NNomenclature (ThreeRadyls a) where
+instance (NNomenclature (Radyl a)) => NNomenclature (ThreeRadyls a) where
   nNomenclature (ThreeRadyls r1 r2 r3) =
     nNomenclature r1 <> "_" <> nNomenclature r2 <> nNomenclature r3
 

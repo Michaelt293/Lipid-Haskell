@@ -9,6 +9,8 @@ Stability   : Experimental
 -}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 module Lipid.KnownSn.Glycerophospholipid where
 
@@ -45,11 +47,11 @@ instance AllRadyls PA where
     <$> f r1
     <*> f r2
 
-instance Shorthand a => Shorthand (PA a) where
+instance Shorthand (Radyl a) => Shorthand (PA a) where
   shorthand (PA (Glycerol r1 r2 h)) =
     shorthand h <> " " <> shorthand r1 <> "/" <> shorthand r2
 
-instance NNomenclature a => NNomenclature (PA a) where
+instance NNomenclature (Radyl a) => NNomenclature (PA a) where
   nNomenclature (PA (Glycerol r1 r2 h)) =
     shorthand h <> " " <> nNomenclature r1 <> "/" <> nNomenclature r2
 
@@ -86,11 +88,11 @@ instance AllRadyls PC where
     <$> f r1
     <*> f r2
 
-instance Shorthand a => Shorthand (PC a) where
+instance Shorthand (Radyl a) => Shorthand (PC a) where
   shorthand (PC (Glycerol r1 r2 h)) =
     shorthand h <> " " <> shorthand r1 <> "/" <> shorthand r2
 
-instance NNomenclature a => NNomenclature (PC a) where
+instance NNomenclature (Radyl a) => NNomenclature (PC a) where
   nNomenclature (PC (Glycerol r1 r2 h)) =
     shorthand h <> " " <> nNomenclature r1 <> "/" <> nNomenclature r2
 
@@ -127,11 +129,11 @@ instance AllRadyls PE where
     <$> f r1
     <*> f r2
 
-instance Shorthand a => Shorthand (PE a) where
+instance Shorthand (Radyl a) => Shorthand (PE a) where
   shorthand (PE (Glycerol r1 r2 h)) =
     shorthand h <> " " <> shorthand r1 <> "/" <> shorthand r2
 
-instance NNomenclature a => NNomenclature (PE a) where
+instance NNomenclature (Radyl a) => NNomenclature (PE a) where
   nNomenclature (PE (Glycerol r1 r2 h)) =
     shorthand h <> " " <> nNomenclature r1 <> "/" <> nNomenclature r2
 
@@ -168,11 +170,11 @@ instance AllRadyls PG where
     <$> f r1
     <*> f r2
 
-instance Shorthand a => Shorthand (PG a) where
+instance Shorthand (Radyl a) => Shorthand (PG a) where
   shorthand (PG (Glycerol r1 r2 h)) =
     shorthand h <> " " <> shorthand r1 <> "/" <> shorthand r2
 
-instance NNomenclature a => NNomenclature (PG a) where
+instance NNomenclature (Radyl a) => NNomenclature (PG a) where
   nNomenclature (PG (Glycerol r1 r2 h)) =
     shorthand h <> " " <> nNomenclature r1 <> "/" <> nNomenclature r2
 
@@ -209,11 +211,11 @@ instance AllRadyls PGP where
     <$> f r1
     <*> f r2
 
-instance Shorthand a => Shorthand (PGP a) where
+instance Shorthand (Radyl a) => Shorthand (PGP a) where
   shorthand (PGP (Glycerol r1 r2 h)) =
     shorthand h <> " " <> shorthand r1 <> "/" <> shorthand r2
 
-instance NNomenclature a => NNomenclature (PGP a) where
+instance NNomenclature (Radyl a) => NNomenclature (PGP a) where
   nNomenclature (PGP (Glycerol r1 r2 h)) =
     shorthand h <> " " <> nNomenclature r1 <> "/" <> nNomenclature r2
 
@@ -250,11 +252,11 @@ instance AllRadyls PI where
     <$> f r1
     <*> f r2
 
-instance Shorthand a => Shorthand (PI a) where
+instance Shorthand (Radyl a) => Shorthand (PI a) where
   shorthand (PI (Glycerol r1 r2 h)) =
     shorthand h <> " " <> shorthand r1 <> "/" <> shorthand r2
 
-instance NNomenclature a => NNomenclature (PI a) where
+instance NNomenclature (Radyl a) => NNomenclature (PI a) where
   nNomenclature (PI (Glycerol r1 r2 h)) =
     shorthand h <> " " <> nNomenclature r1 <> "/" <> nNomenclature r2
 
@@ -291,11 +293,11 @@ instance AllRadyls PIP where
     <$> f r1
     <*> f r2
 
-instance Shorthand a => Shorthand (PIP a) where
+instance Shorthand (Radyl a) => Shorthand (PIP a) where
   shorthand (PIP (Glycerol r1 r2 h)) =
     shorthand h <> " " <> shorthand r1 <> "/" <> shorthand r2
 
-instance NNomenclature a => NNomenclature (PIP a) where
+instance NNomenclature (Radyl a) => NNomenclature (PIP a) where
   nNomenclature (PIP (Glycerol r1 r2 h)) =
     shorthand h <> " " <> nNomenclature r1 <> "/" <> nNomenclature r2
 
@@ -332,11 +334,11 @@ instance AllRadyls PIP2 where
     <$> f r1
     <*> f r2
 
-instance Shorthand a => Shorthand (PIP2 a) where
+instance Shorthand (Radyl a) => Shorthand (PIP2 a) where
   shorthand (PIP2 (Glycerol r1 r2 h)) =
     shorthand h <> " " <> shorthand r1 <> "/" <> shorthand r2
 
-instance NNomenclature a => NNomenclature (PIP2 a) where
+instance NNomenclature (Radyl a) => NNomenclature (PIP2 a) where
   nNomenclature (PIP2 (Glycerol r1 r2 h)) =
     shorthand h <> " " <> nNomenclature r1 <> "/" <> nNomenclature r2
 
@@ -373,11 +375,11 @@ instance AllRadyls PIP3 where
     <$> f r1
     <*> f r2
 
-instance Shorthand a => Shorthand (PIP3 a) where
+instance Shorthand (Radyl a) => Shorthand (PIP3 a) where
   shorthand (PIP3 (Glycerol r1 r2 h)) =
     shorthand h <> " " <> shorthand r1 <> "/" <> shorthand r2
 
-instance NNomenclature a => NNomenclature (PIP3 a) where
+instance NNomenclature (Radyl a) => NNomenclature (PIP3 a) where
   nNomenclature (PIP3 (Glycerol r1 r2 h)) =
     shorthand h <> " " <> nNomenclature r1 <> "/" <> nNomenclature r2
 
@@ -414,11 +416,11 @@ instance AllRadyls PS where
     <$> f r1
     <*> f r2
 
-instance Shorthand a => Shorthand (PS a) where
+instance Shorthand (Radyl a) => Shorthand (PS a) where
   shorthand (PS (Glycerol r1 r2 h)) =
     shorthand h <> " " <> shorthand r1 <> "/" <> shorthand r2
 
-instance NNomenclature a => NNomenclature (PS a) where
+instance NNomenclature (Radyl a) => NNomenclature (PS a) where
   nNomenclature (PS (Glycerol r1 r2 h)) =
     shorthand h <> " " <> nNomenclature r1 <> "/" <> nNomenclature r2
 

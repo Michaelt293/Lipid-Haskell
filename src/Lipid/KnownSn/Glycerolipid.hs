@@ -10,6 +10,8 @@ Stability   : Experimental
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 module Lipid.KnownSn.Glycerolipid where
 
@@ -72,7 +74,6 @@ instance Functor DG where
         DG13 $ Glycerol (f <$> r1) GlycerolHydroxyl (f <$> r2)
       DG23 (Glycerol GlycerolHydroxyl r1 r2) ->
         DG23 $ Glycerol GlycerolHydroxyl (f <$> r1) (f <$> r2)
-
 
 instance Foldable DG where
   foldMap f =
@@ -183,11 +184,11 @@ instance ToElementalComposition (MG a) where
       MG3 g -> toElementalComposition g
   charge _ = Just 1
 
-instance Shorthand a => Shorthand (TG a) where
+instance Shorthand (Radyl a) => Shorthand (TG a) where
   shorthand (TG (Glycerol r1 r2 r3)) =
     "TG " <> shorthand r1 <> "/" <> shorthand r2 <> "/" <> shorthand r3
 
-instance Shorthand a => Shorthand (DG a) where
+instance Shorthand (Radyl a) => Shorthand (DG a) where
   shorthand =
     \case
       DG12 (Glycerol r1 r2 _) ->
@@ -197,7 +198,7 @@ instance Shorthand a => Shorthand (DG a) where
       DG23 (Glycerol _ r2 r3) ->
         "DG 0:0/" <> shorthand r2 <> "/" <> shorthand r3
 
-instance Shorthand a => Shorthand (MG a) where
+instance Shorthand (Radyl a) => Shorthand (MG a) where
   shorthand =
     \case
       MG1 (Glycerol r1 _ _) ->
@@ -207,11 +208,11 @@ instance Shorthand a => Shorthand (MG a) where
       MG3 (Glycerol _ _ r3) ->
        "MG 0:0/0:0/" <> shorthand r3
 
-instance NNomenclature a => NNomenclature (TG a) where
+instance NNomenclature (Radyl a) => NNomenclature (TG a) where
   nNomenclature (TG (Glycerol r1 r2 r3)) =
     "TG" <> nNomenclature r1 <> "/" <> nNomenclature r2 <> "/" <> nNomenclature r3
 
-instance NNomenclature a => NNomenclature (DG a) where
+instance NNomenclature (Radyl a) => NNomenclature (DG a) where
   nNomenclature =
     \case
       DG12 (Glycerol r1 r2 _) ->
@@ -221,7 +222,7 @@ instance NNomenclature a => NNomenclature (DG a) where
       DG23 (Glycerol _ r2 r3) ->
         "DG 0:0/" <> nNomenclature r2 <> "/" <> nNomenclature r3
 
-instance NNomenclature a => NNomenclature (MG a) where
+instance NNomenclature (Radyl a) => NNomenclature (MG a) where
   nNomenclature =
     \case
       MG1 (Glycerol r1 _ _) ->

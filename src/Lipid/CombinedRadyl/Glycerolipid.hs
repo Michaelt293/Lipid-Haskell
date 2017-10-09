@@ -12,6 +12,8 @@ Stability   : Experimental
 {-# LANGUAGE DeriveTraversable #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 module Lipid.CombinedRadyl.Glycerolipid where
 
@@ -27,11 +29,11 @@ newtype TG a = TG
 
 makeLenses ''TG
 
-instance Shorthand a => Shorthand (TG a) where
-  shorthand (TG rs) = "DG " <> shorthand rs
+instance Shorthand (ThreeCombinedRadyls a) => Shorthand (TG a) where
+  shorthand (TG rs) = "TG " <> shorthand rs
 
-instance NNomenclature a => NNomenclature (TG a) where
-  nNomenclature (TG rs) ="DG " <> nNomenclature rs
+instance NNomenclature (ThreeCombinedRadyls a) => NNomenclature (TG a) where
+  nNomenclature (TG rs) ="TG " <> nNomenclature rs
 
 instance HasThreeCombinedRadyls (TG a) a where
   threeCombinedRadyls = getTG
@@ -48,10 +50,10 @@ newtype DG a = DG
 
 makeLenses ''DG
 
-instance Shorthand a => Shorthand (DG a) where
+instance Shorthand (TwoCombinedRadyls a) => Shorthand (DG a) where
   shorthand (DG rs) = "DG " <> shorthand rs
 
-instance NNomenclature a => NNomenclature (DG a) where
+instance NNomenclature (TwoCombinedRadyls a) => NNomenclature (DG a) where
   nNomenclature (DG rs) = "DG " <> nNomenclature rs
 
 instance HasTwoCombinedRadyls (DG a) a where

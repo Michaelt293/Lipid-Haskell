@@ -12,6 +12,8 @@ Stability   : Experimental
 {-# LANGUAGE DeriveFunctor #-}
 {-# LANGUAGE DeriveFoldable #-}
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 module Lipid.Glycerophospholipid where
 
@@ -127,7 +129,7 @@ makePrisms ''PS
 --   deriving (Show, Eq, Ord)
 
 
-instance Shorthand a => Shorthand (PA a) where
+instance (Shorthand (CarbonChain a), Shorthand (TwoCombinedChains a)) => Shorthand (PA a) where
   shorthand =
     \case
       ClassLevelPA n      -> shorthand n
@@ -135,7 +137,7 @@ instance Shorthand a => Shorthand (PA a) where
       UnknownSnPA rs      -> shorthand rs
       KnownSnPA g         -> shorthand g
 
-instance NNomenclature a => NNomenclature (PA a) where
+instance (NNomenclature (CarbonChain a), NNomenclature (TwoCombinedChains a)) => NNomenclature (PA a) where
   nNomenclature =
     \case
       ClassLevelPA n      -> shorthand n
@@ -143,7 +145,7 @@ instance NNomenclature a => NNomenclature (PA a) where
       UnknownSnPA rs      -> nNomenclature rs
       KnownSnPA g         -> nNomenclature g
 
-instance Shorthand a => Shorthand (PC a) where
+instance (Shorthand (CarbonChain a), Shorthand (TwoCombinedChains a)) => Shorthand (PC a) where
   shorthand =
     \case
       ClassLevelPC n      -> shorthand n
@@ -151,7 +153,7 @@ instance Shorthand a => Shorthand (PC a) where
       UnknownSnPC rs      -> shorthand rs
       KnownSnPC g         -> shorthand g
 
-instance NNomenclature a => NNomenclature (PC a) where
+instance (NNomenclature (CarbonChain a), NNomenclature (TwoCombinedChains a)) => NNomenclature (PC a) where
   nNomenclature =
     \case
       ClassLevelPC n      -> shorthand n
@@ -159,7 +161,7 @@ instance NNomenclature a => NNomenclature (PC a) where
       UnknownSnPC rs      -> nNomenclature rs
       KnownSnPC g         -> nNomenclature g
 
-instance Shorthand a => Shorthand (PE a) where
+instance (Shorthand (CarbonChain a), Shorthand (TwoCombinedChains a)) => Shorthand (PE a) where
   shorthand =
     \case
       ClassLevelPE n      -> shorthand n
@@ -167,7 +169,7 @@ instance Shorthand a => Shorthand (PE a) where
       UnknownSnPE rs      -> shorthand rs
       KnownSnPE g         -> shorthand g
 
-instance NNomenclature a => NNomenclature (PE a) where
+instance (NNomenclature (CarbonChain a), NNomenclature (TwoCombinedChains a)) => NNomenclature (PE a) where
   nNomenclature =
     \case
       ClassLevelPE n      -> shorthand n
@@ -175,7 +177,7 @@ instance NNomenclature a => NNomenclature (PE a) where
       UnknownSnPE rs      -> nNomenclature rs
       KnownSnPE g         -> nNomenclature g
 
-instance Shorthand a => Shorthand (PG a) where
+instance (Shorthand (CarbonChain a), Shorthand (TwoCombinedChains a)) => Shorthand (PG a) where
   shorthand =
     \case
       ClassLevelPG n      -> shorthand n
@@ -183,7 +185,7 @@ instance Shorthand a => Shorthand (PG a) where
       UnknownSnPG rs      -> shorthand rs
       KnownSnPG g         -> shorthand g
 
-instance NNomenclature a => NNomenclature (PG a) where
+instance (NNomenclature (CarbonChain a), NNomenclature (TwoCombinedChains a)) => NNomenclature (PG a) where
   nNomenclature =
     \case
       ClassLevelPG n      -> shorthand n
@@ -191,7 +193,7 @@ instance NNomenclature a => NNomenclature (PG a) where
       UnknownSnPG rs      -> nNomenclature rs
       KnownSnPG g         -> nNomenclature g
 
-instance Shorthand a => Shorthand (PGP a) where
+instance (Shorthand (CarbonChain a), Shorthand (TwoCombinedChains a)) => Shorthand (PGP a) where
   shorthand =
     \case
       ClassLevelPGP n      -> shorthand n
@@ -199,7 +201,7 @@ instance Shorthand a => Shorthand (PGP a) where
       UnknownSnPGP rs      -> shorthand rs
       KnownSnPGP g         -> shorthand g
 
-instance NNomenclature a => NNomenclature (PGP a) where
+instance (NNomenclature (CarbonChain a), NNomenclature (TwoCombinedChains a)) => NNomenclature (PGP a) where
   nNomenclature =
     \case
       ClassLevelPGP n      -> shorthand n
@@ -207,7 +209,7 @@ instance NNomenclature a => NNomenclature (PGP a) where
       UnknownSnPGP rs      -> nNomenclature rs
       KnownSnPGP g         -> nNomenclature g
 
-instance Shorthand a => Shorthand (PI a) where
+instance (Shorthand (CarbonChain a), Shorthand (TwoCombinedChains a)) => Shorthand (PI a) where
   shorthand =
     \case
       ClassLevelPI n      -> shorthand n
@@ -215,7 +217,7 @@ instance Shorthand a => Shorthand (PI a) where
       UnknownSnPI rs      -> shorthand rs
       KnownSnPI g         -> shorthand g
 
-instance NNomenclature a => NNomenclature (PI a) where
+instance (NNomenclature (CarbonChain a), NNomenclature (TwoCombinedChains a)) => NNomenclature (PI a) where
   nNomenclature =
     \case
       ClassLevelPI n      -> shorthand n
@@ -223,7 +225,7 @@ instance NNomenclature a => NNomenclature (PI a) where
       UnknownSnPI rs      -> nNomenclature rs
       KnownSnPI g         -> nNomenclature g
 
-instance Shorthand a => Shorthand (PIP a) where
+instance (Shorthand (CarbonChain a), Shorthand (TwoCombinedChains a)) => Shorthand (PIP a) where
   shorthand =
     \case
       ClassLevelPIP n      -> shorthand n
@@ -231,7 +233,7 @@ instance Shorthand a => Shorthand (PIP a) where
       UnknownSnPIP rs      -> shorthand rs
       KnownSnPIP g         -> shorthand g
 
-instance NNomenclature a => NNomenclature (PIP a) where
+instance (NNomenclature (CarbonChain a), NNomenclature (TwoCombinedChains a)) => NNomenclature (PIP a) where
   nNomenclature =
     \case
       ClassLevelPIP n      -> shorthand n
@@ -239,7 +241,7 @@ instance NNomenclature a => NNomenclature (PIP a) where
       UnknownSnPIP rs      -> nNomenclature rs
       KnownSnPIP g         -> nNomenclature g
 
-instance Shorthand a => Shorthand (PIP2 a) where
+instance (Shorthand (CarbonChain a), Shorthand (TwoCombinedChains a)) => Shorthand (PIP2 a) where
   shorthand =
     \case
       ClassLevelPIP2 n      -> shorthand n
@@ -247,7 +249,7 @@ instance Shorthand a => Shorthand (PIP2 a) where
       UnknownSnPIP2 rs      -> shorthand rs
       KnownSnPIP2 g         -> shorthand g
 
-instance NNomenclature a => NNomenclature (PIP2 a) where
+instance (NNomenclature (CarbonChain a), NNomenclature (TwoCombinedChains a)) => NNomenclature (PIP2 a) where
   nNomenclature =
     \case
       ClassLevelPIP2 n      -> shorthand n
@@ -255,7 +257,7 @@ instance NNomenclature a => NNomenclature (PIP2 a) where
       UnknownSnPIP2 rs      -> nNomenclature rs
       KnownSnPIP2 g         -> nNomenclature g
 
-instance Shorthand a => Shorthand (PIP3 a) where
+instance (Shorthand (CarbonChain a), Shorthand (TwoCombinedChains a)) => Shorthand (PIP3 a) where
   shorthand =
     \case
       ClassLevelPIP3 n      -> shorthand n
@@ -263,7 +265,7 @@ instance Shorthand a => Shorthand (PIP3 a) where
       UnknownSnPIP3 rs      -> shorthand rs
       KnownSnPIP3 g         -> shorthand g
 
-instance NNomenclature a => NNomenclature (PIP3 a) where
+instance (NNomenclature (CarbonChain a), NNomenclature (TwoCombinedChains a)) => NNomenclature (PIP3 a) where
   nNomenclature =
     \case
       ClassLevelPIP3 n      -> shorthand n
@@ -271,7 +273,7 @@ instance NNomenclature a => NNomenclature (PIP3 a) where
       UnknownSnPIP3 rs      -> nNomenclature rs
       KnownSnPIP3 g         -> nNomenclature g
 
-instance Shorthand a => Shorthand (PS a) where
+instance (Shorthand (CarbonChain a), Shorthand (TwoCombinedChains a)) => Shorthand (PS a) where
   shorthand =
     \case
       ClassLevelPS n      -> shorthand n
@@ -279,7 +281,7 @@ instance Shorthand a => Shorthand (PS a) where
       UnknownSnPS rs      -> shorthand rs
       KnownSnPS g         -> shorthand g
 
-instance NNomenclature a => NNomenclature (PS a) where
+instance (NNomenclature (CarbonChain a), NNomenclature (TwoCombinedChains a)) => NNomenclature (PS a) where
   nNomenclature =
     \case
       ClassLevelPS n      -> shorthand n

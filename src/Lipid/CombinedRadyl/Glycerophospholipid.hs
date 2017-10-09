@@ -13,6 +13,8 @@ Stability   : Experimental
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 
 module Lipid.CombinedRadyl.Glycerophospholipid where
@@ -28,10 +30,10 @@ newtype PA a = PA
 
 makeClassy ''PA
 
-instance Shorthand a => Shorthand (PA a) where
+instance Shorthand (TwoCombinedRadyls a) => Shorthand (PA a) where
   shorthand (PA rs) = "PA " <> shorthand rs
 
-instance NNomenclature a => NNomenclature (PA a) where
+instance NNomenclature (TwoCombinedRadyls a) => NNomenclature (PA a) where
   nNomenclature (PA rs) = "PA " <> nNomenclature rs
 
 instance HasTwoCombinedRadyls (PA a) a where
@@ -47,10 +49,10 @@ newtype PE a = PE
 
 makeClassy ''PE
 
-instance Shorthand a => Shorthand (PE a) where
+instance Shorthand (TwoCombinedRadyls a) => Shorthand (PE a) where
   shorthand (PE rs) = "PE " <> shorthand rs
 
-instance NNomenclature a => NNomenclature (PE a) where
+instance NNomenclature (TwoCombinedRadyls a) => NNomenclature (PE a) where
   nNomenclature (PE rs) = "PE " <> nNomenclature rs
 
 instance HasTwoCombinedRadyls (PE a) a where
@@ -66,10 +68,10 @@ newtype PC a = PC
 
 makeClassy ''PC
 
-instance Shorthand a => Shorthand (PC a) where
+instance Shorthand (TwoCombinedRadyls a) => Shorthand (PC a) where
   shorthand (PC rs) = "PC " <> shorthand rs
 
-instance NNomenclature a => NNomenclature (PC a) where
+instance NNomenclature (TwoCombinedRadyls a) => NNomenclature (PC a) where
   nNomenclature (PC rs) = "PC " <> nNomenclature rs
 
 instance HasTwoCombinedRadyls (PC a) a where
@@ -85,10 +87,10 @@ newtype PG a = PG
 
 makeClassy ''PG
 
-instance Shorthand a => Shorthand (PG a) where
+instance Shorthand (TwoCombinedRadyls a) => Shorthand (PG a) where
   shorthand (PG rs) = "PG " <> shorthand rs
 
-instance NNomenclature a => NNomenclature (PG a) where
+instance NNomenclature (TwoCombinedRadyls a) => NNomenclature (PG a) where
   nNomenclature (PG rs) = "PG " <> nNomenclature rs
 
 instance HasTwoCombinedRadyls (PG a) a where
@@ -104,10 +106,10 @@ newtype PS a = PS
 
 makeClassy ''PS
 
-instance Shorthand a => Shorthand (PS a) where
+instance Shorthand (TwoCombinedRadyls a) => Shorthand (PS a) where
   shorthand (PS rs) = "PS " <> shorthand rs
 
-instance NNomenclature a => NNomenclature (PS a) where
+instance NNomenclature (TwoCombinedRadyls a) => NNomenclature (PS a) where
   nNomenclature (PS rs) = "PS " <> nNomenclature rs
 
 instance HasTwoCombinedRadyls (PS a) a where
@@ -123,10 +125,10 @@ newtype PI a = PI
 
 makeClassy ''PI
 
-instance Shorthand a => Shorthand (PI a) where
+instance Shorthand (TwoCombinedRadyls a) => Shorthand (PI a) where
   shorthand (PI rs) = "PI " <> shorthand rs
 
-instance NNomenclature a => NNomenclature (PI a) where
+instance NNomenclature (TwoCombinedRadyls a) => NNomenclature (PI a) where
   nNomenclature (PI rs) = "PI " <> nNomenclature rs
 
 instance HasTwoCombinedRadyls (PI a) a where
@@ -142,10 +144,10 @@ newtype PGP a = PGP
 
 makeClassy ''PGP
 
-instance Shorthand a => Shorthand (PGP a) where
+instance Shorthand (TwoCombinedRadyls a) => Shorthand (PGP a) where
   shorthand (PGP rs) = "PGP " <> shorthand rs
 
-instance NNomenclature a => NNomenclature (PGP a) where
+instance NNomenclature (TwoCombinedRadyls a) => NNomenclature (PGP a) where
   nNomenclature (PGP rs) = "PGP " <> nNomenclature rs
 
 instance HasTwoCombinedRadyls (PGP a) a where
@@ -161,10 +163,10 @@ newtype PIP3 a = PIP3
 
 makeClassy ''PIP3
 
-instance Shorthand a => Shorthand (PIP3 a) where
+instance Shorthand (TwoCombinedRadyls a) => Shorthand (PIP3 a) where
   shorthand (PIP3 rs) = "PIP3 " <> shorthand rs
 
-instance NNomenclature a => NNomenclature (PIP3 a) where
+instance NNomenclature (TwoCombinedRadyls a) => NNomenclature (PIP3 a) where
   nNomenclature (PIP3 rs) = "PIP3 " <> nNomenclature rs
 
 instance HasTwoCombinedRadyls (PIP3 a) a where
@@ -181,10 +183,10 @@ data PIP a = PIP
 
 makeClassy ''PIP
 
-instance Shorthand a => Shorthand (PIP a) where
+instance Shorthand (TwoCombinedRadyls a) => Shorthand (PIP a) where
   shorthand (PIP h rs) = shorthand h <> shorthand rs
 
-instance NNomenclature a => NNomenclature (PIP a) where
+instance NNomenclature (TwoCombinedRadyls a) => NNomenclature (PIP a) where
   nNomenclature (PIP h rs) = shorthand h <> nNomenclature rs
 
 instance HasTwoCombinedRadyls (PIP a) a where
@@ -202,10 +204,10 @@ data PIP2 a = PIP2
 
 makeClassy ''PIP2
 
-instance Shorthand a => Shorthand (PIP2 a) where
+instance Shorthand (TwoCombinedRadyls a) => Shorthand (PIP2 a) where
   shorthand (PIP2 h rs) = shorthand h <> shorthand rs
 
-instance NNomenclature a => NNomenclature (PIP2 a) where
+instance NNomenclature (TwoCombinedRadyls a) => NNomenclature (PIP2 a) where
   nNomenclature (PIP2 h rs) = shorthand h <> nNomenclature rs
 
 instance HasTwoCombinedRadyls (PIP2 a) a where

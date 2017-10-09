@@ -11,6 +11,8 @@ Stability   : Experimental
 {-# LANGUAGE DeriveFunctor #-}
 {-# LANGUAGE DeriveFoldable #-}
 {-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 module Lipid.Glycerolipid where
 
@@ -50,21 +52,21 @@ data TG a
 
 makePrisms ''TG
 
-instance Shorthand a => Shorthand (MG a) where
+instance Shorthand (CarbonChain a) => Shorthand (MG a) where
   shorthand l =
     case l of
       ClassLevelMG c -> shorthand c
       UnknownSnMG r  -> shorthand r
-      KnownMG g        -> shorthand g
+      KnownMG g      -> shorthand g
 
-instance NNomenclature a => NNomenclature (MG a) where
+instance NNomenclature (CarbonChain a) => NNomenclature (MG a) where
   nNomenclature l =
     case l of
       ClassLevelMG c -> shorthand c
       UnknownSnMG g  -> nNomenclature g
-      KnownMG g        -> nNomenclature g
+      KnownMG g      -> nNomenclature g
 
-instance Shorthand a => Shorthand (DG a) where
+instance (Shorthand (CarbonChain a), Shorthand (TwoCombinedChains a)) => Shorthand (DG a) where
   shorthand l =
     case l of
       ClassLevelDG c      -> shorthand c
@@ -72,7 +74,7 @@ instance Shorthand a => Shorthand (DG a) where
       UnknownSnDG g       -> shorthand g
       KnownDG g           -> shorthand g
 
-instance NNomenclature a => NNomenclature (DG a) where
+instance (NNomenclature (CarbonChain a), NNomenclature (TwoCombinedChains a)) => NNomenclature (DG a) where
   nNomenclature l =
     case l of
       ClassLevelDG c      -> shorthand c
@@ -80,7 +82,7 @@ instance NNomenclature a => NNomenclature (DG a) where
       UnknownSnDG g       -> nNomenclature g
       KnownDG g           -> nNomenclature g
 
-instance Shorthand a => Shorthand (TG a) where
+instance (Shorthand (CarbonChain a), Shorthand (ThreeCombinedChains a)) => Shorthand (TG a) where
   shorthand l =
     case l of
       ClassLevelTG c       -> shorthand c
@@ -88,7 +90,7 @@ instance Shorthand a => Shorthand (TG a) where
       UnknownSnTG g        -> shorthand g
       KnownSnTG g          -> shorthand g
 
-instance NNomenclature a => NNomenclature (TG a) where
+instance (NNomenclature (CarbonChain a), NNomenclature (ThreeCombinedChains a)) => NNomenclature (TG a) where
   nNomenclature l =
     case l of
       ClassLevelTG c       -> shorthand c

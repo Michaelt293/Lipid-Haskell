@@ -10,6 +10,8 @@ Stability   : experimental
 {-# LANGUAGE DeriveFunctor #-}
 {-# LANGUAGE DeriveFoldable #-}
 {-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 module Lipid.FattyAcid
     ( FA(..)
@@ -27,11 +29,11 @@ data FA a
 
 makePrisms ''FA
 
-instance Shorthand a => Shorthand (FA a) where
+instance Shorthand (CarbonChain a) => Shorthand (FA a) where
     shorthand (ClassLevelFA x) = "FA " <> wrapParen (show x)
     shorthand (FA x)           = "FA " <> shorthand x
 
-instance NNomenclature a => NNomenclature (FA a) where
+instance NNomenclature (CarbonChain a) => NNomenclature (FA a) where
     nNomenclature (ClassLevelFA x) = "FA " <> wrapParen (show x)
     nNomenclature (FA x)           = "FA " <> nNomenclature x
 

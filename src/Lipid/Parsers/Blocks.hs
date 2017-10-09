@@ -54,8 +54,8 @@ doubleBondWithGeometryP p = do
   geo <- optional geometryP
   return $ DoubleBond pos geo
 
-doubleBondP :: Parser a -> Parser (DoubleBond a)
-doubleBondP p = (`DoubleBond` Nothing) <$> p
+-- doubleBondP :: Parser a -> Parser (DoubleBond a)
+-- doubleBondP p = (`DoubleBond` Nothing) <$> p
 
 carbonChainDeltaP :: Parser (CarbonChain DeltaPosition)
 carbonChainDeltaP = do
@@ -82,7 +82,7 @@ carbonChainOmegaP = do
   numCs <- numCarbonsP
   _ <- char ':'
   numDb <- numDoubleBondsP -- error "Number of double bonds does not equal the number of double bonds provided"
-  doublebonds <- list $ doubleBondP omegaPositionP
+  doublebonds <- list $ doubleBondWithGeometryP omegaPositionP
   return $
     if | length doublebonds == fromIntegral numDb ->
            CarbonChain numCs doublebonds
@@ -98,7 +98,7 @@ carbonChainMaybeOmegaP = do
   numCs <- numCarbonsP
   _ <- char ':'
   numDb <- numDoubleBondsP
-  doublebonds <- optional . list $ doubleBondP maybeOmegaPositionP
+  doublebonds <- optional . list $ doubleBondWithGeometryP maybeOmegaPositionP
   return $
     case doublebonds of
       Nothing -> CarbonChain numCs $
@@ -206,23 +206,45 @@ phosphatidylinositolTrisphosphateP :: Parser PhosphatidylinositolTrisphosphate
 phosphatidylinositolTrisphosphateP =
   string "PIP3" >> pure PhosphatidylinositolTrisphosphate
 
-combinedRadylP :: Parser a -> Parser ([Linkage], NumCarbons, [[DoubleBond a]])
+combinedRadylMaybeP :: Parser (Maybe a)
+                    -> Parser ([Linkage], NumCarbons, NumDoubleBonds, [[DoubleBond (Maybe a)]])
+combinedRadylMaybeP p = do
+  ls <- sepBy linkageP (char ',')
+  cs <- numCarbonsP
+  _ <- char ':'
+  numDb <- numDoubleBondsP -- error if numDb /= length (concat dbs)
+  dbs <- many . list $ doubleBondWithGeometryP p
+  return (ls, cs, numDb, dbs)
+
+combinedRadylP :: Parser a
+               -> Parser ([Linkage], NumCarbons, NumDoubleBonds, [[DoubleBond a]])
 combinedRadylP p = do
   ls <- sepBy linkageP (char ',')
   cs <- numCarbonsP
   _ <- char ':'
+  numDb <- numDoubleBondsP -- error if numDb /= length (concat dbs)
   dbs <- many . list $ doubleBondWithGeometryP p
-  return (ls, cs, dbs)
+  return (ls, cs, numDb, dbs)
+
+twoCombinedRadylsMaybeP :: Parser (Maybe a) -> Parser (TwoCombinedRadyls (Maybe a))
+twoCombinedRadylsMaybeP p = do
+  (ls, cs, numDb, dbs) <- combinedRadylMaybeP p
+  return . TwoCombinedRadyls ls $ TwoCombinedChains cs numDb dbs
 
 twoCombinedRadylsP :: Parser a -> Parser (TwoCombinedRadyls a)
 twoCombinedRadylsP p = do
-  (ls, cs, dbs) <- combinedRadylP p
-  return . TwoCombinedRadyls ls $ TwoCombinedChains cs dbs
+  (ls, cs, numDb, dbs) <- combinedRadylP p
+  return . TwoCombinedRadyls ls $ TwoCombinedChains cs numDb dbs
 
 threeCombinedRadylsP :: Parser a -> Parser (ThreeCombinedRadyls a)
 threeCombinedRadylsP p = do
-  (ls, cs, dbs) <- combinedRadylP p
-  return . ThreeCombinedRadyls ls $ ThreeCombinedChains cs dbs
+  (ls, cs, numDb, dbs) <- combinedRadylP p
+  return . ThreeCombinedRadyls ls $ ThreeCombinedChains cs numDb dbs
+
+threeCombinedRadylsMaybeP :: Parser (Maybe a) -> Parser (ThreeCombinedRadyls (Maybe a))
+threeCombinedRadylsMaybeP p = do
+  (ls, cs, numDb, dbs) <- combinedRadylMaybeP p
+  return . ThreeCombinedRadyls ls $ ThreeCombinedChains cs numDb dbs
 
 -- Helper function used in QuasiQuoters
 notHandled :: String -> a
@@ -264,6 +286,8 @@ $(deriveLift ''TwoCombinedRadyls)
 $(deriveLift ''ThreeCombinedRadyls)
 
 $(deriveLift ''CarbonChain)
+
+$(deriveLift ''NumDoubleBonds)
 
 $(deriveLift ''TwoCombinedChains)
 

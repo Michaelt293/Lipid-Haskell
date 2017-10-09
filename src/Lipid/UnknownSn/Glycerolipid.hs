@@ -13,6 +13,8 @@ Stability   : Experimental
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
 
@@ -75,20 +77,20 @@ instance ToElementalComposition (TG a) where
     <> toElementalComposition rs
   charge (TG rs) = charge rs
 
-instance Shorthand a => Shorthand (MG a) where
+instance Shorthand (Radyl a) => Shorthand (MG a) where
   shorthand (MG r) = "MG " <> shorthand r
 
-instance NNomenclature a => NNomenclature (MG a) where
+instance NNomenclature (Radyl a) => NNomenclature (MG a) where
     nNomenclature (MG r) = "MG " <> nNomenclature r
 
-instance Shorthand a => Shorthand (DG a) where
+instance Shorthand (TwoRadyls a) => Shorthand (DG a) where
     shorthand (DG rs) = "DG " <> shorthand rs
 
-instance NNomenclature a => NNomenclature (DG a) where
+instance NNomenclature (TwoRadyls a) => NNomenclature (DG a) where
     nNomenclature (DG rs) = "DG " <> nNomenclature rs
 
-instance Shorthand a => Shorthand (TG a) where
+instance Shorthand (ThreeRadyls a) => Shorthand (TG a) where
   shorthand (TG rs) = "TG " <> shorthand rs
 
-instance NNomenclature a => NNomenclature (TG a) where
+instance NNomenclature (ThreeRadyls a) => NNomenclature (TG a) where
   nNomenclature (TG rs) = "TG " <> nNomenclature rs
