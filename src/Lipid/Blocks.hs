@@ -339,6 +339,7 @@ data TwoCombinedChains a = TwoCombinedChains
 
 makeClassy ''TwoCombinedChains
 
+renderNumCarbonCombinedNumDbs :: (Show a, Show a1) => a1 -> a -> String
 renderNumCarbonCombinedNumDbs cs dbs =
   show cs <> ":" <> show dbs
 
@@ -609,6 +610,7 @@ instance ( ToElementalComposition a
     <> toElementalComposition c
   charge (Glycerol a b c) = charge a +++ charge b +++ charge c
 
+(+++) :: Num a => Maybe a -> Maybe a -> Maybe a
 Just x +++ Just y = Just $ x + y
 _ +++ _           = Nothing
 

@@ -14,11 +14,9 @@ module Lipid.Parsers.CombinedRadyl.Glycerolipid where
 import Lipid.Parsers.Blocks
 import Lipid.CombinedRadyl.Glycerolipid
 import Lipid.Blocks
-import Data.Monoid ((<>))
 import Text.Megaparsec
 import Text.Megaparsec.String
 import Language.Haskell.TH.Quote
-import Language.Haskell.TH.Syntax
 import Language.Haskell.TH.Lift
 
 tgP :: Parser a -> Parser (TG a)

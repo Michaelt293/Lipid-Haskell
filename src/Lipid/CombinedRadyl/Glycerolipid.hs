@@ -21,7 +21,6 @@ import Isotope
 import Lipid.Blocks
 import Control.Lens (makeLenses)
 import Data.Monoid ((<>))
-import Data.List (sort)
 
 newtype TG a = TG
   { _getTG :: ThreeCombinedRadyls a
