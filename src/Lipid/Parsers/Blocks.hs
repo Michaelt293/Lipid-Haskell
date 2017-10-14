@@ -89,10 +89,10 @@ carbonChainOmegaP = do
   return $
     if | length doublebonds' == fromIntegral numDb ->
            CarbonChain numCs doublebonds'
-       | length doublebonds == 1 ->
+       | length doublebonds' == 1 ->
            CarbonChain numCs .
              take (fromIntegral numDb) $
-             (`DoubleBond` Nothing) <$> iterate (+3) (head doublebonds'^.dbPosition)
+             iterate (dbPosition %~ (+3)) (head doublebonds')
        | otherwise ->
            error "Number of double bonds does not equal the number of double bonds provided"
 
@@ -106,7 +106,14 @@ carbonChainMaybeOmegaP = do
     case doublebonds of
       Nothing -> CarbonChain numCs $
         replicate (fromIntegral numDb) (DoubleBond Nothing Nothing)
-      Just dbs -> CarbonChain numCs dbs
+      Just dbs -> if | length dbs == fromIntegral numDb ->
+                         CarbonChain numCs dbs
+                     | length dbs == 1 ->
+                         CarbonChain numCs .
+                           take (fromIntegral numDb) $
+                           iterate ((dbPosition . _Just) %~ (+3)) (head dbs)
+                      | otherwise ->
+                          error "Number of double bonds does not equal the number of double bonds provided"
 
 -- adapted from CIS194 Monads II lecture
 list :: Parser a -> Parser [a]
@@ -125,29 +132,23 @@ linkageP = do
     (Just "P-") -> pure Alkenyl
     _ -> pure Acyl
 
-radylDeltaP :: Parser (Radyl DeltaPosition)
-radylDeltaP = do
+radylP :: Parser (CarbonChain a) -> Parser (Radyl a)
+radylP p = do
   link <- linkageP
-  chain <- carbonChainDeltaP
+  chain <- p
   return $ Radyl link chain
+
+radylDeltaP :: Parser (Radyl DeltaPosition)
+radylDeltaP = radylP carbonChainDeltaP
 
 radylMaybeDeltaP :: Parser (Radyl (Maybe DeltaPosition))
-radylMaybeDeltaP = do
-  link <- linkageP
-  chain <- carbonChainMaybeDeltaP
-  return $ Radyl link chain
+radylMaybeDeltaP = radylP carbonChainMaybeDeltaP
 
 radylOmegaP :: Parser (Radyl OmegaPosition)
-radylOmegaP = do
-  link <- linkageP
-  chain <- carbonChainOmegaP
-  return $ Radyl link chain
+radylOmegaP = radylP carbonChainOmegaP
 
 radylMaybeOmegaP :: Parser (Radyl (Maybe OmegaPosition))
-radylMaybeOmegaP = do
-  link <- linkageP
-  chain <- carbonChainMaybeOmegaP
-  return $ Radyl link chain
+radylMaybeOmegaP = radylP carbonChainMaybeOmegaP
 
 twoRadylsP :: Parser (Radyl a) -> Parser (TwoRadyls a)
 twoRadylsP p = do

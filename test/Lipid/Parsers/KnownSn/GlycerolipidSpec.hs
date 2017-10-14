@@ -16,7 +16,6 @@ import Test.Hspec
 import Lipid.KnownSn.Glycerolipid
 import Lipid.Parsers.KnownSn.Glycerolipid
 
-
 spec :: Spec
 spec = do
   describe "Test for quasiquoters and Shorthand instances" $ do
@@ -34,7 +33,7 @@ spec = do
       shorthand [tgMaybeDelta|TG 16:0/18:1(9Z)/22:6(4,7,10,?,16,19)|] `shouldBe` "TG 16:0/18:1(9Z)/22:6(4,7,10,?,16,19)"
     it "QuasiQuoter for TG 16:0/18:1(9Z)/22:6(4Z,7Z,10Z,13Z,16Z,19Z)" $
       shorthand [tgDelta|TG 16:0/18:1(9Z)/22:6(4Z,7Z,10Z,13Z,16Z,19Z)|] `shouldBe` "TG 16:0/18:1(9Z)/22:6(4Z,7Z,10Z,13Z,16Z,19Z)"
-    it "QuasiQuoter for DG 12:0/14:0/15:0" $
+    it "QuasiQuoter for DG 0:0/14:0/15:0" $
       shorthand @ (DG DeltaPosition) [dgDelta|DG 0:0/14:0/15:0|] `shouldBe` "DG 0:0/14:0/15:0"
   describe "Test for quasiquoters and NNomenclature instances" $ do
     it "QuasiQuoter for TG 16:0/18:1/22:6|" $

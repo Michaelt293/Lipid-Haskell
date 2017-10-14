@@ -846,11 +846,11 @@ instance Ord a => Ord (ThreeRadyls a) where
 
 instance Shorthand (Radyl a) => Shorthand (ThreeRadyls a) where
   shorthand (ThreeRadyls r1 r2 r3) =
-    shorthand r1 <> "_" <> shorthand r2 <> shorthand r3
+    shorthand r1 <> "_" <> shorthand r2 <> "_" <> shorthand r3
 
 instance (NNomenclature (Radyl a)) => NNomenclature (ThreeRadyls a) where
   nNomenclature (ThreeRadyls r1 r2 r3) =
-    nNomenclature r1 <> "_" <> nNomenclature r2 <> nNomenclature r3
+    nNomenclature r1 <> "_" <> nNomenclature r2 <> "_" <> nNomenclature r3
 
 instance ToElementalComposition (ThreeRadyls a) where
   toElementalComposition (ThreeRadyls r1 r2 r3) =
