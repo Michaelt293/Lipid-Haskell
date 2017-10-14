@@ -73,7 +73,7 @@ quoteTgMaybeDelta s =
 tgMaybeDelta :: QuasiQuoter
 tgMaybeDelta = QuasiQuoter
   { quoteExp  = quoteTgMaybeDelta
-  , quotePat  = notHandled "patterns" 
+  , quotePat  = notHandled "patterns"
   , quoteType = notHandled "types" "tgMaybeDelta"
   , quoteDec  = notHandled "declarations" "tgMaybeDelta"
   }
@@ -124,7 +124,7 @@ dg23P p = do
   return . DG23 $ Glycerol GlycerolHydroxyl r2 r3
 
 dgP :: Parser (Radyl a) -> Parser (DG a)
-dgP p = string "DG " *> dg12P p <|> dg13P p <|> dg23P p
+dgP p = string "DG " *> (try (dg12P p) <|> try (dg13P p) <|> dg23P p)
 
 dgDeltaP :: Parser (DG DeltaPosition)
 dgDeltaP = dgP radylDeltaP
@@ -140,7 +140,7 @@ dgMaybeOmegaP = dgP radylMaybeOmegaP
 
 quoteDgDelta :: String -> Q Exp
 quoteDgDelta s =
-  case parse (tgDeltaP <* eof) "" s of
+  case parse (dgDeltaP <* eof) "" s of
     Left err -> fail $
       "Could not parse elemental formula!\n" <> parseErrorPretty err
     Right v  -> lift v

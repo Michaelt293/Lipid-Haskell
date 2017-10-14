@@ -17,9 +17,7 @@ module Lipid.KnownSn.Glycerolipid where
 
 import Isotope
 import Lipid.Blocks
-import Lipid.Format
 import Control.Lens
-import Control.Applicative
 import Data.Monoid ((<>))
 
 newtype TG a = TG
@@ -210,7 +208,7 @@ instance Shorthand (Radyl a) => Shorthand (MG a) where
 
 instance NNomenclature (Radyl a) => NNomenclature (TG a) where
   nNomenclature (TG (Glycerol r1 r2 r3)) =
-    "TG" <> nNomenclature r1 <> "/" <> nNomenclature r2 <> "/" <> nNomenclature r3
+    "TG " <> nNomenclature r1 <> "/" <> nNomenclature r2 <> "/" <> nNomenclature r3
 
 instance NNomenclature (Radyl a) => NNomenclature (DG a) where
   nNomenclature =

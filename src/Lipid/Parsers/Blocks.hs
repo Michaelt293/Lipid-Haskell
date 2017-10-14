@@ -17,6 +17,7 @@ import Lipid.Blocks
 import Control.Lens
 import Control.Applicative
 import Data.Monoid ((<>))
+import Data.Maybe (fromMaybe)
 import Text.Megaparsec
 import Text.Megaparsec.String
 import qualified Text.Megaparsec.Lexer as L
@@ -62,8 +63,9 @@ carbonChainDeltaP = do
   numCs <- numCarbonsP
   _ <- char ':'
   _ <- numDoubleBondsP -- error "Number of double bonds does not equal the number of double bonds provided"
-  doublebonds <- list $ doubleBondWithGeometryP deltaPositionP
-  return $ CarbonChain numCs doublebonds
+  doublebonds <- optional . list $ doubleBondWithGeometryP deltaPositionP
+  let doublebonds' = fromMaybe [] doublebonds
+  return $ CarbonChain numCs doublebonds'
 
 carbonChainMaybeDeltaP :: Parser (CarbonChain (Maybe DeltaPosition))
 carbonChainMaybeDeltaP = do
@@ -82,14 +84,15 @@ carbonChainOmegaP = do
   numCs <- numCarbonsP
   _ <- char ':'
   numDb <- numDoubleBondsP -- error "Number of double bonds does not equal the number of double bonds provided"
-  doublebonds <- list $ doubleBondWithGeometryP omegaPositionP
+  doublebonds <- optional . list $ doubleBondWithGeometryP omegaPositionP
+  let doublebonds' = fromMaybe [] doublebonds
   return $
-    if | length doublebonds == fromIntegral numDb ->
-           CarbonChain numCs doublebonds
+    if | length doublebonds' == fromIntegral numDb ->
+           CarbonChain numCs doublebonds'
        | length doublebonds == 1 ->
            CarbonChain numCs .
              take (fromIntegral numDb) $
-             (`DoubleBond` Nothing) <$> iterate (+3) (head doublebonds^.dbPosition)
+             (`DoubleBond` Nothing) <$> iterate (+3) (head doublebonds'^.dbPosition)
        | otherwise ->
            error "Number of double bonds does not equal the number of double bonds provided"
 

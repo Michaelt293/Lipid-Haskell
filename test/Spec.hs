@@ -9,6 +9,7 @@ import Lipid.Parsers.ClassLevel.GlycerolipidSpec
 import Lipid.Parsers.ClassLevel.GlycerophospholipidSpec
 import Lipid.Parsers.CombinedRadyl.GlycerolipidSpec
 import Lipid.Parsers.CombinedRadyl.GlycerophospholipidSpec
+import Lipid.Parsers.KnownSn.GlycerolipidSpec
 
 
 main :: IO ()
@@ -24,3 +25,5 @@ main = hspec $ do
     Lipid.Parsers.CombinedRadyl.GlycerolipidSpec.spec
   describe "CombinedRadyl level Glycerophospholipid QuasiQuoter"
     Lipid.Parsers.CombinedRadyl.GlycerophospholipidSpec.spec
+  describe "KnownSn level Glycerolipid QuasiQuoter"
+    Lipid.Parsers.KnownSn.GlycerolipidSpec.spec

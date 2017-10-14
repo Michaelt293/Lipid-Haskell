@@ -61,6 +61,7 @@ test-suite Lipid-Haskell-test
                      , Lipid.Parsers.ClassLevel.GlycerophospholipidSpec
                      , Lipid.Parsers.CombinedRadyl.GlycerolipidSpec
                      , Lipid.Parsers.CombinedRadyl.GlycerophospholipidSpec
+                     , Lipid.Parsers.KnownSn.GlycerolipidSpec
 
   main-is:             Spec.hs
   build-depends:       base
