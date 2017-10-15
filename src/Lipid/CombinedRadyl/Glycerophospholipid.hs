@@ -184,10 +184,10 @@ data PIP a = PIP
 makeClassy ''PIP
 
 instance Shorthand (TwoCombinedRadyls a) => Shorthand (PIP a) where
-  shorthand (PIP h rs) = shorthand h <> shorthand rs
+  shorthand (PIP h rs) = shorthand h <> " " <> shorthand rs
 
 instance NNomenclature (TwoCombinedRadyls a) => NNomenclature (PIP a) where
-  nNomenclature (PIP h rs) = shorthand h <> nNomenclature rs
+  nNomenclature (PIP h rs) = shorthand h <> " " <> nNomenclature rs
 
 instance HasTwoCombinedRadyls (PIP a) a where
   twoCombinedRadyls = twoCombinedRadylsPIP
@@ -205,10 +205,10 @@ data PIP2 a = PIP2
 makeClassy ''PIP2
 
 instance Shorthand (TwoCombinedRadyls a) => Shorthand (PIP2 a) where
-  shorthand (PIP2 h rs) = shorthand h <> shorthand rs
+  shorthand (PIP2 h rs) = shorthand h <> " " <> shorthand rs
 
 instance NNomenclature (TwoCombinedRadyls a) => NNomenclature (PIP2 a) where
-  nNomenclature (PIP2 h rs) = shorthand h <> nNomenclature rs
+  nNomenclature (PIP2 h rs) = shorthand h <> " " <> nNomenclature rs
 
 instance HasTwoCombinedRadyls (PIP2 a) a where
   twoCombinedRadyls = twoCombinedRadylsPIP2

@@ -14,11 +14,9 @@ module Lipid.Parsers.CombinedRadyl.Glycerophospholipid where
 import Lipid.Parsers.Blocks
 import Lipid.CombinedRadyl.Glycerophospholipid
 import Lipid.Blocks
-import Data.Monoid ((<>))
 import Text.Megaparsec
 import Text.Megaparsec.String
 import Language.Haskell.TH.Quote
-import Language.Haskell.TH.Syntax
 import Language.Haskell.TH.Lift
 
 paP :: Parser a -> Parser (PA a)
@@ -231,16 +229,16 @@ pipMaybeOmegaP :: Parser (PIP (Maybe OmegaPosition))
 pipMaybeOmegaP = pipP maybeOmegaPositionP
 
 pipDelta :: QuasiQuoter
-pipDelta = qQuoter piDeltaP
+pipDelta = qQuoter pipDeltaP
 
 pipMaybeDelta :: QuasiQuoter
-pipMaybeDelta = qQuoter piMaybeDeltaP
+pipMaybeDelta = qQuoter pipMaybeDeltaP
 
 pipOmega :: QuasiQuoter
-pipOmega = qQuoter piOmegaP
+pipOmega = qQuoter pipOmegaP
 
 pipMaybeOmega :: QuasiQuoter
-pipMaybeOmega = qQuoter piMaybeOmegaP
+pipMaybeOmega = qQuoter pipMaybeOmegaP
 
 pip2P :: Parser a -> Parser (PIP2 a)
 pip2P p = do
@@ -262,16 +260,16 @@ pip2MaybeOmegaP :: Parser (PIP2 (Maybe OmegaPosition))
 pip2MaybeOmegaP = pip2P maybeOmegaPositionP
 
 pip2Delta :: QuasiQuoter
-pip2Delta = qQuoter piDeltaP
+pip2Delta = qQuoter pip2DeltaP
 
 pip2MaybeDelta :: QuasiQuoter
-pip2MaybeDelta = qQuoter piMaybeDeltaP
+pip2MaybeDelta = qQuoter pip2MaybeDeltaP
 
 pip2Omega :: QuasiQuoter
-pip2Omega = qQuoter piOmegaP
+pip2Omega = qQuoter pip2OmegaP
 
 pip2MaybeOmega :: QuasiQuoter
-pip2MaybeOmega = qQuoter piMaybeOmegaP
+pip2MaybeOmega = qQuoter pip2MaybeOmegaP
 
 $(deriveLift ''PA)
 

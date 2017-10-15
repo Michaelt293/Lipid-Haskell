@@ -36,7 +36,7 @@ spec = do
     it "QuasiQuoter for DG 0:0/14:0/15:0" $
       shorthand @ (DG DeltaPosition) [dgDelta|DG 0:0/14:0/15:0|] `shouldBe` "DG 0:0/14:0/15:0"
   describe "Test for quasiquoters and NNomenclature instances" $ do
-    it "QuasiQuoter for TG 16:0/18:1/22:6|" $
+    it "QuasiQuoter for TG 16:0/18:1/22:6" $
       nNomenclature @ (TG (Maybe OmegaPosition)) [tgMaybeOmega|TG 16:0/18:1/22:6|] `shouldBe` "TG 16:0/18:1/22:6"
     it "QuasiQuoter for DG 0:0/16:0/22:6" $
       nNomenclature @ (DG (Maybe OmegaPosition)) [dgMaybeOmega|DG 0:0/16:0/22:6|] `shouldBe` "DG 0:0/16:0/22:6"

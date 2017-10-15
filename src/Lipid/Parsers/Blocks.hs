@@ -111,7 +111,7 @@ carbonChainMaybeOmegaP = do
                      | length dbs == 1 ->
                          CarbonChain numCs .
                            take (fromIntegral numDb) $
-                           iterate ((dbPosition . _Just) %~ (+3)) (head dbs)
+                           iterate (dbPosition . _Just %~ (+3)) (head dbs)
                       | otherwise ->
                           error "Number of double bonds does not equal the number of double bonds provided"
 
@@ -192,19 +192,19 @@ phosphatidylinositolP = string "PI" >> pure Phosphatidylinositol
 
 phosphatidylinositolMonophosphateP :: Parser PhosphatidylinositolMonophosphate
 phosphatidylinositolMonophosphateP = do
-  _ <- string "PIP["
+  _ <- string "PIP"
   option PhosphatidylinositolMonophosphate $
-    (string "5′]" >> pure Phosphatidylinositol5Phosphate) <|>
-    (string "4′]" >> pure Phosphatidylinositol4Phosphate) <|>
-    (string "3′]" >> pure Phosphatidylinositol3Phosphate)
+    (string "[5′]" >> pure Phosphatidylinositol5Phosphate) <|>
+    (string "[4′]" >> pure Phosphatidylinositol4Phosphate) <|>
+    (string "[3′]" >> pure Phosphatidylinositol3Phosphate)
 
 phosphatidylinositolBisphosphateP :: Parser PhosphatidylinositolBisphosphate
 phosphatidylinositolBisphosphateP = do
-  _ <- string "PIP2["
+  _ <- string "PIP2"
   option PhosphatidylinositolBisphosphate $
-    (string "3′,4′]" >> pure Phosphatidylinositol34Bisphosphate) <|>
-    (string "3′,5′]" >> pure Phosphatidylinositol35Bisphosphate) <|>
-    (string "4′,5′]" >> pure Phosphatidylinositol45Bisphosphate)
+    (string "[3′,4′]" >> pure Phosphatidylinositol34Bisphosphate) <|>
+    (string "[3′,5′]" >> pure Phosphatidylinositol35Bisphosphate) <|>
+    (string "[4′,5′]" >> pure Phosphatidylinositol45Bisphosphate)
 
 phosphatidylinositolTrisphosphateP :: Parser PhosphatidylinositolTrisphosphate
 phosphatidylinositolTrisphosphateP =
