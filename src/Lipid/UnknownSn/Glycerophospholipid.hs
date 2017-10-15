@@ -182,10 +182,10 @@ data PIP a = PIP
 makeClassy ''PIP
 
 instance Shorthand (TwoRadyls a) => Shorthand (PIP a) where
-  shorthand (PIP h rs) = shorthand h <> shorthand rs
+  shorthand (PIP h rs) = shorthand h <> " " <> shorthand rs
 
 instance NNomenclature (TwoRadyls a) => NNomenclature (PIP a) where
-  nNomenclature (PIP h rs) = shorthand h <> nNomenclature rs
+  nNomenclature (PIP h rs) = shorthand h <> " " <> nNomenclature rs
 
 instance AllRadyls PIP where
   allRadyls f (PIP h (TwoRadyls r1 r2)) =
@@ -202,10 +202,10 @@ data PIP2 a = PIP2
 makeClassy ''PIP2
 
 instance Shorthand (TwoRadyls a) => Shorthand (PIP2 a) where
-  shorthand (PIP2 h rs) = shorthand h <> shorthand rs
+  shorthand (PIP2 h rs) = shorthand h <> " " <> shorthand rs
 
 instance NNomenclature (TwoRadyls a) => NNomenclature (PIP2 a) where
-  nNomenclature (PIP2 h rs) = shorthand h <> nNomenclature rs
+  nNomenclature (PIP2 h rs) = shorthand h <> " " <> nNomenclature rs
 
 instance AllRadyls PIP2 where
   allRadyls f (PIP2 h (TwoRadyls r1 r2)) =

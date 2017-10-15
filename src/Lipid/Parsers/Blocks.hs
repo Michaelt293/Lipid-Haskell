@@ -181,8 +181,8 @@ phosphatidylcholineP = string "PC" >> pure Phosphatidylcholine
 phosphatidylglycerolP :: Parser Phosphatidylglycerol
 phosphatidylglycerolP = string "PG" >> pure Phosphatidylglycerol
 
-phosphatidylgylcerolphosphate :: Parser Phosphatidylgylcerolphosphate
-phosphatidylgylcerolphosphate = string "PGP" >> pure Phosphatidylgylcerolphosphate
+phosphatidylgylcerolphosphateP :: Parser Phosphatidylgylcerolphosphate
+phosphatidylgylcerolphosphateP = string "PGP" >> pure Phosphatidylgylcerolphosphate
 
 phosphatidylserineP :: Parser Phosphatidylserine
 phosphatidylserineP = string "PS" >> pure Phosphatidylserine

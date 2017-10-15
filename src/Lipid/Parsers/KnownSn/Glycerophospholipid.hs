@@ -14,11 +14,9 @@ module Lipid.Parsers.KnownSn.Glycerophospholipid where
 import Lipid.Parsers.Blocks
 import Lipid.KnownSn.Glycerophospholipid
 import Lipid.Blocks
-import Data.Monoid ((<>))
 import Text.Megaparsec
 import Text.Megaparsec.String
 import Language.Haskell.TH.Quote
-import Language.Haskell.TH.Syntax
 import Language.Haskell.TH.Lift
 
 glyceroPhospholipidP :: Parser a -> Parser b -> Parser (Glycerol b b a)
@@ -138,19 +136,19 @@ pgOmega = qQuoter pgOmegaP
 pgMaybeOmega :: QuasiQuoter
 pgMaybeOmega = qQuoter pgMaybeOmegaP
 
-pgpP :: Parser (Radyl a) -> Parser (PC a)
-pgpP p = PC <$> glyceroPhospholipidP phosphatidylcholineP p
+pgpP :: Parser (Radyl a) -> Parser (PGP a)
+pgpP p = PGP <$> glyceroPhospholipidP phosphatidylgylcerolphosphateP p
 
-pgpDeltaP :: Parser (PC DeltaPosition)
+pgpDeltaP :: Parser (PGP DeltaPosition)
 pgpDeltaP = pgpP radylDeltaP
 
-pgpMaybeDeltaP :: Parser (PC (Maybe DeltaPosition))
+pgpMaybeDeltaP :: Parser (PGP (Maybe DeltaPosition))
 pgpMaybeDeltaP = pgpP radylMaybeDeltaP
 
-pgpOmegaP :: Parser (PC OmegaPosition)
+pgpOmegaP :: Parser (PGP OmegaPosition)
 pgpOmegaP = pgpP radylOmegaP
 
-pgpMaybeOmegaP :: Parser (PC (Maybe OmegaPosition))
+pgpMaybeOmegaP :: Parser (PGP (Maybe OmegaPosition))
 pgpMaybeOmegaP = pgpP radylMaybeOmegaP
 
 pgpDelta :: QuasiQuoter
