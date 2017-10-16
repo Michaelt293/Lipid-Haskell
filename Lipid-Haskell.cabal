@@ -31,6 +31,7 @@ library
                    , Lipid.ClassLevel.Glycerolipid
                    , Lipid.ClassLevel.Glycerophospholipid
                    , Lipid.Parsers.Blocks
+                   , Lipid.Parsers.FattyAcid
                    , Lipid.Parsers.ClassLevel.Glycerolipid
                    , Lipid.Parsers.ClassLevel.Glycerophospholipid
                    , Lipid.Parsers.CombinedRadyl.Glycerolipid
@@ -65,6 +66,7 @@ test-suite Lipid-Haskell-test
                      , Lipid.Parsers.UnknownSn.GlycerolipidSpec
                      , Lipid.Parsers.KnownSn.GlycerophospholipidSpec
                      , Lipid.Parsers.UnknownSn.GlycerophospholipidSpec
+                     , Lipid.Parsers.FattyAcidSpec
   main-is:             Spec.hs
   build-depends:       base
                      , Lipid-Haskell

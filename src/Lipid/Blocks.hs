@@ -800,7 +800,7 @@ newtype ClassLevel = ClassLevel
 makeClassy ''ClassLevel
 
 instance Show ClassLevel where
-  show (ClassLevel n) = show n
+  show (ClassLevel n) = "(" <> show n <> ")"
 
 data TwoRadyls a = TwoRadyls
   { radyl1Di :: Radyl a

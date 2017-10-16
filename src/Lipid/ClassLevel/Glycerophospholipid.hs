@@ -21,7 +21,7 @@ newtype PA = PA
 makeClassy ''PA
 
 instance Shorthand PA where
-  shorthand (PA n) = "PA (" <> show n <> ")"
+  shorthand (PA n) = "PA " <> show n
 
 instance HasClassLevel PA where
   classLevel = getPA
@@ -33,7 +33,7 @@ newtype PE = PE
 makeClassy ''PE
 
 instance Shorthand PE where
-  shorthand (PE n) = "PE (" <> show n <> ")"
+  shorthand (PE n) = "PE " <> show n
 
 instance HasClassLevel PE where
   classLevel = getPE
@@ -45,7 +45,7 @@ newtype PC = PC
 makeClassy ''PC
 
 instance Shorthand PC where
-  shorthand (PC n) = "PC (" <> show n <> ")"
+  shorthand (PC n) = "PC " <> show n
 
 instance HasClassLevel PC where
   classLevel = getPC
@@ -57,7 +57,7 @@ newtype PG = PG
 makeClassy ''PG
 
 instance Shorthand PG where
-  shorthand (PG n) = "PG (" <> show n <> ")"
+  shorthand (PG n) = "PG " <> show n
 
 instance HasClassLevel PG where
   classLevel = getPG
@@ -69,7 +69,7 @@ newtype PGP = PGP
 makeClassy ''PGP
 
 instance Shorthand PGP where
-  shorthand (PGP n) = "PGP (" <> show n <> ")"
+  shorthand (PGP n) = "PGP " <> show n
 
 instance HasClassLevel PGP where
   classLevel = getPGP
@@ -81,7 +81,7 @@ newtype PI = PI
 makeClassy ''PI
 
 instance Shorthand PI where
-  shorthand (PI n) = "PI (" <> show n <> ")"
+  shorthand (PI n) = "PI " <> show n
 
 instance HasClassLevel PI where
   classLevel = getPI
@@ -93,7 +93,7 @@ newtype PIP3 = PIP3
 makeClassy ''PIP3
 
 instance Shorthand PIP3 where
-  shorthand (PIP3 n) = "PIP3 (" <> show n <> ")"
+  shorthand (PIP3 n) = "PIP3 " <> show n
 
 instance HasClassLevel PIP3 where
   classLevel = getPIP3
@@ -105,7 +105,7 @@ newtype PS = PS
 makeClassy ''PS
 
 instance Shorthand PS where
-  shorthand (PS n) = "PS (" <> show n <> ")"
+  shorthand (PS n) = "PS " <> show n
 
 instance HasClassLevel PS where
   classLevel = getPS
@@ -118,7 +118,7 @@ data PIP = PIP
 makeClassy ''PIP
 
 instance Shorthand PIP where
-  shorthand (PIP h n) = shorthand h <> " (" <> show n <> ")"
+  shorthand (PIP h n) = shorthand h <> " " <> show n
 
 instance HasClassLevel PIP where
   classLevel = getPIP
@@ -131,7 +131,7 @@ data PIP2 = PIP2
 makeClassy ''PIP2
 
 instance Shorthand PIP2 where
-  shorthand (PIP2 h n) = shorthand h <> " (" <> show n <> ")"
+  shorthand (PIP2 h n) = shorthand h <> " " <> show n
 
 instance HasClassLevel PIP2 where
   classLevel = getPIP2
@@ -143,7 +143,7 @@ newtype CL = CL
 makeClassy ''CL
 
 instance Shorthand CL where
-  shorthand (CL n) = "CL (" <> show n <> ")"
+  shorthand (CL n) = "CL " <> show n
 
 instance HasClassLevel CL where
   classLevel = getCL

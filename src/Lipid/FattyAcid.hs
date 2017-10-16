@@ -18,23 +18,22 @@ module Lipid.FattyAcid
     ) where
 
 import Lipid.Blocks
-import Lipid.Format
 import Data.Monoid ((<>))
 import Control.Lens
 
 data FA a
-  = ClassLevelFA Integer
+  = ClassLevelFA ClassLevel
   | FA           (CarbonChain a)
   deriving (Show, Eq, Ord, Functor, Foldable, Traversable)
 
 makePrisms ''FA
 
 instance Shorthand (CarbonChain a) => Shorthand (FA a) where
-    shorthand (ClassLevelFA x) = "FA " <> wrapParen (show x)
+    shorthand (ClassLevelFA x) = "FA " <> show x
     shorthand (FA x)           = "FA " <> shorthand x
 
 instance NNomenclature (CarbonChain a) => NNomenclature (FA a) where
-    nNomenclature (ClassLevelFA x) = "FA " <> wrapParen (show x)
+    nNomenclature (ClassLevelFA x) = "FA " <> show x
     nNomenclature (FA x)           = "FA " <> nNomenclature x
 
 instance IsSaturated (FA a) where
@@ -42,13 +41,13 @@ instance IsSaturated (FA a) where
   isSaturated (FA cc) = isSaturated cc
 
 instance IsMonounsaturated (FA a) where
-  isMonounsaturated (ClassLevelFA cc) = Nothing
+  isMonounsaturated (ClassLevelFA _) = Nothing
   isMonounsaturated (FA cc) = isMonounsaturated cc
 
 instance IsPolyunsaturated (FA a) where
-  isPolyunsaturated (ClassLevelFA cc) = Nothing
+  isPolyunsaturated (ClassLevelFA _) = Nothing
   isPolyunsaturated (FA cc) = isPolyunsaturated cc
 
 instance Position a => IsBisAllylic (FA a) where
-  isBisAllylic (ClassLevelFA cc) = Nothing
+  isBisAllylic (ClassLevelFA _) = Nothing
   isBisAllylic (FA cc) = isBisAllylic cc

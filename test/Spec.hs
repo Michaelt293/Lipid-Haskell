@@ -5,6 +5,7 @@ import Test.Hspec
 import Lipid.BlocksSpec
 import Lipid.FattyAcidSpec
 import Lipid.GlycerolipidSpec
+import Lipid.Parsers.FattyAcidSpec
 import Lipid.Parsers.ClassLevel.GlycerolipidSpec
 import Lipid.Parsers.ClassLevel.GlycerophospholipidSpec
 import Lipid.Parsers.CombinedRadyl.GlycerolipidSpec
@@ -36,3 +37,5 @@ main = hspec $ do
     Lipid.Parsers.UnknownSn.GlycerolipidSpec.spec
   describe "UnknownSn level Glycerophospholipid QuasiQuoter"
     Lipid.Parsers.UnknownSn.GlycerophospholipidSpec.spec
+  describe "FattyAcid QuasiQuoter"
+    Lipid.Parsers.FattyAcidSpec.spec
